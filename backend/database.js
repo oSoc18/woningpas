@@ -35,7 +35,8 @@ app.post('/upload', function(req, res){
         }
     });
     req.on('end', function () {
-        fs.writeFile( __dirname + "/logo/" + "logo.svg", body, 'utf8', function (err) {
+        result=JSON.parse(body)
+        fs.writeFile( __dirname + "/logo/" + result.name+"."+result.extension, result.data, 'utf8', function (err) {
         });
     });
 })

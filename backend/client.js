@@ -22,11 +22,18 @@ http.request(options, function(res) {
         console.log('BODY: ' + chunk);
     });
 }).end();*/
-sendFile = function(path){
-  return fs.readFileSync( __dirname + "/" + path, 'utf8')
+sendFile = function(name, extension){
+    data=fs.readFileSync( __dirname + "/" + name+"."+extension, 'utf8')
+    jsonToSend = {
+        name: name,
+        extension: extension,
+        data: data
+    }
+    return JSON.stringify(jsonToSend)
 }
 
 var postReq = http.request(optionPost, function(res){
 })
-postReq.write(sendFile("logo.svg"))
+postReq.write(sendFile("logo", "svg"))
+console.log("success")
 postReq.end()
