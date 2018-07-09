@@ -1,6 +1,7 @@
 var express = require('express');
 var app = express();
 var fs = require("fs");
+var qs = require('querystring');
 
 app.get('/listHouses', function (req, res) {
     fs.readFile( __dirname + "/" + "houses.json", 'utf8', function (err, data) {
@@ -14,7 +15,28 @@ app.get('/isCorrectPassword', function(req, res){
     password = req.query.password
     fs.readFile( __dirname + "/" + "houses.json", 'utf8', function (err, data) {
         file = JSON.parse(data)
-        res.end(String(file[name].password === password))
+        if(file[name].password === password){
+            res.status(200)
+        }
+        else{
+            res.status(203)
+        }
+    });
+})
+
+app.post('/upload', function(req, res){
+    var body = '';
+    req.on('data', function (data) {
+        body += data;
+        // 1e6 === 1 * Math.pow(10, 6) === 1 * 1000000 ~~~ 1MB
+        if (body.length > 1e6) { 
+            // FLOOD ATTACK OR FAULTY CLIENT, NUKE REQUEST
+            req.connection.destroy();
+        }
+    });
+    req.on('end', function () {
+        fs.writeFile( __dirname + "/logo/" + "logo.svg", body, 'utf8', function (err) {
+        });
     });
 })
 
