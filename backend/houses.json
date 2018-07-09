@@ -1,0 +1,12 @@
+{
+    "house1":{
+        "name" : "south house",
+        "password" : "test",
+        "score":"500"
+    },
+    "house2":{
+        "name" : "north house",
+        "password" : "random",
+        "score":"400"
+    }
+}
