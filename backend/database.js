@@ -4,6 +4,12 @@ var fs = require("fs");
 var qs = require('querystring');
 var uuid = require("uuid/v4")
 
+var connected={
+    inspector:[],
+    owner:[],
+    admin:[]
+}
+
 app.get('/listFiles', function (req, res) {
     fs.readFile( __dirname + "/" + "houses.json", 'utf8', function (err, data) {
         console.log( data );
@@ -17,7 +23,10 @@ app.get('/login', function(req, res){
     type = req.query.type
     if(type==="inspector" || type ==="admin" || type==="owner"){
         res.status=200
-        res.write(uuid())
+        key = uuid()
+        connected[type].push(key)
+        console.log(connected)
+        res.write(key)
     }
     else{
         res.status=403

@@ -1,24 +1,6 @@
 {
-    "house1":{
-        "adress" :"10 square",
-        "file":{
-            "file1":{
-                "file":"/logo/logo.svg",
-                "form":{
-                    "score":"333"
-                }
-            }
-        }
-    },
-    "house2":{
-        "adress" :"12 square",
-        "file":{
-            "file1":{
-                "file":"/logo/logo.svg",
-                "form":{
-                    "score":"333"
-                }
-            }
-        }
+    "file1":{
+        "uri":"pdf-sample.pdf",
+        "inspected":"false"
     }
 }
