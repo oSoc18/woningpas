@@ -1,12 +1,24 @@
 {
     "house1":{
-        "name" : "south house",
-        "password" : "test",
-        "score":"500"
+        "adress" :"10 square",
+        "file":{
+            "file1":{
+                "file":"/logo/logo.svg",
+                "form":{
+                    "score":"333"
+                }
+            }
+        }
     },
     "house2":{
-        "name" : "north house",
-        "password" : "random",
-        "score":"400"
+        "adress" :"12 square",
+        "file":{
+            "file1":{
+                "file":"/logo/logo.svg",
+                "form":{
+                    "score":"333"
+                }
+            }
+        }
     }
 }

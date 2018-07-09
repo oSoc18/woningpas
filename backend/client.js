@@ -1,9 +1,10 @@
 var http = require("http")
 var fs = require("fs")
+var key="";
 var options = {
     host: "localhost",
     port: 8080,
-    path: '/isCorrectPassword?name=house1&password=test1',
+    path: '/login?type=inspector',
     method: 'GET'
 };
 
@@ -13,27 +14,38 @@ var optionPost = {
     path: '/upload',
     method: 'POST'
 }
-/*
+
 http.request(options, function(res) {
-    console.log('STATUS: ' + res.statusCode);
-    console.log('HEADERS: ' + JSON.stringify(res.headers));
     res.setEncoding('utf8');
+    sumChunk=""
     res.on('data', function (chunk) {
-        console.log('BODY: ' + chunk);
+        if (res.statusCode=200){
+            sumChunk+=chunk
+        }
     });
-}).end();*/
-sendFile = function(name, extension){
-    data=fs.readFileSync( __dirname + "/" + name+"."+extension, 'utf8')
+    res.on("end", function(){
+        key=sumChunk
+        console.log(key)
+    })
+}).end();
+/*
+sendFile = function(name, house){
+    data=fs.readFileSync( __dirname + "/" + name, 'base64')
     jsonToSend = {
+        house:house,
         name: name,
-        extension: extension,
-        data: data
+        data: data,
+        form:{
+            score:333
+        }
     }
     return JSON.stringify(jsonToSend)
 }
 
 var postReq = http.request(optionPost, function(res){
+    if(res.statusCode===403){
+        console.log("403 error")
+    }
 })
-postReq.write(sendFile("logo", "svg"))
-console.log("success")
-postReq.end()
+postReq.write(sendFile("mini-memoire.pdf", "house1"))
+postReq.end()*/

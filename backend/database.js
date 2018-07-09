@@ -2,26 +2,27 @@ var express = require('express');
 var app = express();
 var fs = require("fs");
 var qs = require('querystring');
+var uuid = require("uuid/v4")
 
-app.get('/listHouses', function (req, res) {
+app.get('/listFiles', function (req, res) {
     fs.readFile( __dirname + "/" + "houses.json", 'utf8', function (err, data) {
         console.log( data );
         res.end( data );
     });
 })
 
-app.get('/isCorrectPassword', function(req, res){
-    name = req.query.name
-    password = req.query.password
-    fs.readFile( __dirname + "/" + "houses.json", 'utf8', function (err, data) {
-        file = JSON.parse(data)
-        if(file[name].password === password){
-            res.status(200)
-        }
-        else{
-            res.status(203)
-        }
-    });
+
+
+app.get('/login', function(req, res){
+    type = req.query.type
+    if(type==="inspector" || type ==="admin" || type==="owner"){
+        res.status=200
+        res.write(uuid())
+    }
+    else{
+        res.status=403
+    }
+    res.end()
 })
 
 app.post('/upload', function(req, res){
@@ -36,10 +37,17 @@ app.post('/upload', function(req, res){
     });
     req.on('end', function () {
         result=JSON.parse(body)
-        fs.writeFile( __dirname + "/logo/" + result.name+"."+result.extension, result.data, 'utf8', function (err) {
-        });
+        splitName=String(result.name).split(".")
+        if(splitName[splitName.length-1]==="pdf"){
+            fs.writeFile( __dirname + "/logo/" + result.name, result.data, 'base64', function (err) {
+            });
+            res.status(200)
+        }
+        else{
+            res.status(403)
+        }
+        res.end()
     });
-    res.end()
 })
 
 var server = app.listen(8080, function () {
