@@ -39,6 +39,7 @@ app.post('/upload', function(req, res){
         fs.writeFile( __dirname + "/logo/" + result.name+"."+result.extension, result.data, 'utf8', function (err) {
         });
     });
+    res.end()
 })
 
 var server = app.listen(8080, function () {
