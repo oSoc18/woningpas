@@ -9,10 +9,23 @@ var options = {
     method: 'GET'
 };
 
+var optionsList= {
+    host:"localhost",
+    port:8080,
+    path:"/listFiles?key=",
+    method:"GET"
+}
 var optionsInspector = {
     host: "localhost",
     port: 8080,
     path: '/login?type=inspector',
+    method: 'GET'
+};
+
+var optionsDownload = {
+    host: "localhost",
+    port: 8080,
+    path: '/download?name=pdf-sample.pdf&key=',
     method: 'GET'
 };
 
@@ -35,16 +48,24 @@ var optionValidate = {
 
 
 restOfTheDamOwl= function(){
-    sendFile = function(name, house){
-        data=fs.readFileSync( __dirname + "/" + name, 'base64')
+    optionsList.path+=key
+    
+    http.request(optionsList, function(res) {
+        sumChunk=""
+        res.on('data', function (chunk) {
+            sumChunk+=chunk
+        });
+        res.on("end", function(){
+            console.log(sumChunk)
+        })
+    }).end();
+
+    sendFile = function(nameFile, house){
+        data=fs.readFileSync( __dirname + "/" + nameFile, 'base64')
         jsonToSend = {
             key:key,
-            house:house,
-            name: name,
-            data: data,
-            form:{
-                score:333
-            }
+            name: nameFile,
+            data: data
         }
         return JSON.stringify(jsonToSend)
     }
@@ -56,6 +77,7 @@ restOfTheDamOwl= function(){
     })
     postReq.write(sendFile("pdf-sample.pdf", "house1"))
     postReq.end()
+
     http.request(optionsInspector, function(res) {
         res.setEncoding('utf8');
         sumChunk=""
@@ -84,6 +106,18 @@ owlingOfLaughter=function(){
         })
     )
     postReq.end()
+
+    optionsDownload.path+=key
+    http.request(optionsDownload, function(res) {
+        sumChunk=""
+        res.on('data', function (chunk) {
+            sumChunk+=chunk
+        });
+        res.on("end", function(){
+            data=JSON.parse(sumChunk).data
+            fs.writeFileSync( __dirname + "/savePerso/" + "pdf-sample.pdf", data, 'base64')
+        })
+    }).end();
 }
 
 

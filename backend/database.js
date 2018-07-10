@@ -11,30 +11,67 @@ var connected={
 }
 
 app.get('/listFiles', function (req, res) {
-    fs.readFile( __dirname + "/" + "houses.json", 'utf8', function (err, data) {
-        console.log( data );
-        res.end( data );
-    });
+    console.log("listing files")
+    data = fs.readFileSync( __dirname + "/" + "houses.json", 'utf8')
+    key=req.query.key
+    if(connected.inspector.includes(key) || connected.owner.includes(key) || connected.admin.includes(key)) {
+        res.status(200)
+        res.write(data);
+    }
+    else{
+        res.status(403)
+    }
+    res.end()
 })
 
 
 
 app.get('/login', function(req, res){
+    console.log("login")
     type = req.query.type
     if(type==="inspector" || type ==="admin" || type==="owner"){
-        res.status=200
+        res.status(200)
         key = uuid()
         connected[type].push(key)
-        console.log(connected)
         res.write(key)
     }
     else{
-        res.status=403
+        res.status(403)
+    }
+    res.end()
+})
+
+app.get('/download', function(req, res){
+    console.log("download")
+    var name = req.query.name
+    var key = req.query.key
+
+    sendFile = function(name){
+        data=fs.readFileSync( __dirname + "/" + name, 'base64')
+        jsonToSend = {
+            key:key,
+            name: name,
+            data: data,
+        }
+        return JSON.stringify(jsonToSend)
+    }
+    var file = fs.readFileSync( __dirname + "/" + "houses.json", 'utf8')
+    var certificate = JSON.parse(file)
+    if( (connected.inspector.includes(key) || connected.owner.includes(key) || connected.admin.includes(key)) &&
+    certificate.hasOwnProperty(name)){
+        res.status(200)
+        res.write(sendFile(name, "base64"))
+        res.end()
+    }
+    else{
+        console.log("error")
+        res.status(403)
     }
     res.end()
 })
 
 app.post('/validate', function(req, res){
+    console.log("validate")
     var body ="";
     req.on('data', function(data){
         body += data;
@@ -45,15 +82,12 @@ app.post('/validate', function(req, res){
         }
     });
     req.on('end', function () {
-        console.log("entered")
         result=JSON.parse(body)
         splitName=String(result.name).split(".")
         if(splitName[splitName.length-1]==="pdf"){
-            console.log("entered")
             var file = fs.readFileSync( __dirname + "/" + "houses.json", 'utf8')
             var certificate = JSON.parse(file)
-            if (certificate[String(result.name)] && connected.inspector.includes(String(result.key))){
-                console.log("entered")
+            if (certificate.hasOwnProperty(String(result.name)) && connected.inspector.includes(String(result.key))){
                 certificate[String(result.name)].inspected = true
                 StringifiedCertificate=JSON.stringify(certificate)
                 fs.writeFileSync( __dirname + "/" + "houses.json", StringifiedCertificate, 'utf8')
@@ -70,6 +104,7 @@ app.post('/validate', function(req, res){
 })
 
 app.post('/upload', function(req, res){
+    console.log("upload")
     var body = '';
     req.on('data', function(data){
         body += data;
@@ -83,8 +118,7 @@ app.post('/upload', function(req, res){
         result=JSON.parse(body)
         splitName=String(result.name).split(".")
         if(splitName[splitName.length-1]==="pdf" && connected.owner.includes(String(result.key))){
-            fs.writeFile( __dirname + "/logo/" + result.name, result.data, 'base64', function (err) {
-            });
+            fs.writeFileSync( __dirname +"/logo/"+ result.name, result.data, 'base64');
             var file = fs.readFileSync( __dirname + "/" + "houses.json", 'utf8')
             var certificate = JSON.parse(file)
             certificate[String(result.name)]={
