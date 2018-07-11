@@ -1,7 +1,10 @@
-#start flow
+# Install dependencies
 
-npm install express
+npm install
 
-npm install uuid
+# Run
 
 npm start
+
+# API
+API reference can be found here
