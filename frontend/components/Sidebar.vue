@@ -1,8 +1,8 @@
 <template>
   <div class="sidebar">
-    <img id="houseImage" />
-    <h2>{{ Address }}</h2>
-    <h3>{{ City }}</h3>
+    <img id="houseImage" src="@/assets/house.jpg">
+    <h3>Hogeweg 543</h3>
+    <h4><b>KORTRIJK</b></h4>
     <hr><br>
     <ul>
       <li>
@@ -50,3 +50,9 @@
     </ul>
   </div>
 </template>
+
+<script>
+export default {
+  name: 'SideBar'
+}
+</script>
