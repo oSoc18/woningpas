@@ -48,6 +48,12 @@ function success(response, data) {
  */
 var app = express();
 app.use(bodyParser.json());
+app.use((req, res, next) => {
+    res.append('Access-Control-Allow-Origin', ['*']);
+    res.append('Access-Control-Allow-Methods', 'GET,POST');
+    res.append('Access-Control-Allow-Headers', 'Content-Type');
+    next();
+});
 
 app.get('/login', function(req, res){
     console.log("login")
