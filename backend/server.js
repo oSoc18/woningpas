@@ -3,7 +3,8 @@ var app = express();
 var fs = require("fs");
 var qs = require('querystring');
 var uuid = require("uuid/v4")
-
+var statusSuccess=200
+var statusError=400
 var connected={
     inspector:[],
     owner:[],
@@ -15,11 +16,11 @@ app.get('/listFiles', function (req, res) {
     data = fs.readFileSync( __dirname + "/" + "houses.json", 'utf8')
     key=req.query.key
     if(connected.inspector.includes(key) || connected.owner.includes(key) || connected.admin.includes(key)) {
-        res.status(200)
+        res.status(statusSuccess)
         res.write(data);
     }
     else{
-        res.status(403)
+        res.status(statusError)
     }
     res.end()
 })
@@ -30,13 +31,13 @@ app.get('/login', function(req, res){
     console.log("login")
     type = req.query.type
     if(type==="inspector" || type ==="admin" || type==="owner"){
-        res.status(200)
+        res.status(statusSuccess)
         key = uuid()
         connected[type].push(key)
         res.write(key)
     }
     else{
-        res.status(403)
+        res.status(statusError)
     }
     res.end()
 })
@@ -59,13 +60,13 @@ app.get('/download', function(req, res){
     var certificate = JSON.parse(file)
     if( (connected.inspector.includes(key) || connected.owner.includes(key) || connected.admin.includes(key)) &&
     certificate.hasOwnProperty(name)){
-        res.status(200)
+        res.status(statusSuccess)
         res.write(sendFile(name, "base64"))
         res.end()
     }
     else{
         console.log("error")
-        res.status(403)
+        res.status(statusError)
     }
     res.end()
 })
@@ -91,13 +92,13 @@ app.post('/validate', function(req, res){
                 certificate[String(result.name)].inspected = true
                 StringifiedCertificate=JSON.stringify(certificate)
                 fs.writeFileSync( __dirname + "/" + "houses.json", StringifiedCertificate, 'utf8')
-                res.status(200)
+                res.status(statusSuccess)
             } else {
-                res.status(403)
+                res.status(statusError)
             }
         }
         else{
-            res.status(403)
+            res.status(statusError)
         }
         res.end()
     });
@@ -127,10 +128,10 @@ app.post('/upload', function(req, res){
             }
             StringifiedCertificate=JSON.stringify(certificate)
             fs.writeFileSync( __dirname + "/" + "houses.json", StringifiedCertificate, 'utf8')
-            res.status(200)
+            res.status(statusSuccess)
         }
         else{
-            res.status(403)
+            res.status(statusError)
         }
         res.end()
     });

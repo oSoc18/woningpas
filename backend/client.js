@@ -71,8 +71,8 @@ restOfTheDamOwl= function(){
     }
     
     var postReq = http.request(optionPost, function(res){
-        if(res.statusCode===403){
-            console.log("403 error")
+        if(res.statusCode!=200){
+            console.log("Error")
         }
     })
     postReq.write(sendFile("pdf-sample.pdf", "house1"))
@@ -96,8 +96,8 @@ restOfTheDamOwl= function(){
 
 owlingOfLaughter=function(){
     var postReq = http.request(optionValidate, function(res){
-        if(res.statusCode===403){
-            console.log("403 error")
+        if(res.statusCode!=200){
+            console.log("Error")
         }
     })
     postReq.write(JSON.stringify({
@@ -127,7 +127,7 @@ http.request(options, function(res) {
     res.setEncoding('utf8');
     sumChunk=""
     res.on('data', function (chunk) {
-        if (res.statusCode=200){
+        if (res.statusCode===200){
             sumChunk+=chunk
         }
     });
