@@ -11,9 +11,9 @@ var connected={
     admin:[]
 }
 
-errorFunction=function(){
+function errorFunction(res){
     res.write(JSON.stringify({success:false}))
-    errorFunction()
+    res.status(statusError)
 }
 
 app.get('/listFiles', function (req, res) {
@@ -26,7 +26,7 @@ app.get('/listFiles', function (req, res) {
         res.write(JSON.stringify({data:data}));
     }
     else{
-        errorFunction()
+        errorFunction(res)
     }
     res.end()
 })
@@ -43,7 +43,7 @@ app.get('/login', function(req, res){
         res.write(JSON.stringify({key:key}))
     }
     else{
-        errorFunction()
+        errorFunction(res)
     }
     res.end()
 })
@@ -71,7 +71,7 @@ app.get('/download', function(req, res){
         res.end()
     }
     else{
-        errorFunction()
+        errorFunction(res)
     }
     res.end()
 })
@@ -100,11 +100,11 @@ app.post('/validate', function(req, res){
                 res.status(statusSuccess)
                 res.write(JSON.stringify({success:true}))
             } else {
-                errorFunction()
+                errorFunction(res)
             }
         }
         else{
-            errorFunction()
+            errorFunction(res)
         }
         res.end()
     });
@@ -138,7 +138,7 @@ app.post('/upload', function(req, res){
             res.write(JSON.stringify({success:true}))
         }
         else{
-            errorFunction()
+            errorFunction(res)
         }
         res.end()
     });
