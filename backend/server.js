@@ -1,14 +1,33 @@
 var express = require('express');
-var app = express();
 var fs = require("fs");
 var qs = require('querystring');
-var uuid = require("uuid/v4")
-var statusSuccess=200
+var uuid = require("uuid/v4");
+var bodyParser = require('body-parser');
 
-var connected={
-    inspector:[],
-    owner:[],
-    admin:[]
+
+let authorized_types = {
+    "owner": true,
+    "inspector": true,
+    "admin": true
+}
+let MAX_FILE_SIZE = 1e6 // 1e6 === 1 * 1000000 ~~~ 1MB
+let UPLOAD_DIR = __dirname + "/uploads/"
+
+
+let keys = {}
+Object.keys(authorized_types).forEach(function(type) {
+    keys[type] = {}
+});
+console.log(keys);
+console.log("saving files in " + UPLOAD_DIR);
+
+function get_type(key) {
+    for(let type of Object.keys(keys)) {
+        if(keys[type][key]) {
+            return type;
+        }
+    }
+    return null;
 }
 
 function error(response, message){
@@ -16,31 +35,132 @@ function error(response, message){
     let data = {
         "message": message
     };
-    response.write(JSON.stringify(data));
-    response.end();
+    response.json(data);
 }
 
 function success(response, data) {
     response.status(200);
-    response.write(JSON.stringify(data));
-    response.end();
+    response.json(data);
 }
 
+/**
+ * Express routes
+ */
+var app = express();
+app.use(bodyParser.json());
+app.use((req, res, next) => {
+    res.append('Access-Control-Allow-Origin', ['*']);
+    res.append('Access-Control-Allow-Methods', 'GET,POST');
+    res.append('Access-Control-Allow-Headers', 'Content-Type');
+    next();
+});
 
 app.get('/login', function(req, res){
     console.log("login")
-    type = req.query.type
-    if(type==="inspector" || type ==="admin" || type==="owner"){
-        key = uuid()
-        connected[type].push(key)
-        success(res, {key:key});
+    let type = req.query.type
+    if(!type) {
+        return error(res, "type parameter is mandatory");
     }
-    else{
-        error(res, "Unknown type");
+    
+    if(!authorized_types.hasOwnProperty(type)){
+        return error(res, "Unknown type");
     }
+    
+    key = uuid()
+    keys[type][key] = true;
+    success(res, {"key": key});
+    console.log(keys);
 })
 
+function authorized_file(name) {
+    let i = name.lastIndexOf('.')
+    if(i === -1) {
+        // no extension
+        return false;
+    }
+    let ext = name.substr(i + 1)
+    return ext.toLocaleLowerCase() === 'pdf'
+}
 
+function save_file(name, content) {
+    // TODO check if file exists
+    fs.writeFileSync(UPLOAD_DIR + name, content, 'base64');
+    // TODO call blockchain API to save file hash
+    console.log("file saved");
+    // TODO check error
+    return true;
+}
+
+function load_file(name) {
+    let content = fs.readFileSync(UPLOAD_DIR + name, 'base64');
+    // TODO check error
+    return content;
+}
+
+app.post('/upload', function(req, res){
+    console.log("upload")
+
+    let data = req.body
+    if(!authorized_file(data["name"])) {
+        return error(res, "Unauthorized file type");
+    }
+    
+    if(get_type(data["key"]) !== "owner") {
+        return error(res, "Only owner can upload file");
+    }
+    
+    if(!save_file(data["name"], data["content"])) {
+        return error(res, "Error saving file");
+    }
+    
+    success(res, {"URL": data["name"]});
+})
+
+app.get('/download', function(req, res){
+    console.log("download")
+    var name = req.query.name
+    var key = req.query.key
+    
+    if(get_type(key) !== "inspector") {
+        return error(res, "Only inspector can download files");
+    }
+    
+    let content = load_file(name);
+    if(!content) {
+        return error(res, "No file with this name");
+    }
+    
+    let data = {
+        "name": name,
+        "content": content
+    }
+    success(res, data);
+})
+
+function validate(name) {
+    // TODO validate
+    return true;
+}
+
+app.post('/validate', function(req, res){
+    console.log("validate")
+
+    let data = req.body
+    let key = data["key"]
+    let name = data["name"]
+    
+    if(get_type(key) !== "inspector") {
+        return error(res, "Only inspector can validate files");
+    }
+    
+    if(!validate(name)) {
+        return error(res, "Error validating file");
+    }
+    
+    success(res, {});
+})
+
+/* TODO later
 app.get('/listFiles', function (req, res) {
     console.log("listing files")
     data = fs.readFileSync( __dirname + "/" + "houses.json", 'utf8')
@@ -52,101 +172,7 @@ app.get('/listFiles', function (req, res) {
         error(res, "Error listing files");
     }
 })
-
-
-app.get('/download', function(req, res){
-    console.log("download")
-    var name = req.query.name
-    var key = req.query.key
-
-    sendFile = function(name){
-        data=fs.readFileSync( __dirname + "/" + name, 'base64')
-        returnData = {
-            key:key,
-            name: name,
-            data: data,
-        }
-        return returnData
-    }
-    var file = fs.readFileSync( __dirname + "/" + "houses.json", 'utf8')
-    var certificate = JSON.parse(file)
-    if( (connected.inspector.includes(key) || connected.owner.includes(key) || connected.admin.includes(key)) &&
-    certificate.hasOwnProperty(name)){
-        success(res, sendFile(name, "base64"))
-    }
-    else{
-        error(res, "Error downloading file")
-    }
-})
-
-
-app.post('/validate', function(req, res){
-    console.log("validate")
-    var body ="";
-    req.on('data', function(data){
-        body += data;
-        // 1e6 === 1 * Math.pow(10, 6) === 1 * 1000000 ~~~ 1MB
-        if (body.length > 1e6) { 
-            // FLOOD ATTACK OR FAULTY CLIENT, NUKE REQUEST
-            req.connection.destroy();
-        }
-    });
-    req.on('end', function () {
-        result=JSON.parse(body)
-        splitName=String(result.name).split(".")
-        if(splitName[splitName.length-1]==="pdf"){
-            var file = fs.readFileSync( __dirname + "/" + "houses.json", 'utf8')
-            var certificate = JSON.parse(file)
-            if (certificate.hasOwnProperty(String(result.name)) && connected.inspector.includes(String(result.key))){
-                certificate[String(result.name)].inspected = true
-                StringifiedCertificate=JSON.stringify(certificate)
-                fs.writeFileSync( __dirname + "/" + "houses.json", StringifiedCertificate, 'utf8')
-                res.status(statusSuccess)
-                res.write(JSON.stringify({success:true}))
-                res.end()
-            } else {
-                error(res, "Error")
-            }
-        }
-        else{
-            error(res, "Error")
-        }
-    });
-})
-
-app.post('/upload', function(req, res){
-    console.log("upload")
-    var body = '';
-    req.on('data', function(data){
-        body += data;
-        // 1e6 === 1 * Math.pow(10, 6) === 1 * 1000000 ~~~ 1MB
-        if (body.length > 1e6) { 
-            // FLOOD ATTACK OR FAULTY CLIENT, NUKE REQUEST
-            req.connection.destroy();
-        }
-    });
-    req.on('end', function () {
-        result=JSON.parse(body)
-        splitName=String(result.name).split(".")
-        if(splitName[splitName.length-1]==="pdf" && connected.owner.includes(String(result.key))){
-            fs.writeFileSync( __dirname +"/logo/"+ result.name, result.data, 'base64');
-            var file = fs.readFileSync( __dirname + "/" + "houses.json", 'utf8')
-            var certificate = JSON.parse(file)
-            certificate[String(result.name)]={
-                uri: String(result.name),
-                inspected: false
-            }
-            StringifiedCertificate=JSON.stringify(certificate)
-            fs.writeFileSync( __dirname + "/" + "houses.json", StringifiedCertificate, 'utf8')
-            res.status(statusSuccess)
-            res.write(JSON.stringify({success:true}))
-            res.end()
-        }
-        else{
-            error(res, "Error")
-        }
-    });
-})
+//*/
 
 var server = app.listen(8080, function () {
     var host = server.address().address
