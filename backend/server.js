@@ -35,8 +35,7 @@ function error(response, message){
     let data = {
         "message": message
     };
-    response.write(JSON.stringify(data));
-    response.end();
+    response.json(data);
 }
 
 function success(response, data) {
@@ -94,30 +93,21 @@ function load_file(name) {
 
 app.post('/upload', function(req, res){
     console.log("upload")
-    let body = '';
-    req.on('data', function(data){
-        body += data;
-        if (body.length > MAX_FILE_SIZE) {
-            error(res, "File too big");
-            //req.connection.destroy();
-        }
-    });
-    req.on('end', function () {
-        let data = JSON.parse(body)
-        if(!authorized_file(data["name"])) {
-            return error(res, "Unauthorized file type");
-        }
-        
-        if(get_type(data["key"]) !== "owner") {
-            return error(res, "Only owner can upload file");
-        }
-        
-        if(!save_file(data["name"], data["content"])) {
-            return error(res, "Error saving file");
-        }
-        
-        success(res, {"URL": data["name"]});
-    });
+
+    let data = req.body
+    if(!authorized_file(data["name"])) {
+        return error(res, "Unauthorized file type");
+    }
+    
+    if(get_type(data["key"]) !== "owner") {
+        return error(res, "Only owner can upload file");
+    }
+    
+    if(!save_file(data["name"], data["content"])) {
+        return error(res, "Error saving file");
+    }
+    
+    success(res, {"URL": data["name"]});
 })
 
 app.get('/download', function(req, res){
@@ -126,7 +116,6 @@ app.get('/download', function(req, res){
     var key = req.query.key
     
     if(get_type(key) !== "inspector") {
-        console.log(get_type(key));
         return error(res, "Only inspector can download files");
     }
     
@@ -143,32 +132,26 @@ app.get('/download', function(req, res){
 })
 
 function validate(name) {
-    
+    // TODO validate
+    return true;
 }
 
 app.post('/validate', function(req, res){
     console.log("validate")
+
+    let data = req.body
+    let key = data["key"]
+    let name = data["name"]
     
-    var body ="";
-    req.on('data', function(data){
-        body += data;
-        if (body.length > MAX_FILE_SIZE) {
-            error(res, "File too big");
-            //req.connection.destroy();
-        }
-    });
-    req.on('end', function () {
-        let data = JSON.parse(body)
-        let key = data["key"]
-        let name = data["name"]
-        
-        if(get_type(key) !== "inspector") {
-            console.log(get_type(key));
-            return error(res, "Only inspector can download files");
-        }
-        
-        validate(name);
-    });
+    if(get_type(key) !== "inspector") {
+        return error(res, "Only inspector can validate files");
+    }
+    
+    if(!validate(name)) {
+        return error(res, "Error validating file");
+    }
+    
+    success(res, {});
 })
 
 /* TODO later
