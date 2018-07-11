@@ -11,6 +11,11 @@ var connected={
     admin:[]
 }
 
+errorFunction=function(){
+    res.write(JSON.stringify({success:false}))
+    errorFunction()
+}
+
 app.get('/listFiles', function (req, res) {
     console.log("listing files")
     data = fs.readFileSync( __dirname + "/" + "houses.json", 'utf8')
@@ -21,7 +26,7 @@ app.get('/listFiles', function (req, res) {
         res.write(JSON.stringify({data:data}));
     }
     else{
-        res.status(statusError)
+        errorFunction()
     }
     res.end()
 })
@@ -38,7 +43,7 @@ app.get('/login', function(req, res){
         res.write(JSON.stringify({key:key}))
     }
     else{
-        res.status(statusError)
+        errorFunction()
     }
     res.end()
 })
@@ -61,13 +66,12 @@ app.get('/download', function(req, res){
     var certificate = JSON.parse(file)
     if( (connected.inspector.includes(key) || connected.owner.includes(key) || connected.admin.includes(key)) &&
     certificate.hasOwnProperty(name)){
-         res.status(statusSuccess)
+        res.status(statusSuccess)
         res.write(sendFile(name, "base64"))
         res.end()
     }
     else{
-        console.log("error")
-        res.status(statusError)
+        errorFunction()
     }
     res.end()
 })
@@ -94,12 +98,13 @@ app.post('/validate', function(req, res){
                 StringifiedCertificate=JSON.stringify(certificate)
                 fs.writeFileSync( __dirname + "/" + "houses.json", StringifiedCertificate, 'utf8')
                 res.status(statusSuccess)
+                res.write(JSON.stringify({success:true}))
             } else {
-                res.status(statusError)
+                errorFunction()
             }
         }
         else{
-            res.status(statusError)
+            errorFunction()
         }
         res.end()
     });
@@ -130,9 +135,10 @@ app.post('/upload', function(req, res){
             StringifiedCertificate=JSON.stringify(certificate)
             fs.writeFileSync( __dirname + "/" + "houses.json", StringifiedCertificate, 'utf8')
             res.status(statusSuccess)
+            res.write(JSON.stringify({success:true}))
         }
         else{
-            res.status(statusError)
+            errorFunction()
         }
         res.end()
     });
