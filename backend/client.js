@@ -56,7 +56,7 @@ restOfTheDamOwl= function(){
             sumChunk+=chunk
         });
         res.on("end", function(){
-            console.log(sumChunk)
+            console.log(JSON.parse(sumChunk).data)
         })
     }).end();
 
@@ -87,7 +87,7 @@ restOfTheDamOwl= function(){
             }
         });
         res.on("end", function(){
-            key=sumChunk
+            key=JSON.parse(sumChunk).key
             owlingOfLaughter()
         })
     }).end();
@@ -132,7 +132,7 @@ http.request(options, function(res) {
         }
     });
     res.on("end", function(){
-        key=sumChunk
+        key=JSON.parse(sumChunk).key
         restOfTheDamOwl()
     })
 }).end();

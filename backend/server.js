@@ -17,7 +17,8 @@ app.get('/listFiles', function (req, res) {
     key=req.query.key
     if(connected.inspector.includes(key) || connected.owner.includes(key) || connected.admin.includes(key)) {
         res.status(statusSuccess)
-        res.write(data);
+
+        res.write(JSON.stringify({data:data}));
     }
     else{
         res.status(statusError)
@@ -34,7 +35,7 @@ app.get('/login', function(req, res){
         res.status(statusSuccess)
         key = uuid()
         connected[type].push(key)
-        res.write(key)
+        res.write(JSON.stringify({key:key}))
     }
     else{
         res.status(statusError)
@@ -60,7 +61,7 @@ app.get('/download', function(req, res){
     var certificate = JSON.parse(file)
     if( (connected.inspector.includes(key) || connected.owner.includes(key) || connected.admin.includes(key)) &&
     certificate.hasOwnProperty(name)){
-        res.status(statusSuccess)
+         res.status(statusSuccess)
         res.write(sendFile(name, "base64"))
         res.end()
     }
