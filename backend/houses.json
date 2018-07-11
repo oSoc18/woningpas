@@ -1,6 +1,1 @@
-{
-    "file1":{
-        "uri":"pdf-sample.pdf",
-        "inspected":"false"
-    }
-}
+{"pdf-sample.pdf":{"uri":"pdf-sample.pdf","inspected":true}}
