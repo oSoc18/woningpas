@@ -3,7 +3,14 @@ var fs = require("fs");
 var qs = require('querystring');
 var uuid = require("uuid/v4");
 var bodyParser = require('body-parser');
+var crypto = require('crypto');
 
+function hash(base64content){
+    const hash = crypto.createHash('sha256');
+    var content = Buffer.from(base64content, 'base64');
+    hash.update(content);
+    return hash.digest('hex');
+}
 
 let authorized_types = {
     "owner": true,
@@ -86,6 +93,7 @@ function save_file(name, content) {
     // TODO check if file exists
     fs.writeFileSync(UPLOAD_DIR + name, content, 'base64');
     // TODO call blockchain API to save file hash
+    // save_hash(name, hash(content))
     console.log("file saved");
     // TODO check error
     return true;
@@ -173,6 +181,7 @@ app.get('/listFiles', function (req, res) {
     }
 })
 //*/
+
 
 var server = app.listen(8080, function () {
     var host = server.address().address
