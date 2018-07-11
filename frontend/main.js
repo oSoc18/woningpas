@@ -6,20 +6,13 @@ import router from './router'
 import header from '@/components/header'
 import sideBar from '@/components/sideBar'
 import footer from '@/components/footer'
-import axios from 'axios'
-import VueAxios from 'vue-axios'
- 
-Vue.use(VueAxios, axios)
+import upload from '@/components/upload'
 
 Vue.component('app-header', header)
 Vue.component('app-sideBar', sideBar)
 Vue.component('app-footer', footer)
+Vue.component('app-upload', upload)
 Vue.config.productionTip = false
-
-const token = localStorage.getItem('user-token')
-if (token) {
-  axios.defaults.headers.common['Authorization'] = token
-}
 
 /* eslint-disable no-new */
 new Vue({

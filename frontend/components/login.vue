@@ -12,11 +12,11 @@
                 <table>
                     <tr>
                         <td>
-                            <input type="radio" id="owner" value="Owner" v-model="role">
+                            <input type="radio" id="owner" value="owner" v-model="type">
                             <label for="owner">I am an owner</label>
                         </td>
                         <td>
-                            <input type="radio" id="inspector" value="Inspector" v-model="role">
+                            <input type="radio" id="inspector" value="inspector" v-model="type">
                             <label for="inspector">I am an inspector</label>
                         </td>
                     </tr>
@@ -30,26 +30,19 @@
 </template>
 
 <script>
-import {loginRoutine} from './loginRoutine.js'
+var loginRoutine = require('./apiCalls.js')
 export default {
     name: 'Login',
     data() {
         return {
-            role: ""
+            type: ""
         }
     },
     methods: {
         login() {
-            console.log(this.role)
-            const { role } = this
-            loginRoutine({ role }).then(() => {
-                this.$router.push('/')
-            })
-            /*
-                Authentification part is missing here
-            */
-            //this.$emit("authenticated", true);
-            //this.$router.replace({ name: "home" });
+            var loginRoutine = require('./apiCalls.js')
+            loginRoutine(this.type)
+            this.$router.push('Home')
         }
     }
 }

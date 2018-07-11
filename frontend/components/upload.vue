@@ -15,23 +15,28 @@
 export default {
     name: 'Upload',
     methods: {
-      submitFile(){
-        let formData = new FormData();
-        formData.append('file', this.file);
-        axios.post( '/single-file',
-            formData,
-            {
-                headers: { 'Content-Type': 'multipart/form-data'}
+         submitFile(name, file, key){
+            sendFile = function(nameFile, file, key){
+                jsonToSend = {
+                    key:key,
+                    name: nameFile,
+                    content: file
+                }
+                return JSON.stringify(jsonToSend)
             }
-        ).then(function(){
-          console.log('SUCCESS!!');
-        })
-        .catch(function(){
-          console.log('FAILURE!!');
-        });
-        },
-        handleFileUpload(){
-            this.file = this.$refs.file.files[0];
+            var option = {
+                host: "localhost",
+                port: 8080,
+                path: '/upload',
+                method: 'POST'
+            }
+            var postReq = http.request(option, function(res){
+                if(res.statusCode!=200){
+                    console.log("Error with upload")
+                }
+            })
+            postReq.write(sendFile(name, file, key))
+            postReq.end()
         }
     }
 }
