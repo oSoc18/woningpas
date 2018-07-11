@@ -12,8 +12,8 @@ var connected={
 }
 
 function errorFunction(res){
-    res.write(JSON.stringify({success:false}))
     res.status(statusError)
+    res.write(JSON.stringify({success:false}))
 }
 
 app.get('/listFiles', function (req, res) {
@@ -22,7 +22,6 @@ app.get('/listFiles', function (req, res) {
     key=req.query.key
     if(connected.inspector.includes(key) || connected.owner.includes(key) || connected.admin.includes(key)) {
         res.status(statusSuccess)
-
         res.write(JSON.stringify({data:data}));
     }
     else{
