@@ -4,48 +4,55 @@ var fs = require("fs");
 var qs = require('querystring');
 var uuid = require("uuid/v4")
 var statusSuccess=200
-var statusError=400
+
 var connected={
     inspector:[],
     owner:[],
     admin:[]
 }
 
-function errorFunction(res){
-    res.status(statusError)
-    res.write(JSON.stringify({success:false}))
+function error(response, message){
+    response.status(400);
+    let data = {
+        "message": message
+    };
+    response.write(JSON.stringify(data));
+    response.end();
 }
 
-app.get('/listFiles', function (req, res) {
-    console.log("listing files")
-    data = fs.readFileSync( __dirname + "/" + "houses.json", 'utf8')
-    key=req.query.key
-    if(connected.inspector.includes(key) || connected.owner.includes(key) || connected.admin.includes(key)) {
-        res.status(statusSuccess)
-        res.write(JSON.stringify({data:data}));
-    }
-    else{
-        errorFunction(res)
-    }
-    res.end()
-})
-
+function success(response, data) {
+    response.status(200);
+    response.write(JSON.stringify(data));
+    response.end();
+}
 
 
 app.get('/login', function(req, res){
     console.log("login")
     type = req.query.type
     if(type==="inspector" || type ==="admin" || type==="owner"){
-        res.status(statusSuccess)
         key = uuid()
         connected[type].push(key)
-        res.write(JSON.stringify({key:key}))
+        success(res, {key:key});
     }
     else{
-        errorFunction(res)
+        error(res, "Unknown type");
     }
-    res.end()
 })
+
+
+app.get('/listFiles', function (req, res) {
+    console.log("listing files")
+    data = fs.readFileSync( __dirname + "/" + "houses.json", 'utf8')
+    key=req.query.key
+    if(connected.inspector.includes(key) || connected.owner.includes(key) || connected.admin.includes(key)) {
+        success(res, data);
+    }
+    else{
+        error(res, "Error listing files");
+    }
+})
+
 
 app.get('/download', function(req, res){
     console.log("download")
@@ -54,26 +61,24 @@ app.get('/download', function(req, res){
 
     sendFile = function(name){
         data=fs.readFileSync( __dirname + "/" + name, 'base64')
-        jsonToSend = {
+        returnData = {
             key:key,
             name: name,
             data: data,
         }
-        return JSON.stringify(jsonToSend)
+        return returnData
     }
     var file = fs.readFileSync( __dirname + "/" + "houses.json", 'utf8')
     var certificate = JSON.parse(file)
     if( (connected.inspector.includes(key) || connected.owner.includes(key) || connected.admin.includes(key)) &&
     certificate.hasOwnProperty(name)){
-        res.status(statusSuccess)
-        res.write(sendFile(name, "base64"))
-        res.end()
+        success(res, sendFile(name, "base64"))
     }
     else{
-        errorFunction(res)
+        error(res, "Error downloading file")
     }
-    res.end()
 })
+
 
 app.post('/validate', function(req, res){
     console.log("validate")
@@ -98,14 +103,14 @@ app.post('/validate', function(req, res){
                 fs.writeFileSync( __dirname + "/" + "houses.json", StringifiedCertificate, 'utf8')
                 res.status(statusSuccess)
                 res.write(JSON.stringify({success:true}))
+                res.end()
             } else {
-                errorFunction(res)
+                error(res, "Error")
             }
         }
         else{
-            errorFunction(res)
+            error(res, "Error")
         }
-        res.end()
     });
 })
 
@@ -135,11 +140,11 @@ app.post('/upload', function(req, res){
             fs.writeFileSync( __dirname + "/" + "houses.json", StringifiedCertificate, 'utf8')
             res.status(statusSuccess)
             res.write(JSON.stringify({success:true}))
+            res.end()
         }
         else{
-            errorFunction(res)
+            error(res, "Error")
         }
-        res.end()
     });
 })
 
