@@ -15,12 +15,18 @@
         <!-- Right aligned nav items -->
         <b-navbar-nav class="ml-auto">
           <b-nav-item right>
-            <em class="name">{{ name }</em>
-            <img id="picture" src=""/>
-            <a href="#">CONTACTEER ONS</a>
+            <a href="#" disabled>over woningpas</a>
+            <a href="#" disabled>disclaimer</a>
+            <a href="#" disabled>toegankelijkheid</a>
           </b-nav-item>
         </b-navbar-nav>
       </b-collapse>
     </b-navbar>
   </div>
 </template>
+
+<script>
+export default {
+  name: 'Footer'
+}
+</script>

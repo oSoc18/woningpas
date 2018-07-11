@@ -1,9 +1,9 @@
 <template>
-  <div id="header">
+  <div>
     <b-navbar toggleable="md" type="dark" variant="info">
       <b-navbar-toggle target="nav_collapse"></b-navbar-toggle>
       <b-navbar-brand href="#">
-        <img id="logo" src=""/>
+        <!--<img id="logo" src=""/>-->
       </b-navbar-brand>
       <b-collapse is-nav id="nav_collapse">
         <b-navbar-nav>
@@ -13,7 +13,7 @@
         <!-- Right aligned nav items -->
         <b-navbar-nav class="ml-auto">
           <b-nav-item right>
-            <em class="name">{{ name }</em>
+            <span class="name">PIETER</span>
             <img id="picture" src=""/>
             <a href="#">CONTACTEER ONS</a>
           </b-nav-item>
@@ -22,3 +22,9 @@
     </b-navbar>
   </div>
 </template>
+
+<script>
+  export default {
+    name: 'Header'
+  }
+</script>
