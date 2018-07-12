@@ -7,10 +7,12 @@
       <!--<app-header></app-header>
       <app-sideBar></app-sideBar>
       <app-footer></app-footer>-->
-      <app-upload></app-upload>
+      <div v-if="auth.role == 'owner'">
+        <app-upload></app-upload>
+      </div>      
       <button v-on:click="logout">Log out</button>
       <div id="mainContent">
-        <h1>Welcome {{username}},</h1>
+        <h1>Welcome {{auth.role}},</h1>
         <!--<p>Your documents</p>-->      
         <table>
           <tr></tr>
@@ -26,22 +28,13 @@ export default {
   name: 'Home',
   data() {
     return {
-      username: '',
       auth: auth
-    }
-  },
-  computed: {
-    username: function () {
-      if (localStorage.getItem(role)) {
-        return "" + localStorage.getItem(role)
-      }
-      return ''
     }
   },
   methods: {
     logout(){
       auth.logout()
-       this.$forceUpdate()
+      this.$router.push({ name: "Home"})
     }
   }
 }
