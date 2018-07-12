@@ -6,6 +6,7 @@ const Tx = require('ethereumjs-tx');
 const solc = require('solc');
 const fs = require('fs');
 
+const dir = __dirname;
 const verbose = argv.verbose;
 const query = argv.query;
 const deploy = argv.deploy;
@@ -24,17 +25,12 @@ let web3 = new Web3(new Web3.providers.HttpProvider(url));
 
 let contractName = 'WoningPas';
 
-//isVerified("Michael");
-//addUpload("Michael","BBB");
-//getUpload("Huseyin");
-setVerification("Michael");
-
 function getContract() {
-  let tsSrc = fs.statSync(`./${contractName}.sol`);
+  let tsSrc = fs.statSync(`${dir}/${contractName}.sol`);
   let tsBin;
 
   try {
-    tsBin = fs.statSync(`./${contractName}.bin`);
+    tsBin = fs.statSync(`${dir}/${contractName}.bin`);
   } catch (err) {
     console.log("Compiled contract does not exist. Will be generated.");
   }
@@ -42,11 +38,11 @@ function getContract() {
   let compiled;
   if (!tsBin || tsSrc.mtimeMs > tsBin.mtimeMs) {
     // source file has been modified since the last compile
-    let data = fs.readFileSync(`./${contractName}.sol`);
+    let data = fs.readFileSync(`${dir}/${contractName}.sol`);
     compiled = solc.compile(data.toString(), 1);
-    fs.writeFileSync(`./${contractName}.bin`, JSON.stringify(compiled));
+    fs.writeFileSync(`${dir}/${contractName}.bin`, JSON.stringify(compiled));
   } else {
-    compiled = JSON.parse(fs.readFileSync(`./${contractName}.bin`).toString());
+    compiled = JSON.parse(fs.readFileSync(`${dir}/${contractName}.bin`).toString());
   }
 
   let contract = compiled.contracts[`:${contractName}`];
@@ -56,7 +52,6 @@ function getContract() {
 
   //adresse est optionnel dans Contract
   let ret = new web3.eth.Contract(abi, addressContract);
-  console.log(ret);
   return ret;
 }
 
@@ -139,7 +134,6 @@ async function getAccount() {
 
 
 module.exports.setVerification = setVerification;
-module.exports.addUpload = setVerification;
+module.exports.addUpload = addUpload;
 module.exports.getUpload = getUpload;
 module.exports.isVerified = isVerified;
-
