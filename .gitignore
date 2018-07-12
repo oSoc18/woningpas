@@ -12,4 +12,6 @@ yarn-error.log*
 *.ntvs*
 *.njsproj
 *.sln
+# comiled smart contracts
+*.bin
 .*
