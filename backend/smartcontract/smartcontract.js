@@ -104,8 +104,10 @@ function getUpload(id, callback) {
     from: addressContract
   }).then(function(result) {
       console.log(result);
-    callback(result);
-    });
+      if(callback) {
+        callback(result);
+      }
+  });
 }
 
 /*Pas complet*/
