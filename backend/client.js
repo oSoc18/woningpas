@@ -1,138 +1,82 @@
 var http = require("http")
-var fs = require("fs")
-var key="";
-var turn=true
-var options = {
-    host: "localhost",
-    port: 8080,
-    path: '/login?type=owner',
-    method: 'GET'
-};
 
-var optionsList= {
-    host:"localhost",
-    port:8080,
-    path:"/listFiles?key=",
-    method:"GET"
-}
-var optionsInspector = {
-    host: "localhost",
-    port: 8080,
-    path: '/login?type=inspector',
-    method: 'GET'
-};
-
-var optionsDownload = {
-    host: "localhost",
-    port: 8080,
-    path: '/download?name=pdf-sample.pdf&key=',
-    method: 'GET'
-};
-
-var optionPost = {
-    host: "localhost",
-    port: 8080,
-    path: '/upload',
-    method: 'POST'
+path = {
+  "login": ["type"],
+  "upload": ["key", "content"],
+  "download": ["key", "url"],
+  "validate": ["key", "url"],
+  "validated": ["key", "url"],
 }
 
-var optionValidate = {
-    host: "localhost",
-    port: 8080,
-    path: '/validate',
-    method: 'POST'
+function usage(command, error) {
+  if(error) {
+    console.log('ERROR: ' + error);
+  }
+
+  if(!command || !path.hasOwnProperty(command)) {
+    return console.log("Available commands:\n\t"+Object.keys(path));
+  }
+
+  return console.log("Required parameters:\n\t" + path[command]);
 }
 
+function command() {
+  let args = process.argv;
+  let len = args.length;
 
+  if(len < 3) {
+    return usage(null, "No command.");
+  }
 
+  let cmd = args[2];
+  if(!path.hasOwnProperty(cmd)) {
+    return usage(null, "Invalid command.");
+  }
 
+  let params = path[cmd];
+  if(len != params.length + 3) {
+    return usage(cmd, "Invalid number of parameters.");
+  }
 
-restOfTheDamOwl= function(){
-    optionsList.path+=key
-    
-    http.request(optionsList, function(res) {
-        sumChunk=""
-        res.on('data', function (chunk) {
-            sumChunk+=chunk
-        });
-        res.on("end", function(){
-            console.log(JSON.parse(sumChunk).data)
-        })
-    }).end();
+  let data = {};
+  for(let i = 0; i < params.length; i++) {
+    let name = params[i];
+    let value = args[i+3];
+    data[name] = value;
+  }
 
-    sendFile = function(nameFile, house){
-        data=fs.readFileSync( __dirname + "/" + nameFile, 'base64')
-        jsonToSend = {
-            key:key,
-            name: nameFile,
-            data: data
-        }
-        return JSON.stringify(jsonToSend)
+  request(cmd, JSON.stringify(data));
+}
+
+function request(cmd, data) {
+  let options = {
+    host: "localhost",
+    port: 8080,
+    path: '/' + cmd,
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
     }
-    
-    var postReq = http.request(optionPost, function(res){
-        if(res.statusCode!=200){
-            console.log("Error")
-        }
-    })
-    postReq.write(sendFile("pdf-sample.pdf", "house1"))
-    postReq.end()
+  }
 
-    http.request(optionsInspector, function(res) {
-        res.setEncoding('utf8');
-        sumChunk=""
-        res.on('data', function (chunk) {
-            if (res.statusCode=200){
-                sumChunk+=chunk
-            }
-        });
-        res.on("end", function(){
-            key=JSON.parse(sumChunk).key
-            owlingOfLaughter()
-        })
-    }).end();
+  console.log('');
+  console.log(options.method + ' ' + 'http://' + options.host + ':' + options.port + options.path);
+  console.log('--- REQ DATA ---');
+  console.log(data);
+
+  let req = http.request(options, function(response) {
+    let body = '';
+    response.on('data', function(data) {
+      body += data;
+    })
+    response.on('end', function() {
+      console.log('STATUS: ' + response.statusCode);
+      console.log('--- RES DATA ---');
+      console.log(body);
+    })
+  })
+  req.write(data);
+  req.end();
 }
 
-
-owlingOfLaughter=function(){
-    var postReq = http.request(optionValidate, function(res){
-        if(res.statusCode!=200){
-            console.log("Error")
-        }
-    })
-    postReq.write(JSON.stringify({
-        name:"pdf-sample.pdf",
-        key:key
-        })
-    )
-    postReq.end()
-
-    optionsDownload.path+=key
-    http.request(optionsDownload, function(res) {
-        sumChunk=""
-        res.on('data', function (chunk) {
-            sumChunk+=chunk
-        });
-        res.on("end", function(){
-            data=JSON.parse(sumChunk).data
-            fs.writeFileSync( __dirname + "/savePerso/" + "pdf-sample.pdf", data, 'base64')
-        })
-    }).end();
-}
-
-
-
-
-http.request(options, function(res) {
-    res.setEncoding('utf8');
-    sumChunk=""
-    res.on('data', function (chunk) {
-        if (res.statusCode===200){
-            sumChunk+=chunk
-        }
-    });
-    res.on("end", function(){
-        key=JSON.parse(sumChunk).key
-        restOfTheDamOwl()
-    })
-}).end();
+command();
