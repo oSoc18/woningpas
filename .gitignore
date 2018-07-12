@@ -14,4 +14,7 @@ yarn-error.log*
 *.sln
 # comiled smart contracts
 *.bin
+# uploads
+uploads/
+# hidden files
 .*
