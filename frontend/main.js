@@ -7,11 +7,13 @@ import header from '@/components/header'
 import sideBar from '@/components/sideBar'
 import footer from '@/components/footer'
 import upload from '@/components/upload'
+import login from '@/components/login'
 
 Vue.component('app-header', header)
 Vue.component('app-sideBar', sideBar)
 Vue.component('app-footer', footer)
 Vue.component('app-upload', upload)
+Vue.component('app-login', login)
 Vue.config.productionTip = false
 
 /* eslint-disable no-new */

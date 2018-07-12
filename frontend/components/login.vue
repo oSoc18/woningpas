@@ -1,22 +1,16 @@
 <template>
     <div id="login" class="login-wrapper border border-light">
         <form class="form-signin" @submit.prevent="login">
-            <!--<p v-if="errors.length">
-                <b>Please correct the following error(s):</b>
-                <ul>
-                    <li v-for="(error, index) in errors" :key="index"></li>
-                </ul>
-            </p>-->
             <h2 class="form-signin-heading">Please choose between the followings</h2>
             <p>
                 <table>
                     <tr>
                         <td>
-                            <input type="radio" id="owner" value="owner" v-model="type">
+                            <input type="radio" id="owner" value="owner" v-model="role">
                             <label for="owner">I am an owner</label>
                         </td>
                         <td>
-                            <input type="radio" id="inspector" value="inspector" v-model="type">
+                            <input type="radio" id="inspector" value="inspector" v-model="role">
                             <label for="inspector">I am an inspector</label>
                         </td>
                     </tr>
@@ -30,19 +24,27 @@
 </template>
 
 <script>
-var loginRoutine = require('./apiCalls.js')
+import axios from 'axios'
+import auth from './auth.js'
 export default {
     name: 'Login',
     data() {
         return {
-            type: ""
+            role: "",
+            auth: auth
         }
     },
     methods: {
         login() {
-            var loginRoutine = require('./apiCalls.js')
-            loginRoutine(this.type)
-            this.$router.push('Home')
+            axios.get('http://localhost:8080/login?type=' + this.role)
+             .then(res => {
+                var token = res.data.key
+                this.auth.login(this.role, token)
+                this.$parent.$forceUpdate()
+             })
+             .catch(error => {
+                console.log('error:', error)
+             })
         }
     }
 }
