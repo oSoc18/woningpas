@@ -15,7 +15,7 @@ const privateFor = argv.privateFor;
 const externallySign = argv.sign;
 var byteCodeContract;
 
-const addressContract = '0x20128b1e2970df825097786de02260b4e96becf2';
+const addressContract = '0x2765eabc3ca01361d38a53efabc38f9d100a4a01';
 
 //Address of the node
 var url = "https://e0vp6l0egw:lt32IHCYpL4rJuBlXHFD-oCTcxABbR96Bh0qaV2FLgE@e0qztrawvi-e0q2xif8zj-rpc.eu-central-1.kaleido.io";
