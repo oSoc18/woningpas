@@ -77,7 +77,7 @@ async function setVerification(id) {
   }).then(function(result) {
     console.log(result);
 
-    return isVerified(hash);
+    return isVerified(id);
   });
 
 }
@@ -88,7 +88,8 @@ async function addUpload(hash, file, id) {
   var ret = getContract();
   console.log("addUpload");
   ret.methods.addUpload(id,file, hash).send({
-    from: acc
+    from: acc,
+    gas: 5e6
   }).then(function(result) {
     console.log(result);
 
@@ -96,16 +97,15 @@ async function addUpload(hash, file, id) {
   });
 }
 
-function getUpload(id) {
+function getUpload(id, callback) {
   var ret = getContract();
   console.log("getUpload");
   ret.methods.getFileName(id).call({
     from: addressContract
   }).then(function(result) {
-    console.log(result);
-
-    return result;
-  });
+      console.log(result);
+    callback(result);
+    });
 }
 
 /*Pas complet*/
