@@ -4,6 +4,7 @@ var qs = require('querystring');
 var uuid = require("uuid/v4");
 var bodyParser = require('body-parser');
 var crypto = require('crypto');
+var smartcontract = require('./smartcontract/smartcontract.js')
 
 function hash(base64content){
     const hash = crypto.createHash('sha256');
@@ -68,11 +69,11 @@ app.get('/login', function(req, res){
     if(!type) {
         return error(res, "type parameter is mandatory");
     }
-    
+
     if(!authorized_types.hasOwnProperty(type)){
         return error(res, "Unknown type");
     }
-    
+
     key = uuid()
     keys[type][key] = true;
     success(res, {"key": key});
@@ -89,16 +90,6 @@ function authorized_file(name) {
     return ext.toLocaleLowerCase() === 'pdf'
 }
 
-function save_file(name, content) {
-    // TODO check if file exists
-    fs.writeFileSync(UPLOAD_DIR + name, content, 'base64');
-    // TODO call blockchain API to save file hash
-    // save_hash(name, hash(content))
-    console.log("file saved");
-    // TODO check error
-    return true;
-}
-
 function load_file(name) {
     let content = fs.readFileSync(UPLOAD_DIR + name, 'base64');
     // TODO check error
@@ -108,36 +99,44 @@ function load_file(name) {
 app.post('/upload', function(req, res){
     console.log("upload")
 
-    let data = req.body
-    if(!authorized_file(data["name"])) {
+    let key = req.body.key
+    let name = req.body.name
+    let content = req.body.content
+
+    if(!authorized_file(name)) {
         return error(res, "Unauthorized file type");
     }
-    
-    if(get_type(data["key"]) !== "owner") {
+
+    if(get_type(key) !== "owner") {
         return error(res, "Only owner can upload file");
     }
-    
-    if(!save_file(data["name"], data["content"])) {
-        return error(res, "Error saving file");
-    }
-    
-    success(res, {"URL": data["name"]});
+
+    // TODO check if file exists and error
+    fs.writeFileSync(UPLOAD_DIR + name, content, 'base64');
+    console.log("file saved");
+
+    let h = hash(content);
+    // TODO check error
+    smartcontract.addUpload(h, name);
+    console.log("called smartcontract");
+
+    success(res, {"URL": name, "hash": h});
 })
 
 app.get('/download', function(req, res){
     console.log("download")
     var name = req.query.name
     var key = req.query.key
-    
+
     if(get_type(key) !== "inspector") {
         return error(res, "Only inspector can download files");
     }
-    
+
     let content = load_file(name);
     if(!content) {
         return error(res, "No file with this name");
     }
-    
+
     let data = {
         "name": name,
         "content": content
@@ -156,15 +155,15 @@ app.post('/validate', function(req, res){
     let data = req.body
     let key = data["key"]
     let name = data["name"]
-    
+
     if(get_type(key) !== "inspector") {
         return error(res, "Only inspector can validate files");
     }
-    
+
     if(!validate(name)) {
         return error(res, "Error validating file");
     }
-    
+
     success(res, {});
 })
 
