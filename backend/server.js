@@ -90,12 +90,6 @@ function authorized_file(name) {
     return ext.toLocaleLowerCase() === 'pdf'
 }
 
-function load_file(name) {
-    let content = fs.readFileSync(UPLOAD_DIR + name, 'base64');
-    // TODO check error
-    return content;
-}
-
 app.post('/upload', function(req, res){
     console.log("upload")
 
@@ -111,37 +105,47 @@ app.post('/upload', function(req, res){
         return error(res, "Only owner can upload file");
     }
 
-    // TODO check if file exists and error
-    fs.writeFileSync(UPLOAD_DIR + name, content, 'base64');
-    console.log("file saved");
-
+    let id = uuid();
     let h = hash(content);
+
+    // TODO check if file exists and error
+    fs.writeFileSync(UPLOAD_DIR + id, content, 'base64');
+    console.log("file saved with id " + id);
+
     // TODO check error
-    smartcontract.addUpload(h, name);
+    smartcontract.addUpload(h, name, id);
     console.log("called smartcontract");
 
-    success(res, {"URL": name, "hash": h});
+    success(res, {"URL": id});
 })
 
 app.get('/download', function(req, res){
     console.log("download")
-    var name = req.query.name
+    var url = req.query.url
     var key = req.query.key
 
     if(get_type(key) !== "inspector") {
         return error(res, "Only inspector can download files");
     }
 
-    let content = load_file(name);
-    if(!content) {
-        return error(res, "No file with this name");
-    }
+    smartcontract.getUpload(url, function(name) {
+        if(!name) {
+          return error(res, "No file with this id");
+        }
 
-    let data = {
-        "name": name,
-        "content": content
-    }
-    success(res, data);
+        // TODO check error
+        let content = fs.readFileSync(UPLOAD_DIR + url, 'base64');
+        if(!content) {
+            // already checked by smartcontract, should exists
+            return error(res, "No file with this name");
+        }
+
+        let data = {
+            "name": name,
+            "content": content
+        }
+        success(res, data);
+    });
 })
 
 function validate(name) {
@@ -149,20 +153,37 @@ function validate(name) {
     return true;
 }
 
+app.get('/validate', function(req, res){
+    console.log("validate")
+
+    let key = req.body.key
+    let url = req.body.url
+    let type = get_type(key)
+    
+    if(type !== "inspector" && type !== "inspector") {
+        return error(res, "Only owner and inspector can validate files");
+    }
+
+    let checked = smartcontract.setVerification(url);
+    
+    console.log('called smartcontract');
+
+    success(res, {"url": url, "valid":smartcontract.isVerified(url)});
+})
+
 app.post('/validate', function(req, res){
     console.log("validate")
 
-    let data = req.body
-    let key = data["key"]
-    let name = data["name"]
+    let key = req.body.key
+    let url = req.body.url
 
     if(get_type(key) !== "inspector") {
         return error(res, "Only inspector can validate files");
     }
 
-    if(!validate(name)) {
-        return error(res, "Error validating file");
-    }
+    // TODO check error
+    smartcontract.setVerification(url);
+    console.log('called smartcontract');
 
     success(res, {});
 })
