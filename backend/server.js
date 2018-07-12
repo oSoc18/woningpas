@@ -63,9 +63,9 @@ app.use((req, res, next) => {
     next();
 });
 
-app.get('/login', function(req, res){
+app.post('/login', function(req, res){
     console.log("login")
-    let type = req.query.type
+    let type = req.body.type
     if(!type) {
         return error(res, "type parameter is mandatory");
     }
@@ -74,8 +74,9 @@ app.get('/login', function(req, res){
         return error(res, "Unknown type");
     }
 
-    key = uuid()
+    let key = uuid()
     keys[type][key] = true;
+
     success(res, {"key": key});
     console.log(keys);
 })
@@ -94,12 +95,7 @@ app.post('/upload', function(req, res){
     console.log("upload")
 
     let key = req.body.key
-    let name = req.body.name
     let content = req.body.content
-
-    if(!authorized_file(name)) {
-        return error(res, "Unauthorized file type");
-    }
 
     if(get_type(key) !== "owner") {
         return error(res, "Only owner can upload file");
@@ -113,63 +109,35 @@ app.post('/upload', function(req, res){
     console.log("file saved with id " + id);
 
     // TODO check error
-    smartcontract.addUpload(h, name, id);
+    smartcontract.addUpload(h, "name", id);
     console.log("called smartcontract");
 
-    success(res, {"URL": id});
+    success(res, {"url": id});
 })
 
-app.get('/download', function(req, res){
+app.post('/download', function(req, res){
     console.log("download")
-    var url = req.query.url
-    var key = req.query.key
+    var url = req.body.url
+    var key = req.body.key
 
     if(get_type(key) !== "inspector") {
         return error(res, "Only inspector can download files");
     }
 
-    smartcontract.getUpload(url, function(name) {
-        if(!name) {
-          return error(res, "No file with this id");
-        }
+    // TODO check error
+    let content = fs.readFileSync(UPLOAD_DIR + url, 'base64');
+    if(!content) {
+        // already checked by smartcontract, should exists
+        return error(res, "No file with this name");
+    }
 
-        // TODO check error
-        let content = fs.readFileSync(UPLOAD_DIR + url, 'base64');
-        if(!content) {
-            // already checked by smartcontract, should exists
-            return error(res, "No file with this name");
-        }
-
-        let data = {
-            "name": name,
-            "content": content
-        }
-        success(res, data);
-    });
+    success(res, {"content": content});
 })
 
 function validate(name) {
     // TODO validate
     return true;
 }
-
-app.get('/validate', function(req, res){
-    console.log("validate")
-
-    let key = req.body.key
-    let url = req.body.url
-    let type = get_type(key)
-    
-    if(type !== "inspector" && type !== "inspector") {
-        return error(res, "Only owner and inspector can validate files");
-    }
-
-    let checked = smartcontract.setVerification(url);
-    
-    console.log('called smartcontract');
-
-    success(res, {"url": url, "valid":smartcontract.isVerified(url)});
-})
 
 app.post('/validate', function(req, res){
     console.log("validate")
@@ -186,6 +154,24 @@ app.post('/validate', function(req, res){
     console.log('called smartcontract');
 
     success(res, {});
+})
+
+app.post('/validated', function(req, res){
+    console.log("validate")
+
+    let key = req.body.key
+    let url = req.body.url
+    let type = get_type(key)
+
+    if(type !== "inspector" && type !== "inspector") {
+        return error(res, "Only owner and inspector see validation status");
+    }
+
+    let checked = smartcontract.setVerification(url);
+
+    console.log('called smartcontract');
+
+    success(res, {"validated":smartcontract.isVerified(url)});
 })
 
 /* TODO later
