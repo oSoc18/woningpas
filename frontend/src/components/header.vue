@@ -13,7 +13,7 @@
         <!-- Right aligned nav items -->
         <b-navbar-nav class="ml-auto">
           <b-nav-item right>
-            <span class="name">PIETER</span>
+            <span class="name">{{username}}</span>
             <img id="picture" src=""/>
             <a href="#">CONTACTEER ONS</a>
           </b-nav-item>
@@ -25,6 +25,11 @@
 
 <script>
   export default {
-    name: 'Header'
+    name: 'Header',
+    data(){
+      return{
+        username: localStorage.getItem('role')
+      }
+    }
   }
 </script>

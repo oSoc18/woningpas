@@ -40,7 +40,7 @@ export default {
              .then(res => {
                 var token = res.data.key
                 this.auth.login(this.role, token)
-                this.$parent.$forceUpdate()
+                 this.$route.router.go('/')
              })
              .catch(error => {
                 console.log('error:', error)
