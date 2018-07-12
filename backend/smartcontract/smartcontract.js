@@ -55,10 +55,10 @@ function getContract() {
   return ret;
 }
 
-function isVerified(hash) {
+function isVerified(id) {
   var ret = getContract();
   console.log("isVerified");
-  ret.methods.isVerified(hash).call({
+  ret.methods.isVerified(id).call({
     from: addressContract
   }).then(function(result) {
     console.log(result);
@@ -68,11 +68,11 @@ function isVerified(hash) {
 
 }
 
-async function setVerification(hash) {
+async function setVerification(id) {
   var ret = getContract();
   let acc = await getAccount();
   console.log("setVerification");
-  ret.methods.setVerification(hash).send({
+  ret.methods.setVerification(id).send({
     from: acc
   }).then(function(result) {
     console.log(result);
@@ -82,12 +82,12 @@ async function setVerification(hash) {
 
 }
 
-async function addUpload(hash, file) {
+async function addUpload(hash, file, id) {
   let acc = await getAccount();
 
   var ret = getContract();
   console.log("addUpload");
-  ret.methods.addUpload(hash, file).send({
+  ret.methods.addUpload(id,file, hash).send({
     from: acc
   }).then(function(result) {
     console.log(result);
@@ -96,10 +96,10 @@ async function addUpload(hash, file) {
   });
 }
 
-function getUpload(hash) {
+function getUpload(id) {
   var ret = getContract();
   console.log("getUpload");
-  ret.methods.getFileName(hash).call({
+  ret.methods.getFileName(id).call({
     from: addressContract
   }).then(function(result) {
     console.log(result);
