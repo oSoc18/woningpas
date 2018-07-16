@@ -1,0 +1,11 @@
+{
+    "account":{
+        "password":"password",
+        "type":"owner",
+        "ethereum":{
+            "KALEIDO_id":"e0q2xif8zj",
+            "RPC_endpoint":"https://e0qztrawvi-e0q2xif8zj-rpc.eu-central-1.kaleido.io",
+            "password":"lt32IHCYpL4rJuBlXHFD-oCTcxABbR96Bh0qaV2FLgE"
+        }
+    }
+}
