@@ -29,8 +29,8 @@ let web3 = new Web3(new Web3.providers.HttpProvider(url));
 var accountAddress;
 
 console.log(`1. Connecting to target node: ${url}`);
-setVerification('cf419cd4-cdb1-4dd6-8ee5-84ecf0218f62');
-getAccount();
+//setVerification('cf419cd4-cdb1-4dd6-8ee5-84ecf0218f62');
+//getAccount();
 function getContract() {
   let tsSrc = fs.statSync(`${dir}/${contractName}.sol`);
   let tsBin;
@@ -77,9 +77,10 @@ async function isVerified(id) {
 
 }
 
-async function setVerification(id) {
+async function setVerification(id, privateKey) {
   var ret = getContract();
-  let acc = await createAccount();
+  console.log(privateKey)
+  let acc = web3.eth.accounts.privateKeyToAccount(privateKey);
   console.log("setVerification");
   
   let tx_builder = ret.methods.setVerification(id);
@@ -87,7 +88,7 @@ async function setVerification(id) {
   let transactionObject = {
     gas: 50000,
     data: encoded_tx,
-    from: acc.address,
+    from: acc.publicKey,
     to: addressContract
   };
   web3.eth.accounts.signTransaction(transactionObject, acc.privateKey, function (error, signedTx) {
@@ -185,3 +186,4 @@ module.exports.setVerification = setVerification;
 module.exports.addUpload = addUpload;
 module.exports.getUpload = getUpload;
 module.exports.isVerified = isVerified;
+module.exports.createAccount = createAccount;

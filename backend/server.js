@@ -40,8 +40,8 @@ function get_type(key) {
 
 let mapping_key_ethereum = {}
 
-function get_ethereum_account(key){
-    return mapping_key_ethereum[key]
+function get_ethereum_key(key){
+    return mapping_key_ethereum[key].privateKey
 }
 
 function create_key(account, password){
@@ -187,7 +187,7 @@ app.post('/validate', function(req, res){
     }
 
     // TODO check error
-    smartcontract.setVerification(url);
+    let checked = smartcontract.setVerification(url, get_ethereum_key(key));
     console.log('called smartcontract');
 
     success(res, {});
@@ -204,7 +204,7 @@ app.post('/validated', function(req, res){
         return error(res, "Only owner and inspector see validation status");
     }
 
-    let checked = smartcontract.setVerification(url);
+    let checked = smartcontract.setVerification(url, get_ethereum_key(key));
 
     console.log('called smartcontract');
 
@@ -225,6 +225,17 @@ app.get('/listFiles', function (req, res) {
 })
 //*/
 
+async function populateDB(){
+    let account = await smartcontract.createAccount();
+    var pop = {
+        account:{
+            password:"password",
+            type:"inspector",
+            ethereum:account
+        }
+    }
+    fs.writeFile("./database.json", JSON.stringify(pop))
+}
 
 var server = app.listen(8080, function () {
     var host = server.address().address
