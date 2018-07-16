@@ -30,7 +30,7 @@ var accountAddress;
 
 console.log(`1. Connecting to target node: ${url}`);
 setVerification('cf419cd4-cdb1-4dd6-8ee5-84ecf0218f62');
-
+getAccount();
 function getContract() {
   let tsSrc = fs.statSync(`${dir}/${contractName}.sol`);
   let tsBin;
@@ -79,20 +79,28 @@ async function isVerified(id) {
 
 async function setVerification(id) {
   var ret = getContract();
-  let acc = await getAccount();
+  let acc = await createAccount();
   console.log("setVerification");
   
-  ret.methods.setVerification(id).send({
-    from: '0x0959dD81F15012194B4De450efDb10Ec616d55D5',
-    gas: 5e6
-  }).then(function(result) {
-  //  console.log(result);
-    //Return transaction ID;
-    //private key needs to be changed
-    signTransaction(result.transactionHash, '0xa2f147dbeb4212d4e0c7dc4b68f78704271811ff0cd51cfbd86eab3835a5c573');
-   // return isVerified(id);
-  });
-
+  let tx_builder = ret.methods.setVerification(id);
+  let encoded_tx = tx_builder.encodeABI();
+  let transactionObject = {
+    gas: 50000,
+    data: encoded_tx,
+    from: acc.address,
+    to: addressContract
+  };
+  web3.eth.accounts.signTransaction(transactionObject, acc.privateKey, function (error, signedTx) {
+    if (error) {
+      console.log(error);
+      // handle error
+    } else {
+      web3.eth.sendSignedTransaction(signedTx.rawTransaction)
+        .on('receipt', function (receipt) {
+            console.log(receipt)
+      });
+    };
+  })
 }
 
 async function addUpload(hash, file, id) {
@@ -159,7 +167,8 @@ async function createAccount(){
   let account = await web3.eth.accounts.create();
   console.log("Create account");
   console.log(account);
-  
+  web3.eth.accounts.wallet.add(account)
+  return account;
 }
 
 async function signTransaction(tx, pvKey, abi){
