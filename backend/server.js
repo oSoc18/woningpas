@@ -38,6 +38,25 @@ function get_type(key) {
     return null;
 }
 
+let mapping_key_ethereum = {}
+
+function get_ethereum_account(key){
+    return mapping_key_ethereum[key]
+}
+
+function create_key(account, password){
+    let key = undefined
+    let database_file = fs.readFileSync("./database.json")
+    let database = JSON.parse(database_file)
+    if (database[account] && database[account].password===password){
+        key = uuid()
+        keys[database[account].type][key] = true;
+        mapping_key_ethereum[key]=database[account].ethereum
+    }
+    return key
+}
+
+
 function error(response, message){
     response.status(400);
     let data = {
@@ -77,6 +96,24 @@ app.post('/login', function(req, res){
     let key = uuid()
     keys[type][key] = true;
 
+    success(res, {"key": key});
+    console.log(keys);
+})
+
+app.post('/newLogin', function(req, res){
+    console.log("login")
+    let account = req.body.account
+    let password = req.body.password
+    if(!account){
+        return error(res, "Account mandatory")
+    }
+    if (!password){
+        return error(res, "Password mandatory")
+    }
+    let key = create_key(account, password)
+    if (key===undefined){
+        return error(res, "Account or password invalid")
+    }
     success(res, {"key": key});
     console.log(keys);
 })

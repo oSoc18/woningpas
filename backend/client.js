@@ -1,6 +1,7 @@
 var http = require("http")
 
 path = {
+  "newLogin":["account", "password"],
   "login": ["type"],
   "upload": ["key", "content"],
   "download": ["key", "url"],
