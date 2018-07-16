@@ -13,17 +13,23 @@ const deploy = argv.deploy;
 const set = argv.set;
 const privateFor = argv.privateFor;
 const externallySign = argv.sign;
+
 var byteCodeContract;
+let contractName = 'WoningPas';
+
 
 const addressContract = '0x2765eabc3ca01361d38a53efabc38f9d100a4a01';
-
+//needs to be changed
+var adresseFrom;
 //Address of the node
 var url = "https://e0vp6l0egw:lt32IHCYpL4rJuBlXHFD-oCTcxABbR96Bh0qaV2FLgE@e0qztrawvi-e0q2xif8zj-rpc.eu-central-1.kaleido.io";
 
-console.log(`1. Connecting to target node: ${url}`);
 let web3 = new Web3(new Web3.providers.HttpProvider(url));
 
-let contractName = 'WoningPas';
+var accountAddress;
+
+console.log(`1. Connecting to target node: ${url}`);
+setVerification('cf419cd4-cdb1-4dd6-8ee5-84ecf0218f62');
 
 function getContract() {
   let tsSrc = fs.statSync(`${dir}/${contractName}.sol`);
@@ -52,14 +58,17 @@ function getContract() {
 
   //adresse est optionnel dans Contract
   let ret = new web3.eth.Contract(abi, addressContract);
+  
   return ret;
 }
 
-function isVerified(id) {
+async function isVerified(id) {
   var ret = getContract();
+  //let acc = await getAccount();
   console.log("isVerified");
   ret.methods.isVerified(id).call({
-    from: addressContract
+    from: accountAddress,
+    gas: 5e6
   }).then(function(result) {
     console.log(result);
 
@@ -72,12 +81,16 @@ async function setVerification(id) {
   var ret = getContract();
   let acc = await getAccount();
   console.log("setVerification");
+  
   ret.methods.setVerification(id).send({
-    from: acc
+    from: '0x0959dD81F15012194B4De450efDb10Ec616d55D5',
+    gas: 5e6
   }).then(function(result) {
-    console.log(result);
-
-    return isVerified(id);
+  //  console.log(result);
+    //Return transaction ID;
+    //private key needs to be changed
+    signTransaction(result.transactionHash, '0xa2f147dbeb4212d4e0c7dc4b68f78704271811ff0cd51cfbd86eab3835a5c573');
+   // return isVerified(id);
   });
 
 }
@@ -124,14 +137,38 @@ function deployyy(hash, fileName) {
 
 }
 
+//Shouldn't be use
 async function getAccount() {
-  let accounts = await web3.eth.personal.getAccounts();
+
+  if(accountAddress === undefined)
+    var accounts = await web3.eth.personal.getAccounts();
+
   if (!accounts || accounts.length === 0) {
     console.error("Can't find accounts in the target node");
     process.exit(1);
   }
 
+  console.log("getAccount ");
+  console.log(accounts[0]);
+  console.log(accounts.length);
+  accountAddress  = accounts[0];
   return accounts[0];
+}
+
+async function createAccount(){
+  let account = await web3.eth.accounts.create();
+  console.log("Create account");
+  console.log(account);
+  
+}
+
+async function signTransaction(tx, pvKey, abi){
+  console.log("signing transcation");
+  let ret = getContract();
+  await web3.eth.accounts.signTransaction(pvKey).then(console.log);
+    
+  
+
 }
 
 
