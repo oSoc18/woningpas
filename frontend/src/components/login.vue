@@ -35,16 +35,22 @@ export default {
         }
     },
     methods: {
+        apiRequest(path, data, success){
+            axios({
+                url: 'http://localhost:8080/' + path,
+                data: data,
+                method: 'POST',
+                responseType: 'json',
+            }).then(success).catch(error => {
+                console.log(error)
+            })
+        },
         login() {
-            axios.get('http://localhost:8080/login?type=' + this.role)
-             .then(res => {
+            this.apiRequest('login', {type: this.role}, (res) => {
                 var token = res.data.key
                 this.auth.login(this.role, token)
-                 this.$route.router.go('/')
-             })
-             .catch(error => {
-                console.log('error:', error)
-             })
+                this.$route.router.go('/')
+            })
         }
     }
 }
@@ -54,7 +60,7 @@ export default {
 body {
   background: #605B56;
 }
-.login-wrapper {
+/*.login-wrapper {
   background: #fff;
   width: 70%;
   margin: 12% auto;
@@ -67,5 +73,5 @@ body {
 .form-signin .form-signin-heading,
 .form-signin .checkbox {
   margin-bottom: 10px;
-}
+}*/
 </style>
