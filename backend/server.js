@@ -48,7 +48,7 @@ function create_key(account, password){
     let key = undefined
     let database_file = fs.readFileSync("./database.json")
     let database = JSON.parse(database_file)
-    if (database[account] && database[account].password===password){
+    if (database[account]){
         key = uuid()
         keys[database[account].type][key] = true;
         mapping_key_ethereum[key]=database[account].ethereum
@@ -103,16 +103,12 @@ app.post('/login', function(req, res){
 app.post('/newLogin', function(req, res){
     console.log("login")
     let account = req.body.account
-    let password = req.body.password
     if(!account){
         return error(res, "Account mandatory")
     }
-    if (!password){
-        return error(res, "Password mandatory")
-    }
-    let key = create_key(account, password)
+    let key = create_key(account)
     if (key===undefined){
-        return error(res, "Account or password invalid")
+        return error(res, "Account invalid")
     }
     success(res, {"key": key});
     console.log(keys);
@@ -223,15 +219,30 @@ app.get('/listFiles', function (req, res) {
 
 async function populateDB(){
     let account = await smartcontract.createAccount();
+    let accountInspector = await smartcontract.createAccount();
     var pop = {
         account:{
-            password:"password",
-            type:"inspector",
+            type:"owner",
+            houses:{
+                house1:{
+                    certificate1:true,
+                    certificate2:true
+                },
+                house2:{
+                    certificate3:true
+                }
+            },
             ethereum:account
+        },
+        inspector:{
+            type:"inspector",
+            ethereum:accountInspector
         }
     }
     fs.writeFile("./database.json", JSON.stringify(pop))
 }
+
+populateDB()
 
 var server = app.listen(8080, function () {
     var host = server.address().address

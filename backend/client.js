@@ -1,7 +1,7 @@
 var http = require("http")
 
 path = {
-  "newLogin":["account", "password"],
+  "newLogin":["account"],
   "login": ["type"],
   "upload": ["key", "content"],
   "download": ["key", "url"],
@@ -81,3 +81,4 @@ function request(cmd, data) {
 }
 
 command();
+module.exports.request = request;

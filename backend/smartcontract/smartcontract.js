@@ -80,7 +80,7 @@ function isVerified(id, privateKey, res, error, success) {
 
 async function setVerification(id, privateKey, res, error, success) {
   var ret = getContract();
-  console.log(privateKey)
+  console.log(ret)
   let acc = web3.eth.accounts.privateKeyToAccount(privateKey);
   console.log("setVerification");
   
@@ -100,7 +100,7 @@ async function setVerification(id, privateKey, res, error, success) {
     } else {
       web3.eth.sendSignedTransaction(signedTx.rawTransaction)
         .on('receipt', function (receipt) {
-            console.log(receipt)
+            console.log(receipt.status)
             success(res, success(res, {"validated":true}))
       });
     };
