@@ -146,7 +146,7 @@ app.post('/upload', function(req, res){
     console.log("file saved with id " + id);
 
     // TODO check error
-    smartcontract.addUpload(h, "name", id);
+    smartcontract.addUpload(h, get_ethereum_key(key), "name", id);
     console.log("called smartcontract");
 
     success(res, {"url": id});
@@ -187,14 +187,12 @@ app.post('/validate', function(req, res){
     }
 
     // TODO check error
-    let checked = smartcontract.setVerification(url, get_ethereum_key(key));
+    smartcontract.setVerification(url, get_ethereum_key(key), res, error, success);
     console.log('called smartcontract');
-
-    success(res, {});
 })
 
 app.post('/validated', function(req, res){
-    console.log("validate")
+    console.log("validated")
 
     let key = req.body.key
     let url = req.body.url
@@ -204,11 +202,9 @@ app.post('/validated', function(req, res){
         return error(res, "Only owner and inspector see validation status");
     }
 
-    let checked = smartcontract.setVerification(url, get_ethereum_key(key));
-
     console.log('called smartcontract');
 
-    success(res, {"validated":smartcontract.isVerified(url)});
+    smartcontract.isVerified(url, get_ethereum_key(key), res, error, success);
 })
 
 /* TODO later
