@@ -120,11 +120,11 @@ function authorized_file(name) {
     return ext.toLocaleLowerCase() === 'pdf'
 }
 
-app.post('/upload', function(req, res){
+apiFunctions.upload = function(req, res, data){
     console.log("upload")
 
-    let key = req.body.key
-    let content = req.body.content
+    let key = data.key
+    let content = data.content
 
     if(get_type(key) !== "owner") {
         return error(res, "Only owner can upload file");
@@ -142,12 +142,12 @@ app.post('/upload', function(req, res){
     console.log("called smartcontract");
 
     success(res, {"url": id});
-})
+}
 
-app.post('/download', function(req, res){
+apiFunctions.download = function(req, res, data){
     console.log("download")
-    var url = req.body.url
-    var key = req.body.key
+    var url = data.url
+    var key = data.key
 
     if(get_type(key) !== "inspector") {
         return error(res, "Only inspector can download files");
@@ -161,18 +161,18 @@ app.post('/download', function(req, res){
     }
 
     success(res, {"content": content});
-})
+}
 
 function validate(name) {
     // TODO validate
     return true;
 }
 
-app.post('/validate', function(req, res){
+apiFunctions.validate = function(req, res, data){
     console.log("validate")
 
-    let key = req.body.key
-    let url = req.body.url
+    let key = data.key
+    let url = data.url
 
     if(get_type(key) !== "inspector") {
         return error(res, "Only inspector can validate files");
@@ -181,13 +181,13 @@ app.post('/validate', function(req, res){
     // TODO check error
     smartcontract.setVerification(url, get_ethereum_key(key), res, error, success);
     console.log('called smartcontract');
-})
+}
 
-app.post('/validated', function(req, res){
+apiFunctions.validated = function(req, res, data){
     console.log("validated")
 
-    let key = req.body.key
-    let url = req.body.url
+    let key = data.key
+    let url = data.url
     let type = get_type(key)
 
     if(type !== "inspector" && type !== "inspector") {
@@ -197,7 +197,7 @@ app.post('/validated', function(req, res){
     console.log('called smartcontract');
 
     smartcontract.isVerified(url, get_ethereum_key(key), res, error, success);
-})
+}
 
 /* TODO later
 app.get('/listFiles', function (req, res) {

@@ -33,12 +33,19 @@ function testUpload(body){
     data["content"]="test"
     request("upload", JSON.stringify(data), 400, function(){})
 }
+function testValidated(body){
+    console.log("Starting testValidate")
+    let data={}
+    data["key"]=key
+    data["url"]="cf419cd4-cdb1-4dd6-8ee5-84ecf0218f62"
+    request("validated", data, 200, function(){})
+}
 function testValidate1(body){
     console.log("Starting testValidate1")
     let data ={}
     data["key"]=key
     data["url"]="test"
-    request("validate", data, 400, function(){})
+    request("validate", data, 400, testValidated)
 }
 function testValidate(body){
     console.log("Starting testValidate")
