@@ -31,6 +31,7 @@ export default {
             }
             axios.post('http://localhost:8080/upload', jsonToSend)
              .then(res => {
+               alert(res.data.url)
                 console.log(res)
              })
         }

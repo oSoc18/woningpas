@@ -9,15 +9,22 @@
         <app-sideBar></app-sideBar>
         <div id="main" class="col-xs-12 col-sm-6 col-md-8">
           <div id="central">
+
             <h1>Welcome {{auth.role}},</h1>
-            <button v-on:click="logout">Log out</button><br>
-            <h2>
-              Here you can see view/download the file and validate it
-            </h2>
+            <button v-on:click="logout">Log out</button>
+            <br><br>
+
             <div v-if="auth.role == 'owner'">
+              <h2>
+                Here you can upload files and wait for an inspector to validate it
+              </h2>
+              <br><br>
               <app-upload></app-upload>
             </div>
             <div v-else-if="auth.role == 'inspector'" id="inspector">
+              <h2>
+                Here you can see view/download the file and validate it
+              </h2>
               <table>
                 <tr>
                   <td>
@@ -52,9 +59,6 @@ export default {
       token: '',
       fileId: '',
       auth: auth
-      /*role: localStorage.getItem('role'),
-      key: localStorage.getItem('token'),
-      loggedIn: localStorage.getItem('role'),*/
     }
   },
   methods: {
@@ -68,31 +72,30 @@ export default {
         console.log(error)
       })
     },
-
     logout(){
       this.auth.logout()
       this.$router.push({ name: "Home"})
     },
     download(){
       var data = {
-        name: this.fileId,
-        key: this.token
+        url: this.fileId,
+        key: localStorage.getItem('token')
       }
-      apiRequest('download', data, (res) => {
-        conole.log(res);return;
-        const url = window.URL.createObjectURL(new Blob([res.data]))
+      this.apiRequest('download', data, (res) => {
+        var content = atob(res.data.content)
+        const url = window.URL.createObjectURL(new Blob([content]))
         const link = document.createElement('a')
         link.href = url
         link.setAttribute('download', 'file.pdf')
         document.body.appendChild(link)
         link.click()
-        console.log(res)
+        console.log(res);
       })
     },
     validate(){
       var jsonToSend = {
         url: this.fileId,
-        key: this.token
+        key: localStorage.getItem('token')
       }
       axios.post('http://localhost:8080/validate', jsonToSend)
         .then(res => {

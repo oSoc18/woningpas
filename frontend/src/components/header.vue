@@ -10,11 +10,21 @@
         <h6><b>Flanders</b></h6>
       </li>
       <li id="appName"><h6><b>WONINGPAS</b></h6></li>
-      <span>
-        <li id="role"><h6>Role</h6></li>
+      <span id="profil">
+        <li id="role"><h6>{{role}}</h6></li>
         <li id="profilPicture">
           <img src="@/assets/profil.jpg" width="20" height="20" alt="profil picture">
         </li>
+        <!--<li>
+          <span class="dropdown">
+            <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+            <span class="caret"></span></button>
+            <ul class="dropdown-menu">
+              <li><button v-on:click="logout">Log out</button></li>
+              <li><a href="#">HTML</a></li>
+            </ul>
+          </span>
+        </li>-->
         <li id="contact"><a href="#">CONTACT US</a></li>
       </span>
     </ul>
@@ -26,7 +36,7 @@
     name: 'Header',
     data(){
       return{
-        username: localStorage.getItem('role')
+        role: localStorage.getItem('role')
       }
     }
   }
@@ -80,10 +90,14 @@ li a:hover:not(.active) {
 .active {
   background-color: #4CAF50;
 }
-span {
+#profil {
   float: right;
 }
 #header {
   border-bottom: solid 1px lightgray;
+}
+.dropdown-toggle{
+  height: 5px;
+  width: 5px;
 }
 </style>
