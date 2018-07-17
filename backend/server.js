@@ -5,6 +5,8 @@ var uuid = require("uuid/v4");
 var bodyParser = require('body-parser');
 var crypto = require('crypto');
 var smartcontract = require('./smartcontract/smartcontract.js')
+var api = require('./api.js').api;
+var apiFunctions = {};
 
 function hash(base64content){
     const hash = crypto.createHash('sha256');
@@ -70,6 +72,14 @@ function success(response, data) {
     response.json(data);
 }
 
+apiFunctions.login = function(req, res, data){
+    let key = create_key(data.account)
+    if (key===undefined){
+        return error(res, "Account invalid")
+    }
+    success(res, {"key": key});
+    console.log(keys);
+}
 /**
  * Express routes
  */
@@ -82,19 +92,23 @@ app.use((req, res, next) => {
     next();
 });
 
-app.post('/login', function(req, res){
-    console.log("login")
-    let account = req.body.account
-    if(!account){
-        return error(res, "Account mandatory")
+let URIs = Object.keys(api);
+URIs.forEach(function(uri) {
+  app.post('/'+uri, function(req, res) {
+    console.log(uri);
+    let params = api[uri];
+    let err = false;
+    params.forEach(function(param) {
+      if(!req.body[param]) {
+        err = true;
+        error(res, "Parameter " + param + " is mandatory");
+      }
+    })
+    if(!err) {
+      apiFunctions[uri](req, res, req.body);
     }
-    let key = create_key(account)
-    if (key===undefined){
-        return error(res, "Account invalid")
-    }
-    success(res, {"key": key});
-    console.log(keys);
-})
+  })
+});
 
 function authorized_file(name) {
     let i = name.lastIndexOf('.')
