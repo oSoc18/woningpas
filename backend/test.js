@@ -3,6 +3,7 @@ var assert = require('assert');
 let key =""
 
 function request(cmd, data, statusCode, followingTest) {
+    let reqBody = JSON.stringify(data)
     let options = {
         host: "localhost",
         port: 8080,
@@ -23,7 +24,7 @@ function request(cmd, data, statusCode, followingTest) {
             followingTest(JSON.parse(body))
         })
     })
-    req.write(data);
+    req.write(reqBody);
     req.end();
 }
 function testUpload(body){
@@ -37,40 +38,40 @@ function testValidate1(body){
     let data ={}
     data["key"]=key
     data["url"]="test"
-    request("validate", JSON.stringify(data), 400, function(){})
+    request("validate", data, 400, function(){})
 }
 function testValidate(body){
     console.log("Starting testValidate")
     let data ={}
     data["key"]=key
     data["url"]="cf419cd4-cdb1-4dd6-8ee5-84ecf0218f62"
-    request("validate", JSON.stringify(data), 200, function(){})
+    request("validate", data, 200, function(){})
 }
 function testNewLogin1(body){
     key=body.key
     console.log("Starting testNewLogin1")
     let data = {}
     data["account"]="accoun1"
-    request("newLogin", JSON.stringify(data), 400, testValidate)
+    request("login", data, 400, testValidate)
 }
 function testNewLogin(body){
     console.log("Starting testNewLogin")
     let data = {}
     data["account"]="inspector"
-    request("newLogin", JSON.stringify(data), 200, testNewLogin1)
+    request("login", data, 200, testNewLogin1)
 }
 function testLogin1(body){
     console.log("Starting testLogin1")
     let data = {}
     data["type"]="inspector1"
-    request("login", JSON.stringify(data), 400, testNewLogin)
+    request("login", data, 400, testNewLogin)
 }
 
 function testLogin(){
     console.log("Starting testLogin")
     let data = {}
     data["type"]="inspector"
-    request("login", JSON.stringify(data), 200, testLogin1)
+    request("login", data, 200, testLogin1)
 }
 
-testLogin()
+testNewLogin()

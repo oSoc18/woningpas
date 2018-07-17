@@ -84,24 +84,6 @@ app.use((req, res, next) => {
 
 app.post('/login', function(req, res){
     console.log("login")
-    let type = req.body.type
-    if(!type) {
-        return error(res, "type parameter is mandatory");
-    }
-
-    if(!authorized_types.hasOwnProperty(type)){
-        return error(res, "Unknown type");
-    }
-
-    let key = uuid()
-    keys[type][key] = true;
-
-    success(res, {"key": key});
-    console.log(keys);
-})
-
-app.post('/newLogin', function(req, res){
-    console.log("login")
     let account = req.body.account
     if(!account){
         return error(res, "Account mandatory")
