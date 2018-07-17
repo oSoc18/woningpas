@@ -27,7 +27,7 @@ export default {
             var token = localStorage.getItem('token')
             var jsonToSend = {
               key: token,
-              content: this.content
+              content: btoa(this.content)
             }
             axios.post('http://localhost:8080/upload', jsonToSend)
              .then(res => {
