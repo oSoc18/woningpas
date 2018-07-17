@@ -221,7 +221,7 @@ async function populateDB(){
     let account = await smartcontract.createAccount();
     let accountInspector = await smartcontract.createAccount();
     var pop = {
-        account:{
+        owner:{
             type:"owner",
             houses:{
                 house1:{
@@ -242,7 +242,7 @@ async function populateDB(){
     fs.writeFile("./database.json", JSON.stringify(pop))
 }
 
-populateDB()
+//populateDB()
 
 var server = app.listen(8080, function () {
     var host = server.address().address

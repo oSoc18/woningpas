@@ -23,12 +23,10 @@ const addressContract = '0x2765eabc3ca01361d38a53efabc38f9d100a4a01';
 var adresseFrom;
 //Address of the node
 var url = "https://e0vp6l0egw:lt32IHCYpL4rJuBlXHFD-oCTcxABbR96Bh0qaV2FLgE@e0qztrawvi-e0q2xif8zj-rpc.eu-central-1.kaleido.io";
-
+console.log(`1. Connecting to target node: ${url}`);
 let web3 = new Web3(new Web3.providers.HttpProvider(url));
 
 var accountAddress;
-
-console.log(`1. Connecting to target node: ${url}`);
 //setVerification('cf419cd4-cdb1-4dd6-8ee5-84ecf0218f62');
 //getAccount();
 function getContract() {

@@ -26,6 +26,12 @@ function request(cmd, data, statusCode, followingTest) {
     req.write(data);
     req.end();
 }
+function testUpload(body){
+    let data ={}
+    data["key"]=key
+    data["content"]="test"
+    request("upload", JSON.stringify(data), 400, function(){})
+}
 function testValidate1(body){
     console.log("Starting testValidate1")
     let data ={}
