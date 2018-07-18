@@ -52,6 +52,7 @@
 import axios from 'axios'
 import auth from './auth.js'
 import api from './api.js'
+import file from './file.js'
 
 export default {
   name: 'Home',
@@ -64,14 +65,6 @@ export default {
     }
   },
   methods: {
-    stringToArray(string) {
-      let l = string.length;
-      let array = new Uint8Array(l);
-      for (var i = 0; i < l; i++){
-          array[i] = string.charCodeAt(i);
-      }
-      return array;
-    },
     logout(){
       this.auth.logout()
       this.$router.push({ name: "Home"})
@@ -82,13 +75,7 @@ export default {
         key: localStorage.getItem('token')
       }
       api.request('download', data, (res) => {
-        var content = this.stringToArray(atob(res.data.content))
-        let file = new Blob([content], {type: 'application/pdf'});
-        let link = document.createElement('a')
-        link.href = window.URL.createObjectURL(file)
-        link.setAttribute('download', 'file.pdf')
-        document.body.appendChild(link)
-        link.click()
+        file.download('file.pdf', atob(res.data.content));
       })
     },
     validate(){
