@@ -70,23 +70,20 @@ export default {
       this.$router.push({ name: "Home"})
     },
     download(){
-      var data = {
+      let data = {
         url: this.fileId,
         key: localStorage.getItem('token')
       }
-      api.request('download', data, (res) => {
-        file.download('file.pdf', atob(res.data.content));
+      api.request('download', data, (data) => {
+        file.download('file.pdf', atob(data.content));
       })
     },
     validate(){
-      var jsonToSend = {
+      let data = {
         url: this.fileId,
         key: localStorage.getItem('token')
       }
-      axios.post('http://localhost:8080/validate', jsonToSend)
-        .then(res => {
-          console.log(res)
-        })
+      api.request('validate', data);
     }
   }
 }
