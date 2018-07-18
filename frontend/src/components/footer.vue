@@ -1,27 +1,24 @@
 <template>
   <div class="footer">
-    <b-navbar toggleable="md" type="dark" variant="info">
-      <b-navbar-toggle target="nav_collapse"></b-navbar-toggle>
-      <b-navbar-brand href="#">
-        <img id="logo" src=""/>
-      </b-navbar-brand>
-      <b>Vlaanderen</b>
-      <b> Dit is een officiële website van de Vlaamse overheid</b>
-      <b-collapse is-nav id="nav_collapse">
-        <b-navbar-nav>
-          <b-nav-item href="#" disabled>Vlaanderen</b-nav-item>
-          <b-nav-item href="#" disabled>WONINGPAS</b-nav-item>
-        </b-navbar-nav>
-        <!-- Right aligned nav items -->
-        <b-navbar-nav class="ml-auto">
-          <b-nav-item right>
-            <a href="#" disabled>over woningpas</a>
-            <a href="#" disabled>disclaimer</a>
-            <a href="#" disabled>toegankelijkheid</a>
-          </b-nav-item>
-        </b-navbar-nav>
-      </b-collapse>
-    </b-navbar>
+    <footer class="o-footer">
+      <div class="row">
+        <div class="footer__left col-md-6">
+          <img src="http://woningpas.brandplatform.be/img/logo-vlaamseoverheid.svg"
+            alt="" class="o-footer__logo">
+          <div class="o-footer_disclaimer">
+            <strong>Dit is een officiële website van de Vlaamse overheid</strong>
+            <small>Uitgegeven door <a href="#">Vlaams Energie Agentschap</a></small>
+          </div>
+        </div>
+        <div class="footer__right col-md-6">
+          <ul class="a-basic-nav">
+            <li><a href="#">over woningpas</a></li>
+            <li><a href="#">disclaimer</a></li>
+            <li><a href="#">toegankelijkheid</a></li>
+          </ul>
+        </div>
+      </div>
+    </footer>
   </div>
 </template>
 
