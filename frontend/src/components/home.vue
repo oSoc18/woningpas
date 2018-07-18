@@ -72,6 +72,14 @@ export default {
         console.log(error)
       })
     },
+    stringToArray(string) {
+      let l = string.length;
+      let array = new Uint8Array(l);
+      for (var i = 0; i < l; i++){
+          array[i] = string.charCodeAt(i);
+      }
+      return array;
+    },
     logout(){
       this.auth.logout()
       this.$router.push({ name: "Home"})
@@ -82,14 +90,13 @@ export default {
         key: localStorage.getItem('token')
       }
       this.apiRequest('download', data, (res) => {
-        var content = atob(res.data.content)
-        const url = window.URL.createObjectURL(new Blob([content]))
-        const link = document.createElement('a')
-        link.href = url
+        var content = this.stringToArray(atob(res.data.content))
+        let file = new Blob([content], {type: 'application/pdf'});
+        let link = document.createElement('a')
+        link.href = window.URL.createObjectURL(file)
         link.setAttribute('download', 'file.pdf')
         document.body.appendChild(link)
         link.click()
-        console.log(res);
       })
     },
     validate(){
