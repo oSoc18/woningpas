@@ -1,6 +1,7 @@
 let http = require("http");
 var assert = require('assert');
 let key =""
+let fs = require("fs")
 
 function request(cmd, data, statusCode, followingTest) {
     let reqBody = JSON.stringify(data)
@@ -20,6 +21,7 @@ function request(cmd, data, statusCode, followingTest) {
             body += data;
         })
         response.on('end', function() {
+            console.log(body)
             assert(response.statusCode===statusCode)
             followingTest(JSON.parse(body))
         })
@@ -28,17 +30,25 @@ function request(cmd, data, statusCode, followingTest) {
     req.end();
 }
 function testUpload(body){
+    key=body.key
+    console.log("Starting testUpload")
     let data ={}
     data["key"]=key
-    data["content"]="test"
-    request("upload", JSON.stringify(data), 400, function(){})
+    data["content"]=fs.readFileSync("./pdf-sample.pdf")
+    request("upload",data, 200, function(){})
+}
+function testLoginUpload(body){
+    console.log("Starting testLoginUpload")
+    let data = {}
+    data["account"]="owner"
+    request("login", data, 200, testUpload)
 }
 function testValidated(body){
-    console.log("Starting testValidate")
+    console.log("Starting testValidated")
     let data={}
     data["key"]=key
     data["url"]="cf419cd4-cdb1-4dd6-8ee5-84ecf0218f62"
-    request("validated", data, 200, function(){})
+    request("validated", data, 200, testLoginUpload)
 }
 function testValidate1(body){
     console.log("Starting testValidate1")
@@ -52,7 +62,7 @@ function testValidate(body){
     let data ={}
     data["key"]=key
     data["url"]="cf419cd4-cdb1-4dd6-8ee5-84ecf0218f62"
-    request("validate", data, 200, function(){})
+    request("validate", data, 200, testValidated)
 }
 function testNewLogin1(body){
     key=body.key
