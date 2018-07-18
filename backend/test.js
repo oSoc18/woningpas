@@ -1,6 +1,8 @@
 let http = require("http");
 var assert = require('assert');
 let key =""
+let url = ""
+let fs = require("fs")
 
 function request(cmd, data, statusCode, followingTest) {
     let reqBody = JSON.stringify(data)
@@ -20,6 +22,7 @@ function request(cmd, data, statusCode, followingTest) {
             body += data;
         })
         response.on('end', function() {
+            console.log(body)
             assert(response.statusCode===statusCode)
             followingTest(JSON.parse(body))
         })
@@ -27,58 +30,48 @@ function request(cmd, data, statusCode, followingTest) {
     req.write(reqBody);
     req.end();
 }
-function testUpload(body){
-    let data ={}
-    data["key"]=key
-    data["content"]="test"
-    request("upload", JSON.stringify(data), 400, function(){})
-}
 function testValidated(body){
-    console.log("Starting testValidate")
+    console.log("Starting testValidated")
     let data={}
     data["key"]=key
-    data["url"]="cf419cd4-cdb1-4dd6-8ee5-84ecf0218f62"
+    data["url"]=url
     request("validated", data, 200, function(){})
-}
-function testValidate1(body){
-    console.log("Starting testValidate1")
-    let data ={}
-    data["key"]=key
-    data["url"]="test"
-    request("validate", data, 400, testValidated)
 }
 function testValidate(body){
     console.log("Starting testValidate")
     let data ={}
     data["key"]=key
-    data["url"]="cf419cd4-cdb1-4dd6-8ee5-84ecf0218f62"
-    request("validate", data, 200, function(){})
+    data["url"]=url
+    request("validate", data, 200, testValidated)
 }
-function testNewLogin1(body){
+function testValidated1(body){
     key=body.key
-    console.log("Starting testNewLogin1")
+    console.log("Starting testValidated1")
+    let data={}
+    data["key"]=key
+    data["url"]=url
+    request("validated", data, 200, testValidate)
+}
+function testLoginUpload(body){
+    url = body.url
+    console.log("Starting testLoginUpload")
     let data = {}
-    data["account"]="accoun1"
-    request("login", data, 400, testValidate)
+    data["account"]="inspector"
+    request("login", data, 200, testValidated1)
+}
+function testUpload(body){
+    key=body.key
+    console.log("Starting testUpload")
+    let data ={}
+    data["key"]=key
+    data["content"]=fs.readFileSync("./pdf-sample.pdf")
+    request("upload",data, 200, testLoginUpload)
 }
 function testNewLogin(body){
     console.log("Starting testNewLogin")
     let data = {}
-    data["account"]="inspector"
-    request("login", data, 200, testNewLogin1)
-}
-function testLogin1(body){
-    console.log("Starting testLogin1")
-    let data = {}
-    data["type"]="inspector1"
-    request("login", data, 400, testNewLogin)
-}
-
-function testLogin(){
-    console.log("Starting testLogin")
-    let data = {}
-    data["type"]="inspector"
-    request("login", data, 200, testLogin1)
+    data["account"]="owner"
+    request("login", data, 200, testUpload)
 }
 
 testNewLogin()

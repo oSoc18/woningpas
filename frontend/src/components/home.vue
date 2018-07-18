@@ -50,7 +50,10 @@
 
 <script>
 import axios from 'axios'
-import auth from './auth.js'
+import auth from '@/js/auth.js'
+import api from '@/js/api.js'
+import file from '@/js/file.js'
+
 export default {
   name: 'Home',
   data() {
@@ -62,45 +65,25 @@ export default {
     }
   },
   methods: {
-    apiRequest(path, data, success){
-      axios({
-        url: 'http://localhost:8080/' + path,
-        data: data,
-        method: 'POST',
-        responseType: 'json',
-      }).then(success).catch(error => {
-        console.log(error)
-      })
-    },
     logout(){
       this.auth.logout()
       this.$router.push({ name: "Home"})
     },
     download(){
-      var data = {
+      let data = {
         url: this.fileId,
         key: localStorage.getItem('token')
       }
-      this.apiRequest('download', data, (res) => {
-        var content = atob(res.data.content)
-        const url = window.URL.createObjectURL(new Blob([content]))
-        const link = document.createElement('a')
-        link.href = url
-        link.setAttribute('download', 'file.pdf')
-        document.body.appendChild(link)
-        link.click()
-        console.log(res);
+      api.request('download', data, (data) => {
+        file.download('file.pdf', atob(data.content));
       })
     },
     validate(){
-      var jsonToSend = {
+      let data = {
         url: this.fileId,
         key: localStorage.getItem('token')
       }
-      axios.post('http://localhost:8080/validate', jsonToSend)
-        .then(res => {
-          console.log(res)
-        })
+      api.request('validate', data);
     }
   }
 }

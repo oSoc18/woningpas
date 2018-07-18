@@ -67,7 +67,9 @@
 
 <script>
 import axios from 'axios'
-import auth from './auth.js'
+import auth from '@/js/auth.js'
+import api from '@/js/api.js'
+
 export default {
     name: 'Login',
     data() {
@@ -77,20 +79,10 @@ export default {
         }
     },
     methods: {
-        apiRequest(path, data, success){
-            axios({
-                url: 'http://localhost:8080/' + path,
-                data: data,
-                method: 'POST',
-                responseType: 'json',
-            }).then(success).catch(error => {
-                console.log(error)
-            })
-        },
         login() {
-            this.apiRequest('login', {account: this.role}, (res) => {
-                var token = res.data.key
-                this.auth.login(this.role, token)
+            api.request('login', {account: this.role}, (data) => {
+                var token = data.key
+                auth.login(this.role, token)
                 this.$router.push('/home')
             })
         }
