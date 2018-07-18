@@ -141,14 +141,14 @@ apiFunctions.upload = function(req, res, data) {
     }
 
     let id = uuid();
-    let h = hash(content);
+    let hash = hash(content);
 
     // TODO check if file exists and error
     fs.writeFileSync(UPLOAD_DIR + id, content, 'base64');
     console.log("file saved with id " + id);
 
     // TODO check error
-    smartcontract.addUpload(h, get_ethereum_key(key), "name", id);
+    smartcontract.addUpload(hash, get_ethereum_key(key), id, houseId);
     console.log("called smartcontract");
 
     success(res, {
@@ -189,7 +189,7 @@ apiFunctions.validate = function(req, res, data) {
     }
 
     // TODO check error
-    smartcontract.setVerification(url, get_ethereum_key(key), res, error, success);
+    smartcontract.setVerification(url, houseId get_ethereum_key(key), res, error, success);
     console.log('called smartcontract');
 }
 
@@ -209,7 +209,7 @@ apiFunctions.validated = function(req, res, data) {
 
     console.log('called smartcontract');
 
-    smartcontract.isVerified(url, get_ethereum_key(key), res, error, success);
+    smartcontract.isVerified(url, houseId, get_ethereum_key(key), res, error, success);
 }
 
 
