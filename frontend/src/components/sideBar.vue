@@ -1,40 +1,47 @@
 <template>
-  <div id="sideBar" class="col-xs-6 col-md-3">
-    <div align="center">
-      <img id="houseImage" src="@/assets/house.jpg">
-      <div id="houseInfo">
-        <h5>Hogeweg 543</h5>
-        <h6><b>KORTRIJK</b></h6>
-        <a href="#">Woningpas other house</a>
-      </div>
-      <div>
-        <div id="houseTabs">
-          <a href="#">
-            <img src="@/assets/houseIcon.jpg" width="20" height="20" alt="house icon">&nbsp;&nbsp;
-            My house
-          </a>
-          <a href="#">Building, layout, location</a>
-          <a href="#">Energy</a>
-          <a href="#">Insulation & glazing</a>
-          <a href="#">Insulation & glazing</a>
-          <a href="#">Installations</a>
-          <a href="#">Ground</a>
-          <a href="#">Permit</a>
+  <div id="sideBar" data-styleguide="woningpas">
+    <section class="o-main-nav">
+      <div class="o-main-nav__house">
+    		<div class="o-main-nav__house__placeholder o-main-nav__house__placeholder--noImage "
+          style="background-image:url('http://woningpas.brandplatform.be/img/coloured-icons/placeholder-appartement.svg')">
         </div>
-        <div id="environment">
-          <a href="#">
-            <img src="@/assets/map.jpg" width="20" height="20" alt="house icon">&nbsp;&nbsp;
-            Environment
-          </a>
-        </div>
-        <div id="docs">
-          <a href="#">
-            <img src="@/assets/document.png" width="16" height="16" alt="document icon">&nbsp;&nbsp;
-            Certificates & documents
-          </a>
+        <div class="o-main-nav__adress">
+          <p>Hogeweg</p>
+          <strong>Kortrijk</strong>
+          <a href="#">woningpas another house</a>
         </div>
       </div>
-    </div>
+      <nav class="o-main-nav__nav">
+        <ul>
+          <li class="">
+            <a class="" href=""><span class="icon-mijn-woningpas"></span> My woningpas</a>
+            <ul>
+               <li class=""><a href="#">Building, layout, location <span class="a-badge a-badge--red"></span></a></li>
+               <li class=""><a href="#">Energy <span class="a-badge a-badge--red"></span></a></li>
+               <li class=""><a href="#">Insulation &amp; Glazing <span class="a-badge a-badge--red"></span></a></li>
+               <li class=""><a href="#">Installations <span class="a-badge a-badge--red">2</span></a></li>
+               <li class=""><a href="#">Ground <span class="a-badge a-badge--red"></span></a></li>
+               <li class=""><a href="#">Permit <span class="a-badge a-badge--red"></span></a></li>
+            </ul>
+          </li>
+          <li class="">
+            <a class="" href="#"><span class="icon-omgeving"></span> Environment</a>
+          </li>
+          <li class="">
+            <a class="" href="#"><span class="icon-attesten"></span> Certificates &amp; documents</a>
+          </li>
+          <li class="o-main-nav__collapsable">
+            <a class="js-menu-collapsable" href="#"><span class="icon-legende"></span> Ik ben van plan om te...</a>
+            <ul>
+               <li class=""><a href="#">To sell <span class="a-badge a-badge--red"></span></a></li>
+               <li class=""><a href="#">To rent <span class="a-badge a-badge--red"></span></a></li>
+               <li class="is-favorited"><a href="isolatie.html">Rebuild <span class="a-badge a-badge--red"></span></a></li>
+               <li class=""><a href="installaties.html">To build <span class="a-badge a-badge--red"></span></a></li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+    </section>
   </div>
 </template>
 
@@ -45,39 +52,4 @@ export default {
 </script>
 
 <style scoped>
-#sideBar {
-  padding: 0;
-  margin: 0;
-  border: solid 1px;
-  background: lightgrey;
-}
-#sideBar a {
-    text-decoration: none;
-    font-size: 16px;
-    color: #2196F3;
-    display: block;
-}
-#sideBar a:hover {
-    color: #f1f1f1;
-}
-#main{
-  padding-left: 6%;
-  padding-right: 6%;
-}
-@media screen and (max-height: 450px) {
-    .sideBar {padding-top: 15px;}
-    .sideBar a {font-size: 18px;}
-}
-#houseImage{
-  width: 100%;
-}
-#houseInfo {
-  background: #ECE6E6;
-  border-top: solid 1px black;
-}
-#houseInfo, #houseTabs, #environment, #docs {
-  padding-top: 4%;
-  padding-bottom: 4%;
-  border-bottom: solid 1px black;
-}
 </style>
