@@ -148,7 +148,7 @@ apiFunctions.upload = function(req, res, data) {
     console.log("file saved with id " + id);
 
     // TODO check error
-    smartcontract.addUpload(hash, get_ethereum_key(key), id, houseId);
+    smartcontract.addUpload(hash, get_ethereum_key(key), id, houseId, res, error, success);
     console.log("called smartcontract");
 
     success(res, {
@@ -213,30 +213,45 @@ apiFunctions.validated = function(req, res, data) {
 }
 
 
-/*Provide houses for a given key(owner)*/
 apiFunctions.getHouses = function(req, res, data) {
     let key = data.key;
-    //TODO verif key provided
-    let db = get_database();
 
-    let houses = db['owner'].houses;
+    let nb = getNbHouses(res, key);
 
-    if (houses.size != 0)
-        success(res, houses);
+    let houses;
+    console.log("iciici");
+    console.log(nb);
+
+    for (var i = 0; i <= nb; i++) {
+        houses = smartcontract.getHouses(i,res, get_ethereum_key(key));
+    }
+
+    success(res, houses);
 }
 
-apiFunctions.addHouse = function(req, res, data){
+apiFunctions.addHouse = function(req, res, data) {
     let key = data.key;
-    let street =  data.street;
+    let street = data.street;
     let zipCode = data.zipCode;
     let city = data.city;
     let country = data.country;
     if (get_type(key) !== "owner") {
-        return error(res, "Only owner can upload file");
+        return error(res, "Only owner can add houses");
     }
-    smartcontract.addHouse(street, zipCode, city, country, houseId, res, error, success)
-    
+    smartcontract.addHouse(street, zipCode, city, country, houseId, res, error, success, get_ethereum_key(key))
+
 }
+
+function getNbHouses(res, key) {
+    console.log(key);
+    if (get_type(key) !== "owner") {
+        return error(res, "Only owner see their number of houses");
+    }
+    let numberOfHouse = smartcontract.getNbHouses(res, error, success, get_ethereum_key(key));
+
+    return numberOfHouse;
+}
+
 
 
 /* TODO later

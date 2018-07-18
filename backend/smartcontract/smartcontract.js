@@ -18,12 +18,15 @@ var byteCodeContract;
 let contractName = 'WoningPasV2';
 
 
-const addressContract = '0x2765eabc3ca01361d38a53efabc38f9d100a4a01';
+//const addressContract = '0x2765eabc3ca01361d38a53efabc38f9d100a4a01';
+const addressContract = '0xe50adc68100fe50d1ce831a3992b74ba0d9b7d11';
+
 //needs to be changed
 var adresseFrom;
 //Address of the node
 var url = "https://e0vp6l0egw:lt32IHCYpL4rJuBlXHFD-oCTcxABbR96Bh0qaV2FLgE@e0qztrawvi-e0q2xif8zj-rpc.eu-central-1.kaleido.io";
 console.log(`1. Connecting to target node: ${url}`);
+
 let web3 = new Web3(new Web3.providers.HttpProvider(url));
 
 var accountAddress;
@@ -56,7 +59,7 @@ function getContract() {
 
   //adresse est optionnel dans Contract
   let ret = new web3.eth.Contract(abi, addressContract);
-  
+
   return ret;
 }
 
@@ -69,7 +72,9 @@ function isVerified(fileId, houseId, privateKey, res, error, success) {
     gas: 5e6
   }).then(function(result) {
     console.log(result);
-    success(res, {"validated":result})
+    success(res, {
+      "validated": result
+    })
   }).catch(function(error) {
     console.log(error)
     error(res, "Error with isVerified")
@@ -81,7 +86,7 @@ async function setVerification(fileId, houseId, privateKey, res, error, success)
   console.log(ret)
   let acc = web3.eth.accounts.privateKeyToAccount(privateKey);
   console.log("setVerification");
-  
+
   let tx_builder = ret.methods.setVerification(fileId, houseId);
   let encoded_tx = tx_builder.encodeABI();
   let transactionObject = {
@@ -90,16 +95,18 @@ async function setVerification(fileId, houseId, privateKey, res, error, success)
     from: acc.address,
     to: addressContract
   };
-  web3.eth.accounts.signTransaction(transactionObject, acc.privateKey, function (err, signedTx) {
+  web3.eth.accounts.signTransaction(transactionObject, acc.privateKey, function(err, signedTx) {
     if (err) {
       console.log(err);
       // handle error
       error(res, "Error with setVerification")
     } else {
       web3.eth.sendSignedTransaction(signedTx.rawTransaction)
-        .on('receipt', function (receipt) {
-            success(res, success(res, {"validated":true}))
-      });
+        .on('receipt', function(receipt) {
+          success(res, success(res, {
+            "validated": true
+          }))
+        });
     };
   })
 }
@@ -111,7 +118,7 @@ async function addUpload(hash, privateKey, fileId, houseId, res, error, success)
   console.log("addUpload");
 
   let tx_builder = ret.methods.addDocument(fileId, false, hash, houseId);
-  
+
   let encoded_tx = tx_builder.encodeABI();
   let transactionObject = {
     gas: 5000000,
@@ -119,16 +126,18 @@ async function addUpload(hash, privateKey, fileId, houseId, res, error, success)
     from: acc.address,
     to: addressContract
   };
-  web3.eth.accounts.signTransaction(transactionObject, acc.privateKey, function (err, signedTx) {
+  web3.eth.accounts.signTransaction(transactionObject, acc.privateKey, function(err, signedTx) {
     if (err) {
       console.log(err);
       // handle error
       error(res, "Error with addUpload")
     } else {
       web3.eth.sendSignedTransaction(signedTx.rawTransaction)
-        .on('receipt', function (receipt) {
-            success(res, success(res, {"url":id}))
-      });
+        .on('receipt', function(receipt) {
+          success(res, success(res, {
+            "url": id
+          }))
+        });
     };
   })
 }
@@ -139,14 +148,97 @@ function getUpload(fileId, houseId, callback) {
   ret.methods.getDocument(fileId, houseId).call({
     from: addressContract
   }).then(function(result) {
-      console.log(result);
-      if(callback) {
-        callback(result);
-      }
-  }).catch(function(error){
+    console.log(result);
+    if (callback) {
+      callback(result);
+    }
+  }).catch(function(error) {
     console.log(error)
   });
 }
+
+
+async function createAccount() {
+  let account = await web3.eth.accounts.create();
+  console.log("Create account");
+  console.log(account);
+  web3.eth.accounts.wallet.add(account)
+  return account;
+}
+
+async function addHouse(street, zipCode, city, country, houseId, privateKey, res, error, success) {
+  let acc = web3.eth.accounts.privateKeyToAccount(privateKey);
+
+  var ret = getContract();
+  console.log("addHouse");
+
+  let tx_builder = ret.methods.addHouse(street, zipCode, city, country, houseId);
+
+  let encoded_tx = tx_builder.encodeABI();
+  let transactionObject = {
+    gas: 5000000,
+    data: encoded_tx,
+    from: acc.address,
+    to: addressContract
+  };
+  web3.eth.accounts.signTransaction(transactionObject, acc.privateKey, function(err, signedTx) {
+    if (err) {
+      console.log(err);
+      // handle error
+      error(res, "Error with addHouse")
+    } else {
+      web3.eth.sendSignedTransaction(signedTx.rawTransaction)
+        .on('receipt', function(receipt) {
+          success(res, success(res, {
+            "message": "Success"
+          }))
+        });
+    };
+  })
+}
+
+async function getHouses(index, callback, privateKey) {
+  var ret = getContract();
+  console.log("getHouses");
+
+  let acc = web3.eth.accounts.privateKeyToAccount(privateKey);
+  console.log(index);
+  ret.methods.getHouses(index).call({
+    from: acc.address,
+    gas: 5e6
+  }).then(function(result) {
+    console.log(result);
+    success(res, {
+      "Message": "Success"
+    })
+  }).catch(function(error) {
+    console.log(error)
+    error(res, "Error with getHouses")
+  })
+}
+
+async function getNbHouses(res, error, success, privateKey) {
+
+  var ret = getContract();
+  console.log("getNbHouses");
+
+  let acc = web3.eth.accounts.privateKeyToAccount(privateKey);
+
+  ret.methods.getHouseNumber().call({
+    from: acc.address,
+    gas: 5e6
+  }).then(function(result) {
+    console.log(result);
+    success(res, {
+      "Message": result
+    })
+  }).catch(function(error) {
+    console.log(error)
+    error(res, "Error with getNbHouses")
+  })
+}
+
+
 
 /*Pas complet*/
 function deployyy(hash, fileName) {
@@ -161,42 +253,6 @@ function deployyy(hash, fileName) {
   console.log(ret);
 }
 
-async function createAccount() {
-  let account = await web3.eth.accounts.create();
-  console.log("Create account");
-  console.log(account);
-  web3.eth.accounts.wallet.add(account)
-  return account;
-}
-
-async function addHouse(street, zipCode, city, country, houseId, res, error, success){
-  let acc = web3.eth.accounts.privateKeyToAccount(privateKey);
-
-  var ret = getContract();
-  console.log("addHouse");
-
-  let tx_builder = ret.methods.addHouse(street, zipCode, city, country, houseId);
-  
-  let encoded_tx = tx_builder.encodeABI();
-  let transactionObject = {
-    gas: 5000000,
-    data: encoded_tx,
-    from: acc.address,
-    to: addressContract
-  };
-  web3.eth.accounts.signTransaction(transactionObject, acc.privateKey, function (err, signedTx) {
-    if (err) {
-      console.log(err);
-      // handle error
-      error(res, "Error with addHouse")
-    } else {
-      web3.eth.sendSignedTransaction(signedTx.rawTransaction)
-        .on('receipt', function (receipt) {
-            success(res, success(res, {"message":"OK"}))
-      });
-    };
-  })
-}
 
 
 module.exports.setVerification = setVerification;
@@ -205,3 +261,5 @@ module.exports.getUpload = getUpload;
 module.exports.isVerified = isVerified;
 module.exports.createAccount = createAccount;
 module.exports.addHouse = addHouse;
+module.exports.getHouses = getHouses;
+module.exports.getNbHouses = getNbHouses;
