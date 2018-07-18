@@ -34,7 +34,8 @@
 
 <script>
 import axios from 'axios'
-import auth from './auth.js'
+import auth from '@/js/auth.js'
+
 export default {
     name: 'Login',
     data() {
