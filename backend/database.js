@@ -1,3 +1,6 @@
+let smartcontract = require("./smartcontract/smartcontract.js")
+let fs = require("fs")
+
 async function populateDB() {
     let account1 = await smartcontract.createAccount();
     let account2 = await smartcontract.createAccount();

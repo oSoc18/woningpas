@@ -85,7 +85,8 @@ apiFunctions.login = function(req, res, data) {
         return error(res, "Account invalid")
     }
     success(res, {
-        "key": key
+        "key": key,
+        "type":get_type(key)
     });
     console.log(keys);
 }
