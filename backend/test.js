@@ -1,6 +1,7 @@
 let http = require("http");
 var assert = require('assert');
 let key =""
+let url = ""
 let fs = require("fs")
 
 function request(cmd, data, statusCode, followingTest) {
@@ -35,37 +36,38 @@ function testUpload(body){
     let data ={}
     data["key"]=key
     data["content"]=fs.readFileSync("./pdf-sample.pdf")
-    request("upload",data, 200, function(){})
+    request("upload",data, 200, testLoginUpload)
 }
 function testLoginUpload(body){
+    url = body.url
     console.log("Starting testLoginUpload")
     let data = {}
-    data["account"]="owner"
-    request("login", data, 200, testUpload)
+    data["account"]="inspector"
+    request("login", data, 200, testValidated1)
 }
 function testValidated(body){
     console.log("Starting testValidated")
     let data={}
     data["key"]=key
-    data["url"]="cf419cd4-cdb1-4dd6-8ee5-84ecf0218f62"
-    request("validated", data, 200, testLoginUpload)
+    data["url"]=url
+    request("validated", data, 200, function(){})
 }
-function testValidate1(body){
-    console.log("Starting testValidate1")
-    let data ={}
+function testValidated1(body){
+    key=body.key
+    console.log("Starting testValidated")
+    let data={}
     data["key"]=key
-    data["url"]="test"
-    request("validate", data, 400, testValidated)
+    data["url"]=url
+    request("validated", data, 200, testValidate)
 }
 function testValidate(body){
     console.log("Starting testValidate")
     let data ={}
     data["key"]=key
-    data["url"]="cf419cd4-cdb1-4dd6-8ee5-84ecf0218f62"
+    data["url"]=url
     request("validate", data, 200, testValidated)
 }
 function testNewLogin1(body){
-    key=body.key
     console.log("Starting testNewLogin1")
     let data = {}
     data["account"]="accoun1"
@@ -74,8 +76,8 @@ function testNewLogin1(body){
 function testNewLogin(body){
     console.log("Starting testNewLogin")
     let data = {}
-    data["account"]="inspector"
-    request("login", data, 200, testNewLogin1)
+    data["account"]="owner"
+    request("login", data, 200, testUpload)
 }
 function testLogin1(body){
     console.log("Starting testLogin1")
@@ -87,7 +89,7 @@ function testLogin1(body){
 function testLogin(){
     console.log("Starting testLogin")
     let data = {}
-    data["type"]="inspector"
+    data["type"]="owner"
     request("login", data, 200, testLogin1)
 }
 
