@@ -5,4 +5,5 @@ module.exports.api = {
   "download": ["key", "url"],
   "validate": ["key", "url"],
   "validated": ["key", "url"],
+  "getHouses":["key"],
 }
