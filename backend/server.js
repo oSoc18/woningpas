@@ -8,7 +8,7 @@ var smartcontract = require('./smartcontract/smartcontract.js')
 var api = require('./api.js').api;
 var apiFunctions = {};
 
-function hash(base64content){
+function hashh(base64content) {
     const hash = crypto.createHash('sha256');
     var content = Buffer.from(base64content, 'base64');
     hash.update(content);
@@ -32,8 +32,8 @@ console.log(keys);
 console.log("saving files in " + UPLOAD_DIR);
 
 function get_type(key) {
-    for(let type of Object.keys(keys)) {
-        if(keys[type][key]) {
+    for (let type of Object.keys(keys)) {
+        if (keys[type][key]) {
             return type;
         }
     }
@@ -41,25 +41,32 @@ function get_type(key) {
 }
 
 let mapping_key_ethereum = {}
+let mapping_key_house = {}
+let mapping_house_files = {}
 
-function get_ethereum_key(key){
+function get_ethereum_key(key) {
     return mapping_key_ethereum[key].privateKey
 }
 
-function create_key(account, password){
-    let key = undefined
+function get_database() {
     let database_file = fs.readFileSync("./database.json")
     let database = JSON.parse(database_file)
-    if (database[account]){
+    return database;
+}
+
+function create_key(account, password) {
+    let key = undefined
+    let database = get_database();
+    if (database[account]) {
         key = uuid()
         keys[database[account].type][key] = true;
-        mapping_key_ethereum[key]=database[account].ethereum
+        mapping_key_ethereum[key] = database[account].ethereum
     }
     return key
 }
 
 
-function error(response, message){
+function error(response, message) {
     response.status(400);
     let data = {
         "message": message
@@ -72,12 +79,14 @@ function success(response, data) {
     response.json(data);
 }
 
-apiFunctions.login = function(req, res, data){
+apiFunctions.login = function(req, res, data) {
     let key = create_key(data.account)
-    if (key===undefined){
+    if (key === undefined) {
         return error(res, "Account invalid")
     }
-    success(res, {"key": key});
+    success(res, {
+        "key": key
+    });
     console.log(keys);
 }
 /**
@@ -94,25 +103,25 @@ app.use((req, res, next) => {
 
 let URIs = Object.keys(api);
 URIs.forEach(function(uri) {
-  app.post('/'+uri, function(req, res) {
-    console.log(uri);
-    let params = api[uri];
-    let err = false;
-    params.forEach(function(param) {
-      if(!req.body[param]) {
-        err = true;
-        error(res, "Parameter " + param + " is mandatory");
-      }
+    app.post('/' + uri, function(req, res) {
+        console.log(uri);
+        let params = api[uri];
+        let err = false;
+        params.forEach(function(param) {
+            if (!req.body[param]) {
+                err = true;
+                error(res, "Parameter " + param + " is mandatory");
+            }
+        })
+        if (!err) {
+            apiFunctions[uri](req, res, req.body);
+        }
     })
-    if(!err) {
-      apiFunctions[uri](req, res, req.body);
-    }
-  })
 });
 
 function authorized_file(name) {
     let i = name.lastIndexOf('.')
-    if(i === -1) {
+    if (i === -1) {
         // no extension
         return false;
     }
@@ -120,84 +129,115 @@ function authorized_file(name) {
     return ext.toLocaleLowerCase() === 'pdf'
 }
 
-apiFunctions.upload = function(req, res, data){
+apiFunctions.upload = function(req, res, data) {
     console.log("upload")
 
     let key = data.key
     let content = data.content
+    let houseId = data.houseId;
 
-    if(get_type(key) !== "owner") {
+    if (get_type(key) !== "owner") {
         return error(res, "Only owner can upload file");
     }
 
     let id = uuid();
-    let h = hash(content);
+    let hash = hashh(content);
 
     // TODO check if file exists and error
     fs.writeFileSync(UPLOAD_DIR + id, content, 'base64');
     console.log("file saved with id " + id);
 
     // TODO check error
-    smartcontract.addUpload(h, get_ethereum_key(key), "name", id);
+    smartcontract.addUpload(hash, get_ethereum_key(key), id, houseId);
     console.log("called smartcontract");
 
-    success(res, {"url": id});
+    success(res, {
+        "url": id
+    });
 }
 
-apiFunctions.download = function(req, res, data){
+apiFunctions.download = function(req, res, data) {
     console.log("download")
     var url = data.url
     var key = data.key
 
-    if(get_type(key) !== "inspector") {
+    if (get_type(key) !== "inspector") {
         return error(res, "Only inspector can download files");
     }
 
     // TODO check error
     let content = fs.readFileSync(UPLOAD_DIR + url, 'base64');
-    if(!content) {
+    if (!content) {
         // already checked by smartcontract, should exists
         return error(res, "No file with this name");
     }
 
-    success(res, {"content": content});
+    success(res, {
+        "content": content
+    });
 }
 
-function validate(name) {
-    // TODO validate
-    return true;
-}
-
-apiFunctions.validate = function(req, res, data){
+apiFunctions.validate = function(req, res, data) {
     console.log("validate")
 
     let key = data.key
     let url = data.url
+    let houseId = data.houseId;
 
-    if(get_type(key) !== "inspector") {
+    if (get_type(key) !== "inspector") {
         return error(res, "Only inspector can validate files");
     }
 
     // TODO check error
-    smartcontract.setVerification(url, get_ethereum_key(key), res, error, success);
+    smartcontract.setVerification(url, houseId, get_ethereum_key(key), res, error, success);
     console.log('called smartcontract');
 }
 
-apiFunctions.validated = function(req, res, data){
+apiFunctions.validated = function(req, res, data) {
     console.log("validated")
 
     let key = data.key
     let url = data.url
+    let houseId = data.houseId;
     let type = get_type(key)
 
-    if(type !== "inspector" && type !== "inspector") {
+    if (type !== "inspector" && type !== "inspector") {
         return error(res, "Only owner and inspector see validation status");
     }
 
+    let db = get_database();
+
     console.log('called smartcontract');
 
-    smartcontract.isVerified(url, get_ethereum_key(key), res, error, success);
+    smartcontract.isVerified(url, houseId, get_ethereum_key(key), res, error, success);
 }
+
+
+/*Provide houses for a given key(owner)*/
+apiFunctions.getHouses = function(req, res, data) {
+    let key = data.key;
+    //TODO verif key provided
+    let db = get_database();
+
+    let houses = db['owner'].houses;
+
+    if (houses.size != 0)
+        success(res, houses);
+}
+
+apiFunctions.addHouse = function(req, res, data){
+    let key = data.key;
+    let street =  data.street;
+    let zipCode = data.zipCode;
+    let city = data.city;
+    let country = data.country;
+    if (get_type(key) !== "owner") {
+        return error(res, "Only owner can upload file");
+    }
+    smartcontract.addHouse(street, zipCode, city, country, houseId, res, error, success)
+    
+}
+
 
 /* TODO later
 app.get('/listFiles', function (req, res) {
@@ -213,34 +253,7 @@ app.get('/listFiles', function (req, res) {
 })
 //*/
 
-async function populateDB(){
-    let account = await smartcontract.createAccount();
-    let accountInspector = await smartcontract.createAccount();
-    var pop = {
-        owner:{
-            type:"owner",
-            houses:{
-                house1:{
-                    certificate1:true,
-                    certificate2:true
-                },
-                house2:{
-                    certificate3:true
-                }
-            },
-            ethereum:account
-        },
-        inspector:{
-            type:"inspector",
-            ethereum:accountInspector
-        }
-    }
-    fs.writeFile("./database.json", JSON.stringify(pop))
-}
-
-//populateDB()
-
-var server = app.listen(8080, function () {
+var server = app.listen(8080, function() {
     var host = server.address().address
     var port = server.address().port
     console.log("Example app listening at http://%s:%s", host, port)

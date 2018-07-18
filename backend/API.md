@@ -30,7 +30,7 @@ with `Content-Type` set to `application/json`.
 ### Request parameters
 - key: access key
 - content: base64 encoded content
-
+- houseId : id of the house that the document is linked
 ### Response parameters
 - url: file url
 
@@ -50,6 +50,7 @@ with `Content-Type` set to `application/json`.
 ### Request parameters
 - key: access key
 - url: file url
+- houseId : id of the house that the document is linked
 
 ### Response parameters
 None
@@ -60,6 +61,17 @@ None
 ### Request parameters
 - key: access key
 - url: file url
+- houseId : id of the house that the document is linked
 
 ### Response parameters
 -validated: boolean wether or not this file has been validated
+
+
+## /getHouses
+
+### Request parameters
+- key: access key
+
+### Response parameters
+-content : list of houses and for each house a list of files
+

@@ -15,7 +15,7 @@ const privateFor = argv.privateFor;
 const externallySign = argv.sign;
 
 var byteCodeContract;
-let contractName = 'WoningPas';
+let contractName = 'WoningPasV2';
 
 
 const addressContract = '0x2765eabc3ca01361d38a53efabc38f9d100a4a01';
@@ -60,11 +60,11 @@ function getContract() {
   return ret;
 }
 
-function isVerified(id, privateKey, res, error, success) {
+function isVerified(fileId, houseId, privateKey, res, error, success) {
   var ret = getContract();
   console.log("isVerified");
   let acc = web3.eth.accounts.privateKeyToAccount(privateKey);
-  ret.methods.isVerified(id).call({
+  ret.methods.isVerified(fileId, houseId).call({
     from: acc.address,
     gas: 5e6
   }).then(function(result) {
@@ -76,13 +76,13 @@ function isVerified(id, privateKey, res, error, success) {
   })
 }
 
-async function setVerification(id, privateKey, res, error, success) {
+async function setVerification(fileId, houseId, privateKey, res, error, success) {
   var ret = getContract();
   console.log(ret)
   let acc = web3.eth.accounts.privateKeyToAccount(privateKey);
   console.log("setVerification");
   
-  let tx_builder = ret.methods.setVerification(id);
+  let tx_builder = ret.methods.setVerification(fileId, houseId);
   let encoded_tx = tx_builder.encodeABI();
   let transactionObject = {
     gas: 50000,
@@ -104,13 +104,14 @@ async function setVerification(id, privateKey, res, error, success) {
   })
 }
 
-async function addUpload(hash, privateKey, file, id, res, error, success) {
+async function addUpload(hash, privateKey, fileId, houseId, res, error, success) {
   let acc = web3.eth.accounts.privateKeyToAccount(privateKey);
 
   var ret = getContract();
   console.log("addUpload");
 
-  let tx_builder = ret.methods.addUpload(id,file, hash);
+  let tx_builder = ret.methods.addDocument(fileId, false, hash, houseId);
+  
   let encoded_tx = tx_builder.encodeABI();
   let transactionObject = {
     gas: 5000000,
@@ -132,10 +133,10 @@ async function addUpload(hash, privateKey, file, id, res, error, success) {
   })
 }
 
-function getUpload(id, callback) {
+function getUpload(fileId, houseId, callback) {
   var ret = getContract();
   console.log("getUpload");
-  ret.methods.getFileName(id).call({
+  ret.methods.getDocument(fileId, houseId).call({
     from: addressContract
   }).then(function(result) {
       console.log(result);
@@ -158,15 +159,43 @@ function deployyy(hash, fileName) {
 
   console.log("Déploiment du contract sur le blockchain");
   console.log(ret);
-
 }
 
-async function createAccount(){
+async function createAccount() {
   let account = await web3.eth.accounts.create();
   console.log("Create account");
   console.log(account);
   web3.eth.accounts.wallet.add(account)
   return account;
+}
+
+async function addHouse(street, zipCode, city, country, houseId, res, error, success){
+  let acc = web3.eth.accounts.privateKeyToAccount(privateKey);
+
+  var ret = getContract();
+  console.log("addHouse");
+
+  let tx_builder = ret.methods.addHouse(street, zipCode, city, country, houseId);
+  
+  let encoded_tx = tx_builder.encodeABI();
+  let transactionObject = {
+    gas: 5000000,
+    data: encoded_tx,
+    from: acc.address,
+    to: addressContract
+  };
+  web3.eth.accounts.signTransaction(transactionObject, acc.privateKey, function (err, signedTx) {
+    if (err) {
+      console.log(err);
+      // handle error
+      error(res, "Error with addHouse")
+    } else {
+      web3.eth.sendSignedTransaction(signedTx.rawTransaction)
+        .on('receipt', function (receipt) {
+            success(res, success(res, {"message":"OK"}))
+      });
+    };
+  })
 }
 
 
@@ -175,3 +204,4 @@ module.exports.addUpload = addUpload;
 module.exports.getUpload = getUpload;
 module.exports.isVerified = isVerified;
 module.exports.createAccount = createAccount;
+module.exports.addHouse = addHouse;
