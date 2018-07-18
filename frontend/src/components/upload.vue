@@ -7,6 +7,8 @@
 
 <script>
 import axios from 'axios'
+import api from '@/js/api.js'
+
 export default {
     name: 'Upload',
     data() {
@@ -23,17 +25,13 @@ export default {
             };
             reader.readAsBinaryString(event.target.files[0]);
         },
-        upload(content){
+        upload(){
             var token = localStorage.getItem('token')
-            var jsonToSend = {
+            var data = {
               key: token,
               content: btoa(this.content)
             }
-            axios.post('http://localhost:8080/upload', jsonToSend)
-             .then(res => {
-               alert(res.data.url)
-                console.log(res)
-             })
+            api.request('upload', data);
         }
     }
 }

@@ -30,35 +30,12 @@ function request(cmd, data, statusCode, followingTest) {
     req.write(reqBody);
     req.end();
 }
-function testUpload(body){
-    key=body.key
-    console.log("Starting testUpload")
-    let data ={}
-    data["key"]=key
-    data["content"]=fs.readFileSync("./pdf-sample.pdf")
-    request("upload",data, 200, testLoginUpload)
-}
-function testLoginUpload(body){
-    url = body.url
-    console.log("Starting testLoginUpload")
-    let data = {}
-    data["account"]="inspector"
-    request("login", data, 200, testValidated1)
-}
 function testValidated(body){
     console.log("Starting testValidated")
     let data={}
     data["key"]=key
     data["url"]=url
     request("validated", data, 200, function(){})
-}
-function testValidated1(body){
-    key=body.key
-    console.log("Starting testValidated")
-    let data={}
-    data["key"]=key
-    data["url"]=url
-    request("validated", data, 200, testValidate)
 }
 function testValidate(body){
     console.log("Starting testValidate")
@@ -67,30 +44,34 @@ function testValidate(body){
     data["url"]=url
     request("validate", data, 200, testValidated)
 }
-function testNewLogin1(body){
-    console.log("Starting testNewLogin1")
+function testValidated1(body){
+    key=body.key
+    console.log("Starting testValidated1")
+    let data={}
+    data["key"]=key
+    data["url"]=url
+    request("validated", data, 200, testValidate)
+}
+function testLoginUpload(body){
+    url = body.url
+    console.log("Starting testLoginUpload")
     let data = {}
-    data["account"]="accoun1"
-    request("login", data, 400, testValidate)
+    data["account"]="inspector"
+    request("login", data, 200, testValidated1)
+}
+function testUpload(body){
+    key=body.key
+    console.log("Starting testUpload")
+    let data ={}
+    data["key"]=key
+    data["content"]=fs.readFileSync("./pdf-sample.pdf")
+    request("upload",data, 200, testLoginUpload)
 }
 function testNewLogin(body){
     console.log("Starting testNewLogin")
     let data = {}
     data["account"]="owner"
     request("login", data, 200, testUpload)
-}
-function testLogin1(body){
-    console.log("Starting testLogin1")
-    let data = {}
-    data["type"]="inspector1"
-    request("login", data, 400, testNewLogin)
-}
-
-function testLogin(){
-    console.log("Starting testLogin")
-    let data = {}
-    data["type"]="owner"
-    request("login", data, 200, testLogin1)
 }
 
 testNewLogin()
