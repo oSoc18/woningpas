@@ -227,7 +227,14 @@ apiFunctions.getHouses = function(req, res, data) {
 
 apiFunctions.addHouse = function(req, res, data){
     let key = data.key;
-
+    let street =  data.street;
+    let zipCode = data.zipCode;
+    let city = data.city;
+    let country = data.country;
+    if (get_type(key) !== "owner") {
+        return error(res, "Only owner can upload file");
+    }
+    smartcontract.addHouse(street, zipCode, city, country, houseId, res, error, success)
     
 }
 
@@ -247,23 +254,35 @@ app.get('/listFiles', function (req, res) {
 //*/
 
 async function populateDB() {
-    let account = await smartcontract.createAccount();
+    let account1 = await smartcontract.createAccount();
+    let account2 = await smartcontract.createAccount();
     let accountInspector = await smartcontract.createAccount();
     var pop = {
-        owner: {
+        "owner1@woningpas.be": {
             type: "owner",
             houses: {
-                House1: {
+                house1_id: {
+                    
                     certificate1: true,
                     certificate2: true
                 },
-                house2: {
+                house2_id: {
                     certificate3: true
                 }
             },
-            ethereum: account
+            ethereum: account1
         },
-        inspector: {
+        "owner2@woningpas.be": {
+            type: "owner",
+            houses: {
+                house1_id: {
+                    certificate1: true,
+                    certificate2: true
+                }
+            },
+            ethereum: account2
+        },
+        "inspector1@woningpas.be": {
             type: "inspector",
             ethereum: accountInspector
         }

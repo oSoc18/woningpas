@@ -204,3 +204,4 @@ module.exports.addUpload = addUpload;
 module.exports.getUpload = getUpload;
 module.exports.isVerified = isVerified;
 module.exports.createAccount = createAccount;
+module.exports.addHouse = addHouse;
