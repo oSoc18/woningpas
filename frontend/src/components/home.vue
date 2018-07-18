@@ -49,7 +49,6 @@
 </template>
 
 <script>
-import axios from 'axios'
 import auth from '@/js/auth.js'
 import api from '@/js/api.js'
 import file from '@/js/file.js'

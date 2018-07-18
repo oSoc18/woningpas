@@ -39,17 +39,19 @@
 </template>
 
 <script>
-  export default {
-    name: 'Header',
-    data(){
-      return{
-        role: localStorage.getItem('role')
-      }
-    },
-    methods:{
-      singOut(){
-        alert("want to sign out")
-      }
+import auth from '@/js/auth.js'
+
+export default {
+  name: 'Header',
+  data(){
+    return{
+      role: auth.getRole()
+    }
+  },
+  methods:{
+    singOut(){
+      alert("want to sign out")
     }
   }
+}
 </script>
