@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+import auth from '@/js/auth.js'
 import api from '@/js/api.js'
 
 export default {
@@ -26,9 +26,8 @@ export default {
             reader.readAsBinaryString(event.target.files[0]);
         },
         upload(){
-            var token = localStorage.getItem('token')
             var data = {
-              key: token,
+              key: auth.getToken(),
               content: btoa(this.content)
             }
             api.request('upload', data);
