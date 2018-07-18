@@ -8,7 +8,7 @@ var smartcontract = require('./smartcontract/smartcontract.js')
 var api = require('./api.js').api;
 var apiFunctions = {};
 
-function hash(base64content) {
+function hashh(base64content) {
     const hash = crypto.createHash('sha256');
     var content = Buffer.from(base64content, 'base64');
     hash.update(content);
@@ -141,7 +141,7 @@ apiFunctions.upload = function(req, res, data) {
     }
 
     let id = uuid();
-    let hash = hash(content);
+    let hash = hashh(content);
 
     // TODO check if file exists and error
     fs.writeFileSync(UPLOAD_DIR + id, content, 'base64');
@@ -189,7 +189,7 @@ apiFunctions.validate = function(req, res, data) {
     }
 
     // TODO check error
-    smartcontract.setVerification(url, houseId get_ethereum_key(key), res, error, success);
+    smartcontract.setVerification(url, houseId, get_ethereum_key(key), res, error, success);
     console.log('called smartcontract');
 }
 
@@ -248,7 +248,7 @@ async function populateDB() {
         owner: {
             type: "owner",
             houses: {
-                house1: {
+                House1: {
                     certificate1: true,
                     certificate2: true
                 },

@@ -15,7 +15,7 @@ const privateFor = argv.privateFor;
 const externallySign = argv.sign;
 
 var byteCodeContract;
-let contractName = 'WoningPas';
+let contractName = 'WoningPasV2';
 
 
 const addressContract = '0x2765eabc3ca01361d38a53efabc38f9d100a4a01';

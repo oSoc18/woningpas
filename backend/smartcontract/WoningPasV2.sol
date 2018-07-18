@@ -1,6 +1,6 @@
 pragma solidity ^0.4.23;
 
-contract WoningPas {
+contract WoningPasV2 {
 
 	struct Owner{
 		address addr;			
@@ -45,12 +45,7 @@ contract WoningPas {
 		owners[msg.sender].houses[_idHouse].documents[_fileId] = docToAdd;
 	}
 
-	//TODO
-	function transferOwnership(string _from, string _to) public {
-
-	}
-
-
+	
 	function getFileHash(string _fileId, string _houseId) public view returns (string){
 		return owners[msg.sender].houses[_houseId].documents[_fileId].hash;
 	}
@@ -75,8 +70,4 @@ contract WoningPas {
 		Document storage doc = owners[msg.sender].houses[_houseId].documents[_docId];
 		return (doc.isVerified, doc.hash);
 	}
-	
-
 }
-
-
