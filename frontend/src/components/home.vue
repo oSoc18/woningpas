@@ -50,9 +50,9 @@
 
 <script>
 import axios from 'axios'
-import auth from './auth.js'
-import api from './api.js'
-import file from './file.js'
+import auth from '@/js/auth.js'
+import api from '@/js/api.js'
+import file from '@/js/file.js'
 
 export default {
   name: 'Home',
