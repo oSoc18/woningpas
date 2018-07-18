@@ -5,6 +5,8 @@ var uuid = require("uuid/v4");
 var bodyParser = require('body-parser');
 var crypto = require('crypto');
 var smartcontract = require('./smartcontract/smartcontract.js')
+var api = require('./api.js').api;
+var apiFunctions = {};
 
 function hash(base64content){
     const hash = crypto.createHash('sha256');
@@ -40,15 +42,15 @@ function get_type(key) {
 
 let mapping_key_ethereum = {}
 
-function get_ethereum_account(key){
-    return mapping_key_ethereum[key]
+function get_ethereum_key(key){
+    return mapping_key_ethereum[key].privateKey
 }
 
 function create_key(account, password){
     let key = undefined
     let database_file = fs.readFileSync("./database.json")
     let database = JSON.parse(database_file)
-    if (database[account] && database[account].password===password){
+    if (database[account]){
         key = uuid()
         keys[database[account].type][key] = true;
         mapping_key_ethereum[key]=database[account].ethereum
@@ -70,6 +72,14 @@ function success(response, data) {
     response.json(data);
 }
 
+apiFunctions.login = function(req, res, data){
+    let key = create_key(data.account)
+    if (key===undefined){
+        return error(res, "Account invalid")
+    }
+    success(res, {"key": key});
+    console.log(keys);
+}
 /**
  * Express routes
  */
@@ -82,41 +92,23 @@ app.use((req, res, next) => {
     next();
 });
 
-app.post('/login', function(req, res){
-    console.log("login")
-    let type = req.body.type
-    if(!type) {
-        return error(res, "type parameter is mandatory");
+let URIs = Object.keys(api);
+URIs.forEach(function(uri) {
+  app.post('/'+uri, function(req, res) {
+    console.log(uri);
+    let params = api[uri];
+    let err = false;
+    params.forEach(function(param) {
+      if(!req.body[param]) {
+        err = true;
+        error(res, "Parameter " + param + " is mandatory");
+      }
+    })
+    if(!err) {
+      apiFunctions[uri](req, res, req.body);
     }
-
-    if(!authorized_types.hasOwnProperty(type)){
-        return error(res, "Unknown type");
-    }
-
-    let key = uuid()
-    keys[type][key] = true;
-
-    success(res, {"key": key});
-    console.log(keys);
-})
-
-app.post('/newLogin', function(req, res){
-    console.log("login")
-    let account = req.body.account
-    let password = req.body.password
-    if(!account){
-        return error(res, "Account mandatory")
-    }
-    if (!password){
-        return error(res, "Password mandatory")
-    }
-    let key = create_key(account, password)
-    if (key===undefined){
-        return error(res, "Account or password invalid")
-    }
-    success(res, {"key": key});
-    console.log(keys);
-})
+  })
+});
 
 function authorized_file(name) {
     let i = name.lastIndexOf('.')
@@ -128,11 +120,11 @@ function authorized_file(name) {
     return ext.toLocaleLowerCase() === 'pdf'
 }
 
-app.post('/upload', function(req, res){
+apiFunctions.upload = function(req, res, data){
     console.log("upload")
 
-    let key = req.body.key
-    let content = req.body.content
+    let key = data.key
+    let content = data.content
 
     if(get_type(key) !== "owner") {
         return error(res, "Only owner can upload file");
@@ -146,16 +138,16 @@ app.post('/upload', function(req, res){
     console.log("file saved with id " + id);
 
     // TODO check error
-    smartcontract.addUpload(h, "name", id);
+    smartcontract.addUpload(h, get_ethereum_key(key), "name", id);
     console.log("called smartcontract");
 
     success(res, {"url": id});
-})
+}
 
-app.post('/download', function(req, res){
+apiFunctions.download = function(req, res, data){
     console.log("download")
-    var url = req.body.url
-    var key = req.body.key
+    var url = data.url
+    var key = data.key
 
     if(get_type(key) !== "inspector") {
         return error(res, "Only inspector can download files");
@@ -169,47 +161,43 @@ app.post('/download', function(req, res){
     }
 
     success(res, {"content": content});
-})
+}
 
 function validate(name) {
     // TODO validate
     return true;
 }
 
-app.post('/validate', function(req, res){
+apiFunctions.validate = function(req, res, data){
     console.log("validate")
 
-    let key = req.body.key
-    let url = req.body.url
+    let key = data.key
+    let url = data.url
 
     if(get_type(key) !== "inspector") {
         return error(res, "Only inspector can validate files");
     }
 
     // TODO check error
-    smartcontract.setVerification(url);
+    smartcontract.setVerification(url, get_ethereum_key(key), res, error, success);
     console.log('called smartcontract');
+}
 
-    success(res, {});
-})
+apiFunctions.validated = function(req, res, data){
+    console.log("validated")
 
-app.post('/validated', function(req, res){
-    console.log("validate")
-
-    let key = req.body.key
-    let url = req.body.url
+    let key = data.key
+    let url = data.url
     let type = get_type(key)
 
     if(type !== "inspector" && type !== "inspector") {
         return error(res, "Only owner and inspector see validation status");
     }
 
-    let checked = smartcontract.setVerification(url);
-
     console.log('called smartcontract');
 
-    success(res, {"validated":smartcontract.isVerified(url)});
-})
+    smartcontract.isVerified(url, get_ethereum_key(key), res, error, success);
+}
 
 /* TODO later
 app.get('/listFiles', function (req, res) {
@@ -225,6 +213,32 @@ app.get('/listFiles', function (req, res) {
 })
 //*/
 
+async function populateDB(){
+    let account = await smartcontract.createAccount();
+    let accountInspector = await smartcontract.createAccount();
+    var pop = {
+        owner:{
+            type:"owner",
+            houses:{
+                house1:{
+                    certificate1:true,
+                    certificate2:true
+                },
+                house2:{
+                    certificate3:true
+                }
+            },
+            ethereum:account
+        },
+        inspector:{
+            type:"inspector",
+            ethereum:accountInspector
+        }
+    }
+    fs.writeFile("./database.json", JSON.stringify(pop))
+}
+
+//populateDB()
 
 var server = app.listen(8080, function () {
     var host = server.address().address

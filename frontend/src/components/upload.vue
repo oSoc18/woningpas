@@ -1,7 +1,7 @@
 <template>
     <div id="upload">
         <input type="file" accept=".pdf" @change="onFileSelected">
-        <button @click="onUpload">Upload</button>
+        <button @click="upload">Upload</button>
     </div>
 </template>
 
@@ -11,22 +11,27 @@ export default {
     name: 'Upload',
     data() {
         return {
-            selectedFile: null
+            content: ''
         }
     },
     methods: {
         onFileSelected(event){
-            this.selectedFile = event.target.files[0]
+            let self = this;
+            let reader = new FileReader();
+            reader.onloadend = function() {
+              self.content = reader.result;
+            };
+            reader.readAsBinaryString(event.target.files[0]);
         },
-        onUpload(){
+        upload(content){
             var token = localStorage.getItem('token')
             var jsonToSend = {
               key: token,
-              name: this.selectedFile.name,
-              content: this.selectedFile
+              content: btoa(this.content)
             }
             axios.post('http://localhost:8080/upload', jsonToSend)
              .then(res => {
+               alert(res.data.url)
                 console.log(res)
              })
         }

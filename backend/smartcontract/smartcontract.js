@@ -23,14 +23,12 @@ const addressContract = '0x2765eabc3ca01361d38a53efabc38f9d100a4a01';
 var adresseFrom;
 //Address of the node
 var url = "https://e0vp6l0egw:lt32IHCYpL4rJuBlXHFD-oCTcxABbR96Bh0qaV2FLgE@e0qztrawvi-e0q2xif8zj-rpc.eu-central-1.kaleido.io";
-
+console.log(`1. Connecting to target node: ${url}`);
 let web3 = new Web3(new Web3.providers.HttpProvider(url));
 
 var accountAddress;
-
-console.log(`1. Connecting to target node: ${url}`);
-setVerification('cf419cd4-cdb1-4dd6-8ee5-84ecf0218f62');
-
+//setVerification('cf419cd4-cdb1-4dd6-8ee5-84ecf0218f62');
+//getAccount();
 function getContract() {
   let tsSrc = fs.statSync(`${dir}/${contractName}.sol`);
   let tsBin;
@@ -62,46 +60,58 @@ function getContract() {
   return ret;
 }
 
-async function isVerified(id) {
+function isVerified(id, privateKey, res, error, success) {
   var ret = getContract();
-  //let acc = await getAccount();
   console.log("isVerified");
+  let acc = web3.eth.accounts.privateKeyToAccount(privateKey);
   ret.methods.isVerified(id).call({
-    from: accountAddress,
+    from: acc.publicKey,
     gas: 5e6
   }).then(function(result) {
     console.log(result);
-
-    return result;
-  });
-
+    success(res, {"validated":result})
+  }).catch(function(error) {
+    console.log(error)
+    error(res, "Error with isVerified")
+  })
 }
 
-async function setVerification(id) {
+async function setVerification(id, privateKey, res, error, success) {
   var ret = getContract();
-  let acc = await getAccount();
+  console.log(ret)
+  let acc = web3.eth.accounts.privateKeyToAccount(privateKey);
   console.log("setVerification");
   
-  ret.methods.setVerification(id).send({
-    from: '0x0959dD81F15012194B4De450efDb10Ec616d55D5',
-    gas: 5e6
-  }).then(function(result) {
-  //  console.log(result);
-    //Return transaction ID;
-    //private key needs to be changed
-    signTransaction(result.transactionHash, '0xa2f147dbeb4212d4e0c7dc4b68f78704271811ff0cd51cfbd86eab3835a5c573');
-   // return isVerified(id);
-  });
-
+  let tx_builder = ret.methods.setVerification(id);
+  let encoded_tx = tx_builder.encodeABI();
+  let transactionObject = {
+    gas: 50000,
+    data: encoded_tx,
+    from: acc.publicKey,
+    to: addressContract
+  };
+  web3.eth.accounts.signTransaction(transactionObject, acc.privateKey, function (error, signedTx) {
+    if (error) {
+      console.log(error);
+      // handle error
+      error(res, "Error with setVerification")
+    } else {
+      web3.eth.sendSignedTransaction(signedTx.rawTransaction)
+        .on('receipt', function (receipt) {
+            console.log(receipt.status)
+            success(res, success(res, {"validated":true}))
+      });
+    };
+  })
 }
 
-async function addUpload(hash, file, id) {
-  let acc = await getAccount();
+async function addUpload(hash, privateKey, file, id) {
+  let acc = web3.eth.accounts.privateKeyToAccount(privateKey);
 
   var ret = getContract();
   console.log("addUpload");
   ret.methods.addUpload(id,file, hash).send({
-    from: acc,
+    from: acc.publicKey,
     gas: 5e6
   }).then(function(result) {
     console.log(result);
@@ -137,38 +147,12 @@ function deployyy(hash, fileName) {
 
 }
 
-//Shouldn't be use
-async function getAccount() {
-
-  if(accountAddress === undefined)
-    var accounts = await web3.eth.personal.getAccounts();
-
-  if (!accounts || accounts.length === 0) {
-    console.error("Can't find accounts in the target node");
-    process.exit(1);
-  }
-
-  console.log("getAccount ");
-  console.log(accounts[0]);
-  console.log(accounts.length);
-  accountAddress  = accounts[0];
-  return accounts[0];
-}
-
 async function createAccount(){
   let account = await web3.eth.accounts.create();
   console.log("Create account");
   console.log(account);
-  
-}
-
-async function signTransaction(tx, pvKey, abi){
-  console.log("signing transcation");
-  let ret = getContract();
-  await web3.eth.accounts.signTransaction(pvKey).then(console.log);
-    
-  
-
+  web3.eth.accounts.wallet.add(account)
+  return account;
 }
 
 
@@ -176,3 +160,4 @@ module.exports.setVerification = setVerification;
 module.exports.addUpload = addUpload;
 module.exports.getUpload = getUpload;
 module.exports.isVerified = isVerified;
+module.exports.createAccount = createAccount;

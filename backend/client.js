@@ -1,13 +1,5 @@
 var http = require("http")
-
-path = {
-  "newLogin":["account", "password"],
-  "login": ["type"],
-  "upload": ["key", "content"],
-  "download": ["key", "url"],
-  "validate": ["key", "url"],
-  "validated": ["key", "url"],
-}
+var path = require('./api.js').api
 
 function usage(command, error) {
   if(error) {
@@ -81,3 +73,4 @@ function request(cmd, data) {
 }
 
 command();
+module.exports.request = request;
