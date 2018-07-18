@@ -169,6 +169,10 @@ async function createAccount() {
   return account;
 }
 
+async function addHouse(street, zipCode, city, country, houseId){
+  
+}
+
 
 module.exports.setVerification = setVerification;
 module.exports.addUpload = addUpload;

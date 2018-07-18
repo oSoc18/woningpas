@@ -225,6 +225,11 @@ apiFunctions.getHouses = function(req, res, data) {
         success(res, houses);
 }
 
+apiFunctions.addHouse = function(req, res, data){
+    let key = data.key;
+
+    
+}
 
 
 /* TODO later
