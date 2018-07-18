@@ -169,8 +169,33 @@ async function createAccount() {
   return account;
 }
 
-async function addHouse(street, zipCode, city, country, houseId){
+async function addHouse(street, zipCode, city, country, houseId, res, error, success){
+  let acc = web3.eth.accounts.privateKeyToAccount(privateKey);
+
+  var ret = getContract();
+  console.log("addHouse");
+
+  let tx_builder = ret.methods.addHouse(street, zipCode, city, country, houseId);
   
+  let encoded_tx = tx_builder.encodeABI();
+  let transactionObject = {
+    gas: 5000000,
+    data: encoded_tx,
+    from: acc.address,
+    to: addressContract
+  };
+  web3.eth.accounts.signTransaction(transactionObject, acc.privateKey, function (err, signedTx) {
+    if (err) {
+      console.log(err);
+      // handle error
+      error(res, "Error with addHouse")
+    } else {
+      web3.eth.sendSignedTransaction(signedTx.rawTransaction)
+        .on('receipt', function (receipt) {
+            success(res, success(res, {"message":"OK"}))
+      });
+    };
+  })
 }
 
 
