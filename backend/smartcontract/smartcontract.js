@@ -65,7 +65,7 @@ function isVerified(id, privateKey, res, error, success) {
   console.log("isVerified");
   let acc = web3.eth.accounts.privateKeyToAccount(privateKey);
   ret.methods.isVerified(id).call({
-    from: acc.publicKey,
+    from: acc.address,
     gas: 5e6
   }).then(function(result) {
     console.log(result);
@@ -87,37 +87,49 @@ async function setVerification(id, privateKey, res, error, success) {
   let transactionObject = {
     gas: 50000,
     data: encoded_tx,
-    from: acc.publicKey,
+    from: acc.address,
     to: addressContract
   };
-  web3.eth.accounts.signTransaction(transactionObject, acc.privateKey, function (error, signedTx) {
-    if (error) {
-      console.log(error);
+  web3.eth.accounts.signTransaction(transactionObject, acc.privateKey, function (err, signedTx) {
+    if (err) {
+      console.log(err);
       // handle error
       error(res, "Error with setVerification")
     } else {
       web3.eth.sendSignedTransaction(signedTx.rawTransaction)
         .on('receipt', function (receipt) {
-            console.log(receipt.status)
             success(res, success(res, {"validated":true}))
       });
     };
   })
 }
 
-async function addUpload(hash, privateKey, file, id) {
+async function addUpload(hash, privateKey, file, id, res, error, success) {
   let acc = web3.eth.accounts.privateKeyToAccount(privateKey);
 
   var ret = getContract();
   console.log("addUpload");
-  ret.methods.addUpload(id,file, hash).send({
-    from: acc.publicKey,
-    gas: 5e6
-  }).then(function(result) {
-    console.log(result);
 
-    return getUpload(hash);
-  });
+  let tx_builder = ret.methods.addUpload(id,file, hash);
+  let encoded_tx = tx_builder.encodeABI();
+  let transactionObject = {
+    gas: 5000000,
+    data: encoded_tx,
+    from: acc.address,
+    to: addressContract
+  };
+  web3.eth.accounts.signTransaction(transactionObject, acc.privateKey, function (err, signedTx) {
+    if (err) {
+      console.log(err);
+      // handle error
+      error(res, "Error with addUpload")
+    } else {
+      web3.eth.sendSignedTransaction(signedTx.rawTransaction)
+        .on('receipt', function (receipt) {
+            success(res, success(res, {"url":id}))
+      });
+    };
+  })
 }
 
 function getUpload(id, callback) {
@@ -130,6 +142,8 @@ function getUpload(id, callback) {
       if(callback) {
         callback(result);
       }
+  }).catch(function(error){
+    console.log(error)
   });
 }
 
