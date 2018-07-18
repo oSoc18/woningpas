@@ -7,7 +7,7 @@
         <p>Please choose between the followings</p>
         <button v-on:click="login" class="a-button" title="Log in" >owner1@woningpas.be</button>
         <button v-on:click="login" class="a-button" title="Log in">owner2@woningpas.be</button>
-        <button v-on:click="login" class="a-button" title="Log in">inspector@woningpas.be</button>
+        <button v-on:click="login" class="a-button" title="Log in">inspector1@woningpas.be</button>
       </div>
       <img src="http://woningpas.brandplatform.be/img/images/kenuwwoning-x2.jpg" alt="">
     </section>
@@ -84,9 +84,7 @@ export default {
       let email = event.target.textContent
       console.log(event);
       api.request('login', {account: email}, (data) => {
-          var token = data.key
-          auth.login(this.role, token)
-          this.$router.push('/home')
+          auth.login(this, email, data.type, data.key)
       })
     }
   }

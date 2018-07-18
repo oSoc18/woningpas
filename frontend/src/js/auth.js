@@ -1,22 +1,35 @@
-const auth = {
-    loggedIn: false,
-    role: '',
-    key: '',
-    login(role, token){
-        localStorage.setItem('token', token)
-        localStorage.setItem('role', role)
-        this.key = token
-        this.role = role
-        this.loggedIn = true        
-    },
-    logout(){
-        localStorage.removeItem('token')
-        localStorage.removeItem('role')
-        this.key = ''
-        this.role = ''
-        this.loggedIn = false
-    }    
-  }
 
-  export default auth
-  
+function login(comp, email, role, token){
+  localStorage.setItem('email', email)
+  localStorage.setItem('role', role)
+  localStorage.setItem('token', token)
+  comp.$router.push('/')
+}
+
+function logout(comp){
+  localStorage.removeItem('email')
+  localStorage.removeItem('role')
+  localStorage.removeItem('token')
+  console.log('redirecting')
+  comp.$router.push('/login')
+}
+
+function getRole() {
+  return localStorage.getItem('role');
+}
+
+function getToken() {
+  return localStorage.getItem('token');
+}
+
+function getEmail() {
+  return localStorage.getItem('email');
+}
+
+export default {
+  login: login,
+  logout: logout,
+  getRole: getRole,
+  getToken: getToken,
+  getEmail: getEmail
+}

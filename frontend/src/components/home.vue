@@ -1,6 +1,6 @@
 <template>
   <div id="home">
-    <div v-if="!auth.loggedIn">
+    <div v-if="!role">
       <app-login></app-login>
     </div>
     <div v-else>
@@ -10,18 +10,18 @@
         <div id="main" class="col-xs-12 col-sm-6 col-md-8">
           <div id="central">
 
-            <h1>Welcome {{auth.role}},</h1>
+            <h1>Welcome {{role}},</h1>
             <button v-on:click="logout">Log out</button>
             <br><br>
 
-            <div v-if="auth.role == 'owner'">
+            <div v-if="role == 'owner'">
               <h2>
                 Here you can upload files and wait for an inspector to validate it
               </h2>
               <br><br>
               <app-upload></app-upload>
             </div>
-            <div v-else-if="auth.role == 'inspector'" id="inspector">
+            <div v-else-if="role == 'inspector'" id="inspector">
               <h2>
                 Here you can see view/download the file and validate it
               </h2>
@@ -58,21 +58,18 @@ export default {
   name: 'Home',
   data() {
     return {
-      role: '',
-      token: '',
-      fileId: '',
-      auth: auth
+      role: auth.getRole(),
+      fileId: ''
     }
   },
   methods: {
     logout(){
-      this.auth.logout()
-      this.$router.push({ name: "Home"})
+      auth.logout(this)
     },
     download(){
       let data = {
         url: this.fileId,
-        key: localStorage.getItem('token')
+        key: auth.getToken()
       }
       api.request('download', data, (data) => {
         file.download('file.pdf', atob(data.content));
@@ -81,7 +78,7 @@ export default {
     validate(){
       let data = {
         url: this.fileId,
-        key: localStorage.getItem('token')
+        key: auth.getToken()
       }
       api.request('validate', data);
     }
