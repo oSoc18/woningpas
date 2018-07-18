@@ -62,6 +62,7 @@
         </div>
       </div>
     </section>
+    <app-footer></app-footer>
   </div>
 </template>
 
@@ -71,22 +72,24 @@ import auth from '@/js/auth.js'
 import api from '@/js/api.js'
 
 export default {
-    name: 'Login',
-    data() {
-        return {
-            role: "",
-            auth: auth
-        }
-    },
-    methods: {
-        login() {
-            api.request('login', {account: this.role}, (data) => {
-                var token = data.key
-                auth.login(this.role, token)
-                this.$router.push('/home')
-            })
-        }
+  name: 'Login',
+  data() {
+      return {
+          role: "",
+          auth: auth
+      }
+  },
+  methods: {
+    login: function(event) {
+      let email = event.target.textContent
+      console.log(event);
+      api.request('login', {account: email}, (data) => {
+          var token = data.key
+          auth.login(this.role, token)
+          this.$router.push('/home')
+      })
     }
+  }
 }
 </script>
 

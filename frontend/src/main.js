@@ -8,7 +8,7 @@ import sideBar from '@/components/sideBar'
 import footer from '@/components/footer'
 import upload from '@/components/upload'
 import login from '@/components/login'
-import notFound from '@/components/404'
+import notFound from '@/components/notFound'
 
 Vue.component('app-header', header)
 Vue.component('app-sideBar', sideBar)
