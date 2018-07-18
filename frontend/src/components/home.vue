@@ -51,6 +51,8 @@
 <script>
 import axios from 'axios'
 import auth from './auth.js'
+import api from './api.js'
+
 export default {
   name: 'Home',
   data() {
@@ -62,16 +64,6 @@ export default {
     }
   },
   methods: {
-    apiRequest(path, data, success){
-      axios({
-        url: 'http://localhost:8080/' + path,
-        data: data,
-        method: 'POST',
-        responseType: 'json',
-      }).then(success).catch(error => {
-        console.log(error)
-      })
-    },
     stringToArray(string) {
       let l = string.length;
       let array = new Uint8Array(l);
@@ -89,7 +81,7 @@ export default {
         url: this.fileId,
         key: localStorage.getItem('token')
       }
-      this.apiRequest('download', data, (res) => {
+      api.request('download', data, (res) => {
         var content = this.stringToArray(atob(res.data.content))
         let file = new Blob([content], {type: 'application/pdf'});
         let link = document.createElement('a')
