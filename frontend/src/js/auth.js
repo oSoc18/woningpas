@@ -10,7 +10,6 @@ function logout(comp){
   localStorage.removeItem('email')
   localStorage.removeItem('role')
   localStorage.removeItem('token')
-  console.log('redirecting')
   comp.$router.push('/login')
 }
 

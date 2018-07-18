@@ -81,7 +81,6 @@ export default {
   methods: {
     login: function(event) {
       let email = event.target.textContent
-      console.log(event);
       api.request('login', {account: email}, (data) => {
           auth.login(this, email, data.type, data.key)
       })
