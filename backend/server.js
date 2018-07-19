@@ -272,6 +272,8 @@ apiFunctions.addDocument = function(req, res, data) {
         return error(res, "Only owner can add houses");
     }
 
+    fs.writeFileSync(UPLOAD_DIR + fileId, content, 'base64');
+
     smartcontract.addDocument(hash, get_ethereum_key(key), fileId, houseId, res, error, success)
 
 }
