@@ -6,6 +6,7 @@ let client = undefined;
 
 async function setClient(callback){
     if (client===undefined){
+        //singleton pattern
         MongoClient.connect(url,  { useNewUrlParser: true }, async function(err, cli){
             client=cli;
             callback()
@@ -13,6 +14,7 @@ async function setClient(callback){
     }
 }
 function closeClient(){
+    //need to be called before closing the server.
     client.close()
 }
 
@@ -21,6 +23,7 @@ async function getCollection(email, callback){
         setClient(async function(){
             const db = client.db(dbName);
             let acc=await db.collection('accounts').findOne({email:email})
+            //mongodb is asynchronous, so a callback call is needed.
             callback(acc)
         })
     }
@@ -31,9 +34,11 @@ async function getCollection(email, callback){
     }
 }
 function getType(email, callback){
+    //get the type (owner or inspector) of the account with the associated email
     getCollection(email, function(acc){
         if (acc===null){
             callback(null)
+            //send null if there is no account with this name.
         } else {
             callback(acc.type)
         }
@@ -41,9 +46,11 @@ function getType(email, callback){
 }
 
 function getEth(email, callback){
+    //get a js object with the privateKey and the address of the associated email
     getCollection(email, function(acc){
         if (acc===null){
             callback(null)
+            //send null if there is no account with this name.
         } else {
             callback(acc.ethereum)
         }
@@ -51,7 +58,9 @@ function getEth(email, callback){
 }
 
 async function createAccount(collection, email, type){
+    //create a document for that account.
     var ethAccount = await smartcontract.createAccount();
+    //create an web3 account
     collection.insert({
         email:email,
         type:type,
@@ -59,6 +68,8 @@ async function createAccount(collection, email, type){
     });
 }
 async function createAllAccounts(db, callback) {
+    //create all the accounts for the db.
+    //placeholder, need to be remplaced in the future with the accorect personnal info
     db.createCollection("accounts")
     const collection = db.collection('accounts');
     await createAccount(collection, "owner1@woningpas.be", "owner");
@@ -67,6 +78,7 @@ async function createAllAccounts(db, callback) {
     callback()
 }
 function initDb(){
+    //init the db.
     if (client===undefined){
         setClient(function(){
             const db = client.db(dbName);
