@@ -9,6 +9,7 @@ var api = require('./api.js').api;
 var apiFunctions = {};
 let db = require("./database.js");
 
+generateDate();
 function hashh(base64content) {
     const hash = crypto.createHash('sha256');
     var content = Buffer.from(base64content, 'base64');
@@ -50,17 +51,16 @@ function get_ethereum_key(key) {
 function create_key(account, callback) {
     let key = undefined
     key = uuid()
-    db.getType(account, function(res){
-        if(res != null){
+    db.getType(account, function(res) {
+        if (res != null) {
             console.log(res)
             keys[res][key] = true;
-            db.getEth(account, function(eth){
+            db.getEth(account, function(eth) {
                 console.log(eth)
                 mapping_key_ethereum[key] = eth
                 callback(key)
             })
-        }
-        else{
+        } else {
             console.log("Couldn't find account")
             callback(undefined)
         }
@@ -82,7 +82,7 @@ function success(response, data) {
 }
 
 apiFunctions.login = function(req, res, data) {
-    create_key(data.account, function(key){
+    create_key(data.account, function(key) {
 
         if (key === undefined) {
             return error(res, "Account invalid")
@@ -253,14 +253,14 @@ apiFunctions.addDocument = function(req, res, data) {
 
     let fileId = uuid();
     let hash = hashh(content);
-
+    let time = generateDate();
 
 
     fs.writeFileSync(UPLOAD_DIR + fileId, content, 'base64');
 
-    smartcontract.addDocument(hash, get_ethereum_key(key), fileId, houseId, res, error, success)
+    smartcontract.addDocument(hash, get_ethereum_key(key), fileId, houseId, time, res, error, success)
     success(res, {
-        "url": id
+        "url": fileId
     });
 
 }
@@ -273,7 +273,7 @@ apiFunctions.getDocuments = function(req, res, data) {
     smartcontract.getNbDoc(res, error, get_ethereum_key(key), houseId, function(number) {
         console.log(number);
         let index = 0;
-        let docFields = ["fileId", "isVerified", "hash"];
+        let docFields = ["fileId", "isVerified", "hash", "addedAt"];
         let prettyResult = {};
         for (var i = 1; i <= number; i++) {
             smartcontract.getDocument(i, get_ethereum_key(key), houseId, function(result) {
@@ -305,6 +305,31 @@ apiFunctions.getDocuments = function(req, res, data) {
 
 }
 
+function generateDate() {
+    var today = new Date();
+    var dd = today.getDate();
+    var mm = today.getMonth() + 1; //January is 0!
+    var yyyy = today.getFullYear();
+    var minute = today.getMinutes();
+    var hour = today.getHours();
+    var minute = today.getMinutes();
+    var second = today.getSeconds();
+    var millisecond = today.getMilliseconds();
+
+
+    if (dd < 10) {
+        dd = '0' + dd
+    }
+
+    if (mm < 10) {
+        mm = '0' + mm
+    }
+
+    today = dd + '/' + mm + '/' + yyyy + " " + hour + ":" + minute + ":"+ second +":" +millisecond;
+
+    console.log(today);
+    return today;
+}
 
 
 var server = app.listen(8080, function() {

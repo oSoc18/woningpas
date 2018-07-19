@@ -19,7 +19,7 @@ let contractName = 'WoningPasV2';
 
 
 //const addressContract = '0x2765eabc3ca01361d38a53efabc38f9d100a4a01';
-const addressContract = '0x78b81959cd8bd8c42a94ed87d9aa192b0f63914a';
+const addressContract = '0xb070cb107f3892c9d58750a961d28b2785e61a33';
 
 //needs to be changed
 var adresseFrom;
@@ -168,7 +168,7 @@ async function addHouse(street, zipCode, city, country, houseId, privateKey, res
   })
 }
 
-async function addDocument(hash, privateKey, fileId, houseId, res, error, success) {
+async function addDocument(hash, privateKey, fileId, houseId, time, res, error, success) {
   console.log("addDocument");
 
   let acc = web3.eth.accounts.privateKeyToAccount(privateKey);
@@ -176,7 +176,7 @@ async function addDocument(hash, privateKey, fileId, houseId, res, error, succes
   var ret = getContract();
 
 
-  let tx_builder = ret.methods.addDocument(fileId, false, hash, houseId);
+  let tx_builder = ret.methods.addDocument(fileId, false, hash, houseId, time);
 
   let encoded_tx = tx_builder.encodeABI();
   let transactionObject = {
