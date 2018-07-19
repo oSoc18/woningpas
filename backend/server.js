@@ -130,32 +130,7 @@ function authorized_file(name) {
     return ext.toLocaleLowerCase() === 'pdf'
 }
 
-apiFunctions.upload = function(req, res, data) {
-    console.log("upload")
 
-    let key = data.key
-    let content = data.content
-    let houseId = data.houseId;
-
-    if (get_type(key) !== "owner") {
-        return error(res, "Only owner can upload file");
-    }
-
-    let id = uuid();
-    let hash = hashh(content);
-
-    // TODO check if file exists and error
-    fs.writeFileSync(UPLOAD_DIR + id, content, 'base64');
-    console.log("file saved with id " + id);
-
-    // TODO check error
-    smartcontract.addUpload(hash, get_ethereum_key(key), id, houseId, res, error, success);
-    console.log("called smartcontract");
-
-    success(res, {
-        "url": id
-    });
-}
 
 apiFunctions.download = function(req, res, data) {
     console.log("download")
@@ -216,15 +191,23 @@ apiFunctions.validated = function(req, res, data) {
 
 apiFunctions.getHouses = function(req, res, data) {
     let key = data.key;
-    var houses = {};
+    var houses = [];
 
     smartcontract.getNbHouses(res, error, get_ethereum_key(key), function(number) {
         let index = 0;
+        let houseFields = ["street", "zipCode", "city", "country", "houseId"];
+
         for (var i = 1; i <= number; i++) {
             smartcontract.getHouse(i, get_ethereum_key(key), function(result) {
                 console.log(index);
-                houses[index] = result;
-                console.log(houses);
+                prettyResult = {}
+                for (j in result) {
+                    prettyResult[houseFields[j]] = result[j];
+
+
+                }
+                houses.push(prettyResult);
+                console.log(prettyResult);
                 index++;
 
                 if (index == number) {
@@ -262,33 +245,41 @@ apiFunctions.addDocument = function(req, res, data) {
     let houseId = data.houseId;
     let content = data.content;
 
-    let fileId = uuid();
-    let hash = hashh(content);
-
-
     if (get_type(key) !== "owner") {
         return error(res, "Only owner can add houses");
     }
 
+    let fileId = uuid();
+    let hash = hashh(content);
+
+
+
     fs.writeFileSync(UPLOAD_DIR + fileId, content, 'base64');
 
     smartcontract.addDocument(hash, get_ethereum_key(key), fileId, houseId, res, error, success)
+    success(res, {
+        "url": id
+    });
 
 }
-
 
 apiFunctions.getDocuments = function(req, res, data) {
     let key = data.key;
     let houseId = data.houseId;
-    var documents = {};
+    var documents = [];
 
     smartcontract.getNbDoc(res, error, get_ethereum_key(key), houseId, function(number) {
         console.log(number);
         let index = 0;
+        let docFields = ["fileId", "isVerified", "hash"];
+        let prettyResult = {};
         for (var i = 1; i <= number; i++) {
             smartcontract.getDocument(i, get_ethereum_key(key), houseId, function(result) {
                 console.log(index);
-                documents[index] = result;
+                for (j in result) {
+                    prettyResult[docFields[j]] = result[j];
+                }
+                documents.push(prettyResult);
                 console.log(documents);
                 index++;
 
