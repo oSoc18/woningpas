@@ -10,10 +10,10 @@
               <span class="icon icon-permit icon--primary icon--small"></span>
             </div>
             <div class="col-md-11">
-              <h4 class="m-permit__details__title">{{this.document.name}}</h4>
-              <p class="m-permit__details__subtitle">Kappen van hoogstammige bomen in een bos</p>
+              <h4 class="m-permit__details__title">{{this.document.fileId}}</h4>
+              <!--p class="m-permit__details__subtitle">Kappen van hoogstammige bomen in een bos</p>
               <p>Nullam id dolor id nibh ultricies vehicula ut id elit. Donec id elit non mi porta gravida at eget metus. Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Etiam porta sem malesuada magna mollis euismod.</p>
-              <!--a href="#" class="icon-arrow-right">Details</a-->
+              <!a href="#" class="icon-arrow-right">Details</a-->
             </div>
           </div>
           <div class="m-permit__section row">

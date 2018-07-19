@@ -3,7 +3,7 @@
     <app-header></app-header>
 	  <main>
       <app-sideBar></app-sideBar>
-      <app-documents v-bind:houseId="id"></app-documents>
+      <app-documents v-bind:id="id"></app-documents>
     </main>
   	<app-footer></app-footer>
   </div>
