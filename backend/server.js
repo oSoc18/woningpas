@@ -86,7 +86,7 @@ apiFunctions.login = function(req, res, data) {
     }
     success(res, {
         "key": key,
-        "type":get_type(key)
+        "type": get_type(key)
     });
     console.log(keys);
 }
@@ -216,18 +216,27 @@ apiFunctions.validated = function(req, res, data) {
 
 apiFunctions.getHouses = function(req, res, data) {
     let key = data.key;
+    var houses = {};
 
-    let nb = getNbHouses(res, key);
+    smartcontract.getNbHouses(res, error, get_ethereum_key(key), function(number) {
+        let index = 0;
+        for (var i = 1; i <= number; i++) {
+            smartcontract.getHouse(i, get_ethereum_key(key), function(result) {
+                console.log(index);
+                houses[index] = result;
+                console.log(houses);
+                index++;
 
-    let houses;
-    console.log("iciici");
-    console.log(nb);
+                if (index == number) {
+                    success(res, {
+                        "result": houses
+                    });
+                }
 
-    for (var i = 0; i <= nb; i++) {
-        houses = smartcontract.getHouses(i,res, get_ethereum_key(key));
-    }
+            });
+        }
+    });
 
-    success(res, houses);
 }
 
 apiFunctions.addHouse = function(req, res, data) {
@@ -236,38 +245,72 @@ apiFunctions.addHouse = function(req, res, data) {
     let zipCode = data.zipCode;
     let city = data.city;
     let country = data.country;
+    let houseId = uuid();
+
+
     if (get_type(key) !== "owner") {
         return error(res, "Only owner can add houses");
     }
-    smartcontract.addHouse(street, zipCode, city, country, houseId, res, error, success, get_ethereum_key(key))
+
+    smartcontract.addHouse(street, zipCode, city, country, houseId, get_ethereum_key(key), res, error, success)
 
 }
 
-function getNbHouses(res, key) {
-    console.log(key);
+
+apiFunctions.addDocument = function(req, res, data) {
+    let key = data.key;
+    let houseId = data.houseId;
+    let content = data.content;
+
+    let fileId = uuid();
+    let hash = hashh(content);
+
+
     if (get_type(key) !== "owner") {
-        return error(res, "Only owner see their number of houses");
+        return error(res, "Only owner can add houses");
     }
-    let numberOfHouse = smartcontract.getNbHouses(res, error, success, get_ethereum_key(key));
 
-    return numberOfHouse;
+    smartcontract.addDocument(hash, get_ethereum_key(key), fileId, houseId, res, error, success)
+
 }
 
 
+apiFunctions.getDocuments = function(req, res, data) {
+    let key = data.key;
+    let houseId = data.houseId;
+    var documents = {};
 
-/* TODO later
-app.get('/listFiles', function (req, res) {
-    console.log("listing files")
-    data = fs.readFileSync( __dirname + "/" + "houses.json", 'utf8')
-    key=req.query.key
-    if(connected.inspector.includes(key) || connected.owner.includes(key) || connected.admin.includes(key)) {
-        success(res, data);
-    }
-    else{
-        error(res, "Error listing files");
-    }
-})
-//*/
+    smartcontract.getNbDoc(res, error, get_ethereum_key(key), houseId, function(number) {
+        console.log(number);
+        let index = 0;
+        for (var i = 1; i <= number; i++) {
+            smartcontract.getDocument(i, get_ethereum_key(key), houseId, function(result) {
+                console.log(index);
+                documents[index] = result;
+                console.log(documents);
+                index++;
+
+                if (index == number) {
+                    success(res, {
+                        "result": documents
+                    });
+
+                }
+
+
+            });
+        }
+        if (number == 0) {
+            error(res, {
+                "result": "No documents for this house"
+            });
+        }
+
+    });
+
+}
+
+
 
 var server = app.listen(8080, function() {
     var host = server.address().address

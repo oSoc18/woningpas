@@ -19,7 +19,7 @@ let contractName = 'WoningPasV2';
 
 
 //const addressContract = '0x2765eabc3ca01361d38a53efabc38f9d100a4a01';
-const addressContract = '0xe50adc68100fe50d1ce831a3992b74ba0d9b7d11';
+const addressContract = '0x78b81959cd8bd8c42a94ed87d9aa192b0f63914a';
 
 //needs to be changed
 var adresseFrom;
@@ -111,36 +111,7 @@ async function setVerification(fileId, houseId, privateKey, res, error, success)
   })
 }
 
-async function addUpload(hash, privateKey, fileId, houseId, res, error, success) {
-  let acc = web3.eth.accounts.privateKeyToAccount(privateKey);
 
-  var ret = getContract();
-  console.log("addUpload");
-
-  let tx_builder = ret.methods.addDocument(fileId, false, hash, houseId);
-
-  let encoded_tx = tx_builder.encodeABI();
-  let transactionObject = {
-    gas: 5000000,
-    data: encoded_tx,
-    from: acc.address,
-    to: addressContract
-  };
-  web3.eth.accounts.signTransaction(transactionObject, acc.privateKey, function(err, signedTx) {
-    if (err) {
-      console.log(err);
-      // handle error
-      error(res, "Error with addUpload")
-    } else {
-      web3.eth.sendSignedTransaction(signedTx.rawTransaction)
-        .on('receipt', function(receipt) {
-          success(res, success(res, {
-            "url": id
-          }))
-        });
-    };
-  })
-}
 
 function getUpload(fileId, houseId, callback) {
   var ret = getContract();
@@ -167,10 +138,10 @@ async function createAccount() {
 }
 
 async function addHouse(street, zipCode, city, country, houseId, privateKey, res, error, success) {
+  console.log("addHouse");
   let acc = web3.eth.accounts.privateKeyToAccount(privateKey);
 
   var ret = getContract();
-  console.log("addHouse");
 
   let tx_builder = ret.methods.addHouse(street, zipCode, city, country, houseId);
 
@@ -197,27 +168,58 @@ async function addHouse(street, zipCode, city, country, houseId, privateKey, res
   })
 }
 
-async function getHouses(index, callback, privateKey) {
+async function addDocument(hash, privateKey, fileId, houseId, res, error, success) {
+  console.log("addDocument");
+
+  let acc = web3.eth.accounts.privateKeyToAccount(privateKey);
+
+  var ret = getContract();
+
+
+  let tx_builder = ret.methods.addDocument(fileId, false, hash, houseId);
+
+  let encoded_tx = tx_builder.encodeABI();
+  let transactionObject = {
+    gas: 5000000,
+    data: encoded_tx,
+    from: acc.address,
+    to: addressContract
+  };
+  web3.eth.accounts.signTransaction(transactionObject, acc.privateKey, function(err, signedTx) {
+    if (err) {
+      console.log(err);
+      // handle error
+      error(res, "Error with addDocument")
+    } else {
+      web3.eth.sendSignedTransaction(signedTx.rawTransaction)
+        .on('receipt', function(receipt) {
+          success(res, success(res, {
+            "fileID": fileId
+          }))
+        });
+    };
+  })
+}
+
+
+async function getHouse(index, privateKey, callback) {
   var ret = getContract();
   console.log("getHouses");
 
   let acc = web3.eth.accounts.privateKeyToAccount(privateKey);
   console.log(index);
-  ret.methods.getHouses(index).call({
+  ret.methods.getHouse(index).call({
     from: acc.address,
     gas: 5e6
   }).then(function(result) {
-    console.log(result);
-    success(res, {
-      "Message": "Success"
-    })
+    callback(result);
   }).catch(function(error) {
     console.log(error)
     error(res, "Error with getHouses")
   })
 }
 
-async function getNbHouses(res, error, success, privateKey) {
+async function getNbHouses(res, error, privateKey, callB) {
 
   var ret = getContract();
   console.log("getNbHouses");
@@ -228,13 +230,49 @@ async function getNbHouses(res, error, success, privateKey) {
     from: acc.address,
     gas: 5e6
   }).then(function(result) {
-    console.log(result);
-    success(res, {
-      "Message": result
-    })
+    callB(result);
+
   }).catch(function(error) {
     console.log(error)
     error(res, "Error with getNbHouses")
+  })
+}
+
+
+async function getNbDoc(res, error, privateKey, houseId, callB) {
+
+  var ret = getContract();
+  console.log("getNbDoc");
+
+  let acc = web3.eth.accounts.privateKeyToAccount(privateKey);
+
+  ret.methods.getDocumentNumber(houseId).call({
+    from: acc.address,
+    gas: 5e6
+  }).then(function(result) {
+    callB(result);
+
+  }).catch(function(error) {
+    console.log(error)
+    error(res, "Error with getNbDoc")
+  })
+}
+
+
+async function getDocument(index, privateKey, houseId, callback) {
+  var ret = getContract();
+  console.log("getDocs");
+
+  let acc = web3.eth.accounts.privateKeyToAccount(privateKey);
+  console.log(index);
+  ret.methods.getDocument(houseId, index).call({
+    from: acc.address,
+    gas: 5e6
+  }).then(function(result) {
+    callback(result);
+  }).catch(function(error) {
+    console.log(error)
+    error(res, "Error with getHouses")
   })
 }
 
@@ -256,10 +294,11 @@ function deployyy(hash, fileName) {
 
 
 module.exports.setVerification = setVerification;
-module.exports.addUpload = addUpload;
-module.exports.getUpload = getUpload;
 module.exports.isVerified = isVerified;
 module.exports.createAccount = createAccount;
 module.exports.addHouse = addHouse;
-module.exports.getHouses = getHouses;
+module.exports.getHouse = getHouse;
 module.exports.getNbHouses = getNbHouses;
+module.exports.getDocument = getDocument;
+module.exports.getNbDoc = getNbDoc;
+module.exports.addDocument = addDocument;
