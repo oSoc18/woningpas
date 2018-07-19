@@ -25,12 +25,13 @@ with `Content-Type` set to `application/json`.
 - key: access key
 
 
-## /upload
+## /addDocument
 
 ### Request parameters
 - key: access key
 - content: base64 encoded content
 - houseId : id of the house that the document is linked
+
 ### Response parameters
 - url: file url
 
@@ -74,4 +75,34 @@ None
 
 ### Response parameters
 -content : list of houses and for each house a list of files
+
+
+
+## /addHouse
+
+### Request parameters
+- key: access key
+- street : street of the house
+- zipCode : zip code of the house 
+- city : of the house
+- country : of the house
+ 
+
+### Response parameters
+none
+
+
+
+## /getDocuments
+
+### Request parameters
+- key: access key
+- houseId : id of the house
+
+ 
+
+### Response parameters
+none
+
+
 
