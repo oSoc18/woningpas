@@ -1,41 +1,74 @@
 let smartcontract = require("./smartcontract/smartcontract.js")
-let fs = require("fs")
+const MongoClient = require('mongodb').MongoClient;
+const url = "mongodb://woningpas:woningpas1@ds219100.mlab.com:19100/woningpas"
+const dbName = 'woningpas';
+let client = undefined;
 
-async function populateDB() {
-    let account1 = await smartcontract.createAccount();
-    let account2 = await smartcontract.createAccount();
-    let accountInspector = await smartcontract.createAccount();
-    var pop = {
-        "owner1@woningpas.be": {
-            type: "owner",
-            houses: {
-                house1_id: {
-                    
-                    certificate1: true,
-                    certificate2: true
-                },
-                house2_id: {
-                    certificate3: true
-                }
-            },
-            ethereum: account1
-        },
-        "owner2@woningpas.be": {
-            type: "owner",
-            houses: {
-                house1_id: {
-                    certificate1: true,
-                    certificate2: true
-                }
-            },
-            ethereum: account2
-        },
-        "inspector1@woningpas.be": {
-            type: "inspector",
-            ethereum: accountInspector
-        }
+async function setClient(callback){
+    if (client===undefined){
+        MongoClient.connect(url,  { useNewUrlParser: true }, async function(err, cli){
+            client=cli;
+            callback()
+        })
     }
-    fs.writeFile("./database.json", JSON.stringify(pop))
+}
+function closeClient(){
+    client.close()
 }
 
-populateDB()
+async function getCollection(email, callback){
+    if (client===undefined){
+        setClient(async function(){
+            const db = client.db(dbName);
+            let acc=await db.collection('accounts').findOne({email:email})
+            callback(acc)
+        })
+    }
+}
+function getType(email, callback){
+    getCollection(email, function(acc){
+        if (acc===null){
+            callback(null)
+        } else {
+            callback(acc.type)
+        }
+    })
+}
+
+function getEth(email, eth){
+    getCollection(email, function(acc){
+        if (acc===null){
+            callback(null)
+        } else {
+            callback(acc.ethereum)
+        }
+    })
+}
+
+async function createAccount(collection, email, type){
+    var ethAccount = await smartcontract.createAccount();
+    collection.insert({
+        email:email,
+        type:type,
+        ethereum: ethAccount
+    });
+}
+async function createAllAccounts(db, callback) {
+    db.createCollection("accounts")
+    const collection = db.collection('accounts');
+    await createAccount(collection, "owner1@woningpas.be", "owner");
+    await createAccount(collection, "owner2@woningpas.be", "owner");
+    await createAccount(collection, "inspector1@woningpas.be", "inspector")
+    callback()
+}
+function initDb(){
+    if (client===undefined){
+        setClient(function(){
+            const db = client.db(dbName);
+            createAllAccounts(db, function() {
+                client.close();
+            });
+        });
+    }
+}
+//initDb()
