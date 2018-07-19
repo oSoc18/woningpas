@@ -8,7 +8,7 @@
         <div class="o-main-nav__adress">
           <p>Hogeweg</p>
           <strong>Kortrijk</strong>
-          <a href="#">woningpas another house</a>
+          <a href="/home">other houses</a>
         </div>
       </div>
       <nav class="o-main-nav__nav">
@@ -35,8 +35,8 @@
             <ul>
                <li class=""><a href="#">To sell <span class="a-badge a-badge--red"></span></a></li>
                <li class=""><a href="#">To rent <span class="a-badge a-badge--red"></span></a></li>
-               <li class="is-favorited"><a href="isolatie.html">Rebuild <span class="a-badge a-badge--red"></span></a></li>
-               <li class=""><a href="installaties.html">To build <span class="a-badge a-badge--red"></span></a></li>
+               <li class="is-favorited"><a href="#">Rebuild <span class="a-badge a-badge--red"></span></a></li>
+               <li class=""><a href="#">To build <span class="a-badge a-badge--red"></span></a></li>
             </ul>
           </li>
         </ul>

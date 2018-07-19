@@ -1,50 +1,85 @@
 <template>
-  <div id="home">
-    <div v-if="!role">
-      <app-login></app-login>
-    </div>
-    <div v-else>
-      <app-header></app-header>
-      <div class="row">
-        <app-sideBar></app-sideBar>
-        <div id="main" class="col-xs-12 col-sm-6 col-md-8">
-          <div id="central">
+  <div id="home" class="site-container">
+    <app-header></app-header>
+    <main>
+  		<section class="o-section u-mt-2">
+  			<div class="container">
+  				<div class="row">
 
-            <h1>Welcome {{role}},</h1>
-            <button v-on:click="logout">Log out</button>
-            <br><br>
+  						<h1 class="text-center">Choose one of your properties</h1>
+  						<div class="row row--flex row--flexCenter">
+  							<div class="col-md-6">
+    							<p class="text-center">
+    								Are you the owner of one or more houses in Flanders? Select the property you want to view. This data comes from the Federal Public Service, Finance, Patrimonial Documentation ...
+    							</p>
+  							</div>
+  						</div>
+  						<br>
+  						<div class="row row--eq-height">
+  					    <div class="col-md-4">
+  								<div class="m_house">
+  									<div class="m_house__cover" style="background-image:url('http://woningpas.brandplatform.be/img/images/keuzescherm-home-01-x2.jpg')">
+  								  </div>
+  									<div class="m_house__information">
+  										<div class="m_house__information__arrow">
+  											<span class="icon-arrow-right"></span>
+  										</div>
+  										<div class="m_house__information__text">
+  											<p>
+  													Hoge weg 543 <br>
+  													<b>Kortrijk</b>
+  											</p>
+  									  </div>
+  								  </div>
+  							  </div>
+  					    </div>
 
-            <div v-if="role == 'owner'">
-              <h2>
-                Here you can upload files and wait for an inspector to validate it
-              </h2>
-              <br><br>
-              <app-upload></app-upload>
-            </div>
-            <div v-else-if="role == 'inspector'" id="inspector">
-              <h2>
-                Here you can see view/download the file and validate it
-              </h2>
-              <table>
-                <tr>
-                  <td>
-                    <input v-model="fileId" placeholder="file id">
-                  </td>
-                  <td>
-                    <button v-on:click="download" class="btn btn-primary">Download</button>
-                  </td>
-                  <td>
-                    <button v-on:click="validate" class="btn btn-success">Validate</button>
-                  </td>
-                </tr>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
+  					    <div class="col-md-4">
+  								<div class="m_house">
+  									<div class="m_house__cover">
+  										<div>
+  											<img src="http://woningpas.brandplatform.be/img/coloured-icons/placeholder-appartement.svg" alt="">
+  											<strong>Insulation</strong>
+  										</div>
+  								  </div>
+  									<div class="m_house__information">
+  										<div class="m_house__information__arrow">
+  											<span class="icon-arrow-right"></span>
+  										</div>
+  										<div class="m_house__information__text">
+  											<p>
+  													Hoge weg 543 <br>
+  													<b>Antwerpen</b>
+  											</p>
+  									  </div>
+  								  </div>
+  							  </div>
+  					    </div>
 
-      <!--<app-footer></app-footer>-->
-    </div>
+  							<div class="col-md-4">
+  								<div class="m_house">
+  									<div class="m_house__cover" style="background-image:url('http://woningpas.brandplatform.be/img/images/keuzescherm-home-01-x2.jpg')">
+  								  </div>
+  									<div class="m_house__information">
+  										<div class="m_house__information__arrow">
+  											<span class="icon-arrow-right"></span>
+  										</div>
+  										<div class="m_house__information__text">
+  											<p>
+  													Hoge weg 543 <br>
+  													<b>Brugge</b>
+  											</p>
+  									  </div>
+  								  </div>
+  							  </div>
+  					    </div>
+
+  					</div>
+  				</div>
+  			</div>
+  		</section>
+  	</main>
+  	<app-footer></app-footer>
   </div>
 </template>
 

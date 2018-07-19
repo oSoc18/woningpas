@@ -2,7 +2,9 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Home from '@/components/home'
 import Login from '@/components/login'
+import House from '@/components/house'
 import NotFound from '@/components/notFound'
+import auth from '@/js/auth.js'
 
 Vue.use(Router)
 
@@ -14,7 +16,7 @@ export default new Router({
       component: Home,
       alias: '/home',
       beforeEnter: (to, from, next) => {
-        if (!localStorage.getItem('role') && !localStorage.getItem('token')) {
+        if (!auth.getRole()) {
           next('/login')
         }
         next()
@@ -25,7 +27,7 @@ export default new Router({
       name: 'Login',
       component: Login,
       beforeEnter: (to, from, next) => {
-        if (localStorage.getItem('role') && localStorage.getItem('token')) {
+        if (auth.getRole()) {
           next('/home')
         }
         next()
@@ -35,6 +37,11 @@ export default new Router({
       path: '/404',
       name: 'NotFound',
       component: NotFound
+    },
+    {
+      path: '/house',
+      name: 'House',
+      component: House
     }
   ]
 })

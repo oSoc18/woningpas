@@ -8,6 +8,7 @@ import sideBar from '@/components/sideBar'
 import footer from '@/components/footer'
 import upload from '@/components/upload'
 import login from '@/components/login'
+import house from '@/components/house'
 import notFound from '@/components/notFound'
 
 Vue.component('app-header', header)
@@ -16,6 +17,7 @@ Vue.component('app-footer', footer)
 Vue.component('app-upload', upload)
 Vue.component('app-login', login)
 Vue.component('app-notFound', notFound)
+Vue.component('app-house', house)
 Vue.config.productionTip = false
 
 /* eslint-disable no-new */
