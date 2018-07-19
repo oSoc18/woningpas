@@ -10,6 +10,7 @@ import upload from '@/components/upload'
 import login from '@/components/login'
 import house from '@/components/house'
 import notFound from '@/components/notFound'
+import houseList from '@/components/houseList'
 
 Vue.component('app-header', header)
 Vue.component('app-sideBar', sideBar)
@@ -18,6 +19,7 @@ Vue.component('app-upload', upload)
 Vue.component('app-login', login)
 Vue.component('app-notFound', notFound)
 Vue.component('app-house', house)
+Vue.component('app-houseList', houseList)
 Vue.config.productionTip = false
 
 /* eslint-disable no-new */

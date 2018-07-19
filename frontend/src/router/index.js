@@ -4,6 +4,7 @@ import Home from '@/components/home'
 import Login from '@/components/login'
 import House from '@/components/house'
 import NotFound from '@/components/notFound'
+import HouseList from '@/components/houseList'
 import auth from '@/js/auth.js'
 
 Vue.use(Router)
@@ -39,7 +40,7 @@ export default new Router({
       component: NotFound
     },
     {
-      path: '/house',
+      path: '/house/:id',
       name: 'House',
       component: House
     }
