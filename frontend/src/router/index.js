@@ -5,6 +5,8 @@ import Login from '@/components/login'
 import House from '@/components/house'
 import NotFound from '@/components/notFound'
 import HouseList from '@/components/houseList'
+import Documents from '@/components/documents'
+import Document from '@/components/document'
 import auth from '@/js/auth.js'
 
 Vue.use(Router)
@@ -33,6 +35,11 @@ export default new Router({
         }
         next()
       }
+    },
+    {
+      path: '/documents',
+      name: 'Documents',
+      component: Documents
     },
     {
       path: '/404',
