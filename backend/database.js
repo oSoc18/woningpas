@@ -24,6 +24,11 @@ async function getCollection(email, callback){
             callback(acc)
         })
     }
+    else{
+        const db = client.db(dbName);
+        let acc=await db.collection('accounts').findOne({email:email})
+        callback(acc)
+    }
 }
 function getType(email, callback){
     getCollection(email, function(acc){
@@ -35,7 +40,7 @@ function getType(email, callback){
     })
 }
 
-function getEth(email, eth){
+function getEth(email, callback){
     getCollection(email, function(acc){
         if (acc===null){
             callback(null)
@@ -72,3 +77,9 @@ function initDb(){
     }
 }
 //initDb()
+
+module.exports.initDb = initDb;
+module.exports.setClient = setClient;
+module.exports.getEth = getEth;
+module.exports.getType = getType;
+module.exports.closeClient = closeClient;

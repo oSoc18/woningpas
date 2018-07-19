@@ -7,6 +7,7 @@ var crypto = require('crypto');
 var smartcontract = require('./smartcontract/smartcontract.js')
 var api = require('./api.js').api;
 var apiFunctions = {};
+let db = require("./database.js");
 
 function hashh(base64content) {
     const hash = crypto.createHash('sha256');
@@ -41,28 +42,29 @@ function get_type(key) {
 }
 
 let mapping_key_ethereum = {}
-let mapping_key_house = {}
-let mapping_house_files = {}
 
 function get_ethereum_key(key) {
     return mapping_key_ethereum[key].privateKey
 }
 
-function get_database() {
-    let database_file = fs.readFileSync("./database.json")
-    let database = JSON.parse(database_file)
-    return database;
-}
-
-function create_key(account, password) {
+function create_key(account, callback) {
     let key = undefined
-    let database = get_database();
-    if (database[account]) {
-        key = uuid()
-        keys[database[account].type][key] = true;
-        mapping_key_ethereum[key] = database[account].ethereum
-    }
-    return key
+    key = uuid()
+    db.getType(account, function(res){
+        if(res != null){
+            console.log(res)
+            keys[res][key] = true;
+            db.getEth(account, function(eth){
+                console.log(eth)
+                mapping_key_ethereum[key] = eth
+                callback(key)
+            })
+        }
+        else{
+            console.log("Couldn't find account")
+            callback(undefined)
+        }
+    })
 }
 
 
@@ -80,15 +82,17 @@ function success(response, data) {
 }
 
 apiFunctions.login = function(req, res, data) {
-    let key = create_key(data.account)
-    if (key === undefined) {
-        return error(res, "Account invalid")
-    }
-    success(res, {
-        "key": key,
-        "type": get_type(key)
-    });
-    console.log(keys);
+    create_key(data.account, function(key){
+
+        if (key === undefined) {
+            return error(res, "Account invalid")
+        }
+        success(res, {
+            "key": key,
+            "type": get_type(key)
+        });
+        console.log(keys);
+    })
 }
 /**
  * Express routes
@@ -205,8 +209,6 @@ apiFunctions.validated = function(req, res, data) {
     if (type !== "inspector" && type !== "inspector") {
         return error(res, "Only owner and inspector see validation status");
     }
-
-    let db = get_database();
 
     console.log('called smartcontract');
 

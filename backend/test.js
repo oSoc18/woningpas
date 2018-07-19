@@ -4,6 +4,7 @@ let key =""
 let url = ""
 let fs = require("fs")
 
+
 function request(cmd, data, statusCode, followingTest) {
     let reqBody = JSON.stringify(data)
     let options = {
@@ -60,18 +61,28 @@ function testLoginUpload(body){
     request("login", data, 200, testValidated1)
 }
 function testUpload(body){
-    key=body.key
+    console.log(body)
     console.log("Starting testUpload")
     let data ={}
     data["key"]=key
     data["content"]=fs.readFileSync("./pdf-sample.pdf")
     request("upload",data, 200, testLoginUpload)
 }
+function testAddHouse(body){
+    key=body.key;
+    console.log("Starting testAddHouse");
+    data={};
+    data["key"]=key;
+    request("getHouses",data, 200, function(body){
+        console.log(body)
+    })
+
+}
 function testNewLogin(body){
     console.log("Starting testNewLogin")
     let data = {}
-    data["account"]="owner"
-    request("login", data, 200, testUpload)
+    data["account"]="owner1@woningpas.be"
+    request("login", data, 200, testAddHouse)
 }
 
 testNewLogin()
