@@ -28,6 +28,7 @@ contract WoningPasV2 {
 		string fileId;
 		bool isVerified;
 		string hash;
+		string addedAt;
 	}
 
 
@@ -44,8 +45,8 @@ contract WoningPasV2 {
 	}
 
 
-	function addDocument(string _fileId, bool _isVerified, string _hash, string _idHouse) public{
-		Document memory docToAdd = Document(_fileId, _isVerified, _hash);
+	function addDocument(string _fileId, bool _isVerified, string _hash, string _idHouse, string addedAt) public{
+		Document memory docToAdd = Document(_fileId, _isVerified, _hash, addedAt);
 		owners[msg.sender].houses[_idHouse].documents[_fileId] = docToAdd;
 		owners[msg.sender].houses[_idHouse].keysOfDocs.push(_fileId);
 	}
@@ -86,14 +87,14 @@ contract WoningPasV2 {
 		return owners[msg.sender].houses[_idHouse].keysOfDocs.length;
 	}
 
-	function getDocument(string _idHouse, uint _index) public view returns(string, bool, string){
+	function getDocument(string _idHouse, uint _index) public view returns(string, bool, string, string){
 		string memory fileId;
 		for (uint i=0; i<_index; i++) {
  			fileId = owners[msg.sender].houses[_idHouse].keysOfDocs[i];
 		}
 		
 		Document storage doc = owners[msg.sender].houses[_idHouse].documents[fileId];
-		return (doc.fileId, doc.isVerified, doc.hash);
+		return (doc.fileId, doc.isVerified, doc.hash, doc.addedAt);
 	}
 
 }

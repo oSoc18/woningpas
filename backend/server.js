@@ -274,10 +274,11 @@ apiFunctions.getDocuments = function(req, res, data) {
         console.log(number);
         let index = 0;
         let docFields = ["fileId", "isVerified", "hash", "addedAt"];
-        let prettyResult = {};
+        
         for (var i = 1; i <= number; i++) {
             smartcontract.getDocument(i, get_ethereum_key(key), houseId, function(result) {
                 console.log(index);
+                let prettyResult = {};
                 for (j in result) {
                     prettyResult[docFields[j]] = result[j];
                 }
@@ -291,8 +292,7 @@ apiFunctions.getDocuments = function(req, res, data) {
                     });
 
                 }
-
-
+        
             });
         }
         if (number == 0) {

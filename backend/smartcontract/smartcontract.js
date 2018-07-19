@@ -82,10 +82,9 @@ function isVerified(fileId, houseId, privateKey, res, error, success) {
 }
 
 async function setVerification(fileId, houseId, privateKey, res, error, success) {
-  var ret = getContract();
-  console.log(ret)
-  let acc = web3.eth.accounts.privateKeyToAccount(privateKey);
   console.log("setVerification");
+  var ret = getContract();
+  let acc = web3.eth.accounts.privateKeyToAccount(privateKey);
 
   let tx_builder = ret.methods.setVerification(fileId, houseId);
   let encoded_tx = tx_builder.encodeABI();
@@ -103,6 +102,7 @@ async function setVerification(fileId, houseId, privateKey, res, error, success)
     } else {
       web3.eth.sendSignedTransaction(signedTx.rawTransaction)
         .on('receipt', function(receipt) {
+          console.log(receipt);
           success(res, success(res, {
             "validated": true
           }))
