@@ -1,8 +1,9 @@
 <template>
-    <div id="upload">
-        <input type="file" accept=".pdf" @change="onFileSelected">
-        <button @click="upload">Upload</button>
-    </div>
+  <div>
+    <h2>Add a document</h2><br>
+    <input type="file" accept=".pdf" @change="onFileSelected"><br>
+    <button class="a-button" @click="upload">Upload</button>
+  </div>
 </template>
 
 <script>
