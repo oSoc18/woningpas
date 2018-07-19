@@ -3,6 +3,8 @@ import Router from 'vue-router'
 import Home from '@/components/home'
 import Login from '@/components/login'
 import NotFound from '@/components/notFound'
+import Documents from '@/components/documents'
+import Document from '@/components/document'
 
 Vue.use(Router)
 
@@ -30,6 +32,11 @@ export default new Router({
         }
         next()
       }
+    },
+    {
+      path: '/documents',
+      name: 'Documents',
+      component: Documents
     },
     {
       path: '/404',
