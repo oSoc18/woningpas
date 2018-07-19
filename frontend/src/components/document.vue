@@ -1,5 +1,5 @@
 <template>
-  <div id="document" class="m-page">
+  <div class="m-page">
     <!-- page -->
     <div class="m-page__section">
       <div class="m-permit row">
@@ -10,10 +10,10 @@
               <span class="icon icon-permit icon--primary icon--small"></span>
             </div>
             <div class="col-md-11">
-              <h4 class="m-permit__details__title">Aanvraag voor stedenbouwkundige vergunning 2009</h4>
+              <h4 class="m-permit__details__title">{{this.document.name}}</h4>
               <p class="m-permit__details__subtitle">Kappen van hoogstammige bomen in een bos</p>
               <p>Nullam id dolor id nibh ultricies vehicula ut id elit. Donec id elit non mi porta gravida at eget metus. Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Etiam porta sem malesuada magna mollis euismod.</p>
-              <a href="#" class="icon-arrow-right">Details</a>
+              <!--a href="#" class="icon-arrow-right">Details</a-->
             </div>
           </div>
           <div class="m-permit__section row">
@@ -38,8 +38,8 @@
                   <p class="m-permit__value">Vergund</p>
                 </div>
               </div>
-              <br>
-              <a href="#" class="icon-arrow-right">Details</a>
+              <!--br>
+              <a href="#" class="icon-arrow-right">Details</a-->
             </div>
           </div>
         </div>
@@ -49,5 +49,11 @@
   </div>
 </template>
 
+<script>
+import auth from '@/js/auth.js'
+import api from '@/js/api.js'
 
-<
+export default {
+  props: ['document']
+}
+</script>
