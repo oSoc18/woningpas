@@ -2,7 +2,7 @@
 
 Frontend is using Vue.js
 
-## Build Setup
+## Setup
 
 ``` bash
 # install dependencies
