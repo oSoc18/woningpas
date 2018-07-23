@@ -6,5 +6,6 @@ module.exports.api = {
 	"getHouses": ["key"],
 	"addHouse": ["key", "street", "zipCode", "city", "country"],
 	"getDocuments": ["key", "houseId"],
-	"addDocument": ["key", "houseId", "content"]
+	"addDocument": ["key", "houseId", "content"],
+	"getHouse" : ["key", "houseId"]
 }

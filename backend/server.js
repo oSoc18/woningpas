@@ -10,8 +10,8 @@ var apiFunctions = {};
 let db = require("./database.js");
 
 generateDate();
+//used to hash the content of the file, to create a fingerprint
 function hashh(base64content) {
-    //used to hash the content of the file, to be allowed to check its veracity.
     const hash = crypto.createHash('sha256');
     var content = Buffer.from(base64content, 'base64');
     hash.update(content);
@@ -34,6 +34,7 @@ Object.keys(authorized_types).forEach(function(type) {
 console.log(keys);
 console.log("saving files in " + UPLOAD_DIR);
 
+//Verify if the key is connected.
 function exist_key(key) {
     for (let type of Object.keys(keys)) {
         if (keys[type][key]) {
@@ -42,8 +43,9 @@ function exist_key(key) {
     }
     return false; 
 }
+
+//Get the type of the identification token (owner, inspector or admin)
 function get_type(key) {
-    //Get the type of the identification token (owner, inspector or admin)
     for (let type of Object.keys(keys)) {
         if (keys[type][key]) {
             return type;
@@ -54,13 +56,14 @@ function get_type(key) {
 
 let mapping_key_ethereum = {}
 
+
+//get the web3 private key associated with the email account
 function get_ethereum_key(key) {
-    //get the web3 private key associated with the email account, using the identification token.
     return mapping_key_ethereum[key].privateKey
 }
 
+//initialise the mappings using the mongoDB database.
 function create_key(account, callback) {
-    //initialise the mappings using the mongoDB database.
     db.getType(account, function(res) {
         if (res != null) {
             keys[res][account] = true;
@@ -69,15 +72,13 @@ function create_key(account, callback) {
                 callback(account)
             })
         } else {
-            console.log("Couldn't find account")
             callback(undefined)
         }
     })
 }
 
-
+//Send to client an error message.
 function error(response, message) {
-    //Send to client an error message.
     response.status(400);
     let data = {
         "message": message
@@ -85,15 +86,15 @@ function error(response, message) {
     response.json(data);
 }
 
+//Send to client the result of the request.
 function success(response, data) {
-    //Send to client the result of the request.
     response.status(200);
     response.json(data);
 }
 
+//handle the login. Return an error message to the client in case of failure,
+//and otherwise the key and type.
 apiFunctions.login = function(req, res, data) {
-    //handle the login. Return an error message to the client in case of failure,
-    //and otherwise the key and type.
     create_key(data.account, function(key) {
         if (key === undefined) {
             return error(res, "No such account")
@@ -118,14 +119,14 @@ app.use((req, res, next) => {
 });
 
 let URIs = Object.keys(api);
+//Associate the various api function each with their own post request.
 URIs.forEach(function(uri) {
-    //Associate the various api function each with their own post request.
     app.post('/' + uri, function(req, res) {
         console.log(uri);
         let params = api[uri];
         let err = false;
+        //Check if all the parameters are valid and acts accordingly.
         params.forEach(function(param) {
-            //Check if all the parameters are valid and acts accordingly.
             if (!req.body[param]) {
                 err = true;
                 error(res, "Parameter " + param + " is mandatory");
@@ -154,9 +155,8 @@ function authorized_file(name) {
 }
 
 
-
+//Download document associated with the URL for the inspector to check.
 apiFunctions.download = function(req, res, data) {
-    console.log("download")
     var url = data.url
     var key = data.key
 
@@ -176,8 +176,9 @@ apiFunctions.download = function(req, res, data) {
     });
 }
 
+//Validate the file if the person trying to do so is an inspector.
+//Require the url of the file and the id of the house the file is associated to.
 apiFunctions.validate = function(req, res, data) {
-    console.log("validate")
 
     let key = data.key
     let url = data.url
@@ -187,13 +188,12 @@ apiFunctions.validate = function(req, res, data) {
         return error(res, "Only inspector can validate files");
     }
 
-    // TODO check error
     smartcontract.setVerification(url, houseId, get_ethereum_key(key), res, error, success);
-    console.log('called smartcontract');
 }
 
+//Check if the file is validated. Owner and inspector can check this.
+//Require the url of the file and the id of the house the file is associated to.
 apiFunctions.validated = function(req, res, data) {
-    console.log("validated")
 
     let key = data.key
     let url = data.url
@@ -204,31 +204,29 @@ apiFunctions.validated = function(req, res, data) {
         return error(res, "Only owner and inspector see validation status");
     }
 
-    console.log('called smartcontract');
-
     smartcontract.isVerified(url, houseId, get_ethereum_key(key), res, error, success);
 }
 
-
+//Get all the houses associated to an account.
 apiFunctions.getHouses = function(req, res, data) {
     let key = data.key;
     var houses = [];
 
+    //Call the smart contract to get the number of houses associated with the account.
     smartcontract.getNbHouses(res, error, get_ethereum_key(key), function(number) {
         let index = 0;
         let houseFields = ["street", "zipCode", "city", "country", "houseId"];
 
+        //Get each house one by one.
+        //As it is not possible to return arrays in solidity currently.
         for (var i = 1; i <= number; i++) {
             smartcontract.getHouse(i, get_ethereum_key(key), function(result) {
-                console.log(index);
+                //Prettify the result
                 prettyResult = {}
                 for (j in result) {
                     prettyResult[houseFields[j]] = result[j];
-
-
                 }
                 houses.push(prettyResult);
-                console.log(prettyResult);
                 index++;
 
                 if (index == number) {
@@ -236,13 +234,13 @@ apiFunctions.getHouses = function(req, res, data) {
                         "result": houses
                     });
                 }
-
             });
         }
     });
-
 }
 
+
+//Add a new house to the account.
 apiFunctions.addHouse = function(req, res, data) {
     let key = data.key;
     let street = data.street;
@@ -257,10 +255,9 @@ apiFunctions.addHouse = function(req, res, data) {
     }
 
     smartcontract.addHouse(street, zipCode, city, country, houseId, get_ethereum_key(key), res, error, success)
-
 }
 
-
+//Add a new document to the house.
 apiFunctions.addDocument = function(req, res, data) {
     let key = data.key;
     let houseId = data.houseId;
@@ -278,10 +275,6 @@ apiFunctions.addDocument = function(req, res, data) {
     fs.writeFileSync(UPLOAD_DIR + fileId, content, 'base64');
 
     smartcontract.addDocument(hash, get_ethereum_key(key), fileId, houseId, time, res, error, success)
-    success(res, {
-        "url": fileId
-    });
-
 }
 
 apiFunctions.getDocuments = function(req, res, data) {
@@ -293,7 +286,7 @@ apiFunctions.getDocuments = function(req, res, data) {
         console.log(number);
         let index = 0;
         let docFields = ["fileId", "isVerified", "hash", "addedAt"];
-        
+
         for (var i = 1; i <= number; i++) {
             smartcontract.getDocument(i, get_ethereum_key(key), houseId, function(result) {
                 console.log(index);
@@ -311,7 +304,7 @@ apiFunctions.getDocuments = function(req, res, data) {
                     });
 
                 }
-        
+
             });
         }
         if (number == 0) {
@@ -321,6 +314,14 @@ apiFunctions.getDocuments = function(req, res, data) {
     });
 
 }
+
+apiFunctions.getHouse = function(req, res, data) {
+    let key = data.key;
+    let houseId = data.houseId;
+
+    smartcontract.getHouseWithId(houseId, get_ethereum_key(key), res, success, error);
+};
+
 
 function generateDate() {
     var today = new Date();
@@ -342,7 +343,7 @@ function generateDate() {
         mm = '0' + mm
     }
 
-    today = dd + '/' + mm + '/' + yyyy + " " + hour + ":" + minute + ":"+ second +":" +millisecond;
+    today = dd + '/' + mm + '/' + yyyy + " " + hour + ":" + minute + ":" + second + ":" + millisecond;
 
     console.log(today);
     return today;

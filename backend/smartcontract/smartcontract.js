@@ -19,7 +19,8 @@ let contractName = 'WoningPasV2';
 
 
 //const addressContract = '0x2765eabc3ca01361d38a53efabc38f9d100a4a01';
-const addressContract = '0xb070cb107f3892c9d58750a961d28b2785e61a33';
+//const addressContract = '0xb070cb107f3892c9d58750a961d28b2785e61a33';
+const addressContract = '0x20686bc3c9848455014c250827e10494a776e9c5';
 
 //needs to be changed
 var adresseFrom;
@@ -87,6 +88,9 @@ async function setVerification(fileId, houseId, privateKey, res, error, success)
   let acc = web3.eth.accounts.privateKeyToAccount(privateKey);
 
   let tx_builder = ret.methods.setVerification(fileId, houseId);
+
+
+
   let encoded_tx = tx_builder.encodeABI();
   let transactionObject = {
     gas: 50000,
@@ -103,9 +107,9 @@ async function setVerification(fileId, houseId, privateKey, res, error, success)
       web3.eth.sendSignedTransaction(signedTx.rawTransaction)
         .on('receipt', function(receipt) {
           console.log(receipt);
-          success(res, success(res, {
+          success(res, {
             "validated": true
-          }))
+          })
         });
     };
   })
@@ -160,9 +164,9 @@ async function addHouse(street, zipCode, city, country, houseId, privateKey, res
     } else {
       web3.eth.sendSignedTransaction(signedTx.rawTransaction)
         .on('receipt', function(receipt) {
-          success(res, success(res, {
+          success(res, {
             "message": "Success"
-          }))
+          })
         });
     };
   })
@@ -193,9 +197,9 @@ async function addDocument(hash, privateKey, fileId, houseId, time, res, error, 
     } else {
       web3.eth.sendSignedTransaction(signedTx.rawTransaction)
         .on('receipt', function(receipt) {
-          success(res, success(res, {
+          success(res, {
             "fileID": fileId
-          }))
+          })
         });
     };
   })
@@ -276,6 +280,42 @@ async function getDocument(index, privateKey, houseId, callback) {
   })
 }
 
+async function getHouseWithId(houseId, privateKey, res, success, error) {
+  var ret = getContract();
+  console.log("getHouse avec ID");
+
+  let acc = web3.eth.accounts.privateKeyToAccount(privateKey);
+
+  console.log(houseId);
+  ret.methods.getHouseWithId(houseId).call({
+    from: acc.address,
+    gas: 5e6
+  }).then(function(result) {
+    success(res, parseHouse(result));
+  }).catch(function(error) {
+    console.log(error)
+    error(res, "Error with getHouse avec id")
+  })
+
+}
+
+function parseHouse(data) {
+
+  let index = 0;
+  let houseFields = ["houseId", "street", "zipCode", "city", "country"];
+  var houses = [];
+
+  let prettyResult = {};
+
+  for (var j in data) {
+    prettyResult[houseFields[j]] = data[j];
+  }
+
+  houses.push(prettyResult);
+  console.log(prettyResult);
+  return prettyResult;
+
+}
 
 
 /*Pas complet*/
@@ -302,3 +342,4 @@ module.exports.getNbHouses = getNbHouses;
 module.exports.getDocument = getDocument;
 module.exports.getNbDoc = getNbDoc;
 module.exports.addDocument = addDocument;
+module.exports.getHouseWithId = getHouseWithId;
