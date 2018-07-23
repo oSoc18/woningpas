@@ -10,6 +10,7 @@ var apiFunctions = {};
 let db = require("./database.js");
 
 generateDate();
+
 function hashh(base64content) {
     //used to hash the content of the file, to be allowed to check its veracity.
     const hash = crypto.createHash('sha256');
@@ -279,7 +280,7 @@ apiFunctions.getDocuments = function(req, res, data) {
         console.log(number);
         let index = 0;
         let docFields = ["fileId", "isVerified", "hash", "addedAt"];
-        
+
         for (var i = 1; i <= number; i++) {
             smartcontract.getDocument(i, get_ethereum_key(key), houseId, function(result) {
                 console.log(index);
@@ -297,7 +298,7 @@ apiFunctions.getDocuments = function(req, res, data) {
                     });
 
                 }
-        
+
             });
         }
         if (number == 0) {
@@ -307,6 +308,14 @@ apiFunctions.getDocuments = function(req, res, data) {
     });
 
 }
+
+apiFunctions.getHouse = function(req, res, data) {
+    let key = data.key;
+    let houseId = data.houseId;
+
+    smartcontract.getHouseWithId(houseId, get_ethereum_key(key), res, success, error);
+};
+
 
 function generateDate() {
     var today = new Date();
@@ -328,7 +337,7 @@ function generateDate() {
         mm = '0' + mm
     }
 
-    today = dd + '/' + mm + '/' + yyyy + " " + hour + ":" + minute + ":"+ second +":" +millisecond;
+    today = dd + '/' + mm + '/' + yyyy + " " + hour + ":" + minute + ":" + second + ":" + millisecond;
 
     console.log(today);
     return today;
