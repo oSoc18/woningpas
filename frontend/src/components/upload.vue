@@ -1,8 +1,8 @@
 <template>
   <div>
-    <h2>Add a document</h2><br>
-    <input type="file" accept=".pdf" @change="onFileSelected"><br>
-    <button class="a-button" @click="upload">Upload</button>
+    <!--h2>Add a document</h2><br-->
+    <button class="a-button" :disabled="uploading" @click="addDocument">Add document</button>
+    <input id="file" type="file" accept=".pdf" @change="fileChanged">
   </div>
 </template>
 
@@ -11,28 +11,44 @@ import auth from '@/js/auth.js'
 import api from '@/js/api.js'
 
 export default {
-    name: 'Upload',
-    data() {
-        return {
-            content: ''
-        }
-    },
-    methods: {
-        onFileSelected(event){
-            let self = this;
-            let reader = new FileReader();
-            reader.onloadend = function() {
-              self.content = reader.result;
-            };
-            reader.readAsBinaryString(event.target.files[0]);
-        },
-        upload(){
-            var data = {
-              key: auth.getToken(),
-              content: btoa(this.content)
-            }
-            api.request('upload', data);
-        }
+  name: 'Upload',
+  props: ['houseId'],
+  data() {
+    return {
+      uploading: false
     }
+  },
+  methods: {
+    addDocument: function(event) {
+      $('#file').click();
+    },
+    fileChanged: function(event) {
+      let upload = this.upload;
+      console.log('reading file');
+      let reader = new FileReader();
+      reader.onloadend = function() {
+        upload(reader.result);
+      };
+      reader.readAsBinaryString(event.target.files[0]);
+    },
+    upload: function(content) {
+      console.log('uploading');
+      this.uploading = true;
+      var data = {
+        key: auth.getToken(),
+        content: btoa(content),
+        houseId: this.houseId
+      }
+      api.request('addDocument', data, function(data) {
+        alert('Document uploaded.\n' + document.location + '/document/' + data.url);
+        document.location.href = document.location.href;
+      });
+    }
+  }
 }
 </script>
+<style scoped>
+input[type=file] {
+  display: none;
+}
+</style>
