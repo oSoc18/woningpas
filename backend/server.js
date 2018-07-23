@@ -231,7 +231,7 @@ apiFunctions.getHouses = function(req, res, data) {
             });
         }
         if (number == 0) {
-            success(res, "No house for this owner");
+            success(res, []);
         }
     });
 }
