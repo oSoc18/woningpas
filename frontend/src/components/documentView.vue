@@ -7,7 +7,7 @@
         <div class="container">
           <div class="row">
             <div class="col-md-12">
-              <app-document v-bind:document="document"></app-document>
+              <app-document v-if="!error" v-bind:document="document"></app-document>
       				<!-- /col -->
             </div>
       		<!-- /row -->
@@ -32,7 +32,8 @@ export default {
       role: auth.getRole(),
       houseId: this.$route.params.houseId,
       documentId: this.$route.params.documentId,
-      document: {}
+      document: {},
+      error: false
     }
   },
   created() {
@@ -40,8 +41,6 @@ export default {
   },
   methods: {
       getDocument(){
-        console.log('houseId='+this.houseId)
-        console.log('documentId='+this.documentId)
         let data = {
           key: auth.getToken(),
           houseId: this.houseId,
@@ -49,6 +48,9 @@ export default {
         }
         api.request('getDocument', data, data => {
           this.document = data
+        }, callback => {
+          this.error = true
+          console.log(callback)
         })
       }
   }

@@ -69,7 +69,7 @@ export default {
           houseId: this.houseId
         }
         api.request('getHouse', data, data => {
-          this.house = data.result
+          this.house = data
         })
       }
   }

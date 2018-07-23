@@ -2,8 +2,7 @@
   <div id="viewPDF">
     <app-header></app-header>
     <main>
-      <embed :src="url"><br>
-      <button v-on:click="download" class="btn btn-primary">Download</button>
+      <embed :src="url">
       <button v-on:click="validate" class="btn btn-success">Validate</button>
     </main>
     <app-footer></app-footer>
@@ -23,7 +22,7 @@ export default{
 
 <style scoped>
 embed{
-  width: 70%;
-  height: 450px;
+  width: 100%;
+  height: 600px;
 }
 </style>
