@@ -53,14 +53,12 @@ function get_ethereum_key(key) {
 
 function create_key(account, callback) {
     //initialise the mappings using the mongoDB database.
-    let key = undefined
-    key = uuid()
     db.getType(account, function(res) {
         if (res != null) {
-            keys[res][key] = true;
+            keys[res][account] = true;
             db.getEth(account, function(eth) {
-                mapping_key_ethereum[key] = eth
-                callback(key)
+                mapping_key_ethereum[account] = eth
+                callback(account)
             })
         } else {
             console.log("Couldn't find account")
@@ -80,14 +78,15 @@ function error(response, message) {
 }
 
 function success(response, data) {
-    //
+    //Send to client the result of the request.
     response.status(200);
     response.json(data);
 }
 
 apiFunctions.login = function(req, res, data) {
+    //handle the login. Return an error message to the client in case of failure,
+    //and otherwise the key and type.
     create_key(data.account, function(key) {
-
         if (key === undefined) {
             return error(res, "Account invalid")
         }
@@ -95,7 +94,7 @@ apiFunctions.login = function(req, res, data) {
             "key": key,
             "type": get_type(key)
         });
-        console.log(keys);
+
     })
 }
 /**
@@ -112,11 +111,13 @@ app.use((req, res, next) => {
 
 let URIs = Object.keys(api);
 URIs.forEach(function(uri) {
+    //Associate the various api function each with their own post request.
     app.post('/' + uri, function(req, res) {
         console.log(uri);
         let params = api[uri];
         let err = false;
         params.forEach(function(param) {
+            //Check if all the parameters are valid and acts accordingly.
             if (!req.body[param]) {
                 err = true;
                 error(res, "Parameter " + param + " is mandatory");
