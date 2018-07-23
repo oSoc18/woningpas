@@ -292,7 +292,7 @@ async function getHouseWithId(houseId, privateKey, res, success, error) {
     gas: 5e6
   }).then(function(result) {
     success(res, {
-      "result": parseResult(result, houseFields)
+      "result": parseResult(result, houseFields);
     });
   }).catch(function(error) {
     console.log(error)
@@ -313,7 +313,7 @@ async function getDocumentWithId(houseId, documentId, privateKey, res, success, 
     gas: 5e6
   }).then(function(result) {
     success(res, {
-        "result": parseResult(result, docFields))
+        "result": parseResult(result, docFields);
     };
   }).catch(function(error) {
     console.log(error)
