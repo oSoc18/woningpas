@@ -7,7 +7,7 @@
         </div>
       </div>
       <hr>
-      <app-upload></app-upload>
+      <app-upload :houseId="id"></app-upload>
       <hr>
   		<div class="row">
         <div class="col-md-12">
