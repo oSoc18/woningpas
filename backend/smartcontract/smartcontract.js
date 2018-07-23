@@ -20,7 +20,7 @@ var docFields = ["documentId", "isVerified", "hash", "addedAt"];
 var byteCodeContract;
 let contractName = 'WoningPasV2';
 
-const addressContract = '0x1b767a283c758dcad0d862b3069bd75434c53cb5';
+const addressContract = '0xe8f16e6769705c93d265076682cfb59a8d3abce9';
 
 //needs to be changed
 var adresseFrom;
@@ -291,9 +291,14 @@ async function getHouseWithId(houseId, privateKey, res, success, error) {
     from: acc.address,
     gas: 5e6
   }).then(function(result) {
-    success(res, {
-      "result": parseResult(result, houseFields)
-    });
+    console.log("iciicic");
+    console.log(result);
+    if (result[0] == '') {
+      error(res, "No item for this id");
+    } else {
+      success(res, parseResult(result, houseFields));
+    }
+
   }).catch(function(error) {
     console.log(error)
     error(res, "Error with getHouse avec id")
@@ -308,57 +313,59 @@ async function getDocumentWithId(houseId, documentId, privateKey, res, success, 
 
   let acc = web3.eth.accounts.privateKeyToAccount(privateKey);
 
-  ret.methods.getDocumentWithId(houseId, documentId).call({
+  ret.methods.getDocumentWithId(documentId, houseId).call({
     from: acc.address,
     gas: 5e6
   }).then(function(result) {
-      success(res, {
-          "result": parseResult(result, docFields)
-        });
-      }).catch(function(error) {
-      console.log(error)
-      error(res, "Error with getDoc avec id")
-    })
-
-  }
-
-  function parseResult(data, fields) {
-    let index = 0;
-    var result = [];
-    let prettyResult = {};
-
-    for (var j in data) {
-      prettyResult[fields[j]] = data[j];
+    if (result[0] == '') {
+      error(res, "No item for this id");
+    } else {
+      success(res, parseResult(result, docFields));
     }
+  }).catch(function(error) {
+    console.log(error)
+    error(res, "Error with getDoc avec id")
+  })
 
-    console.log(prettyResult);
-    return prettyResult;
+}
+
+function parseResult(data, fields) {
+  let index = 0;
+  var result = [];
+  let prettyResult = {};
+
+  for (var j in data) {
+    prettyResult[fields[j]] = data[j];
   }
 
-
-  /*Pas complet*/
-  function deployyy(hash, fileName) {
-    var ret = getContract();
-
-    ret = ret.deploy({
-      data: byteCodeContract,
-      arguments: ["hash", "fileName"]
-    });
-
-    console.log("Déploiment du contract sur le blockchain");
-    console.log(ret);
-  }
+  console.log(prettyResult);
+  return prettyResult;
+}
 
 
+/*Pas complet*/
+function deployyy(hash, fileName) {
+  var ret = getContract();
 
-  module.exports.setVerification = setVerification;
-  module.exports.isVerified = isVerified;
-  module.exports.createAccount = createAccount;
-  module.exports.addHouse = addHouse;
-  module.exports.getHouse = getHouse;
-  module.exports.getNbHouses = getNbHouses;
-  module.exports.getDocument = getDocument;
-  module.exports.getNbDoc = getNbDoc;
-  module.exports.addDocument = addDocument;
-  module.exports.getHouseWithId = getHouseWithId;
-  module.exports.getDocumentWithId = getDocumentWithId;
+  ret = ret.deploy({
+    data: byteCodeContract,
+    arguments: ["hash", "fileName"]
+  });
+
+  console.log("Déploiment du contract sur le blockchain");
+  console.log(ret);
+}
+
+
+
+module.exports.setVerification = setVerification;
+module.exports.isVerified = isVerified;
+module.exports.createAccount = createAccount;
+module.exports.addHouse = addHouse;
+module.exports.getHouse = getHouse;
+module.exports.getNbHouses = getNbHouses;
+module.exports.getDocument = getDocument;
+module.exports.getNbDoc = getNbDoc;
+module.exports.addDocument = addDocument;
+module.exports.getHouseWithId = getHouseWithId;
+module.exports.getDocumentWithId = getDocumentWithId;
