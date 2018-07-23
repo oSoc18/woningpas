@@ -8,6 +8,7 @@ import HouseList from '@/components/houseList'
 import Documents from '@/components/documents'
 import Document from '@/components/document'
 import ViewPDF from '@/components/viewPDF'
+import DocumentView from '@/components/documentView'
 import auth from '@/js/auth.js'
 
 Vue.use(Router)
@@ -39,15 +40,23 @@ export default new Router({
       }
     },
     {
-      path: '/documents',
-      name: 'Documents',
-      component: Documents
-    },
-    {
-      path: '/house/:id',
+      path: '/house/:houseId',
       name: 'House',
       component: House,
-      props: true
+      beforeEnter: (to, from, next) => {
+        if (!auth.getRole()) {
+          next('/login')
+        }
+        else if (auth.getRole() == 'inspector') {
+          next('/pageNotFound')
+        }
+        next()
+      }
+    },
+    {
+      path: '/house/:houseId/document/:documentId',
+      name: 'DocumentView',
+      component: DocumentView
     },
     {
       path: '/viewPDF',

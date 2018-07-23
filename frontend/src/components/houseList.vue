@@ -58,7 +58,7 @@ export default {
   },
   methods:{
     selectHouse: function(houseId){
-      this.$router.push({ name: 'House', params: { id: houseId }})
+      this.$router.push({ name: 'House', params: { houseId: houseId }})
     }
   }
 }

@@ -6,8 +6,8 @@
           style="background-image:url('http://woningpas.brandplatform.be/img/coloured-icons/placeholder-appartement.svg')">
         </div>
         <div class="o-main-nav__adress">
-          <p>Hogeweg</p>
-          <strong>Kortrijk</strong>
+          <p>{{house.street}}</p>
+          <strong>{{house.city}}</strong>
           <router-link :to="{ name: 'Home'}">other houses</router-link>
         </div>
       </div>
@@ -48,7 +48,30 @@
 </template>
 
 <script>
+import auth from '@/js/auth.js'
+import api from '@/js/api.js'
+
 export default {
-  name: 'SideBar'
+  name: 'SideBar',
+  data() {
+    return {
+      houseId: this.$route.params.houseId,
+      house: {}
+    }
+  },
+  created() {
+    this.getHouse();
+  },
+  methods: {
+      getHouse(){
+        let data = {
+          key: auth.getToken(),
+          houseId: this.houseId
+        }
+        api.request('getHouse', data, data => {
+          this.house = data.result
+        })
+      }
+  }
 }
 </script>

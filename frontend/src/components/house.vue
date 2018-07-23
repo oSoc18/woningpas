@@ -2,21 +2,25 @@
   <div id="house" class="site-container">
     <app-header></app-header>
 	  <main>
-      <app-sideBar></app-sideBar>
-      <app-documents v-bind:id="id"></app-documents>
+      <app-sideBar v-if="role == 'owner'"></app-sideBar>
+      <app-documents v-bind:id="houseId"></app-documents>
     </main>
   	<app-footer></app-footer>
   </div>
 </template>
 
 <script>
+import auth from '@/js/auth.js'
+import api from '@/js/api.js'
+
 export default {
   name: 'House',
   data() {
     return {
-      id: this.$route.params.id
+      role: auth.getRole(),
+      houseId: this.$route.params.houseId
     }
-  }
+  },
 }
 </script>
 

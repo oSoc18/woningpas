@@ -14,6 +14,7 @@ import houseList from '@/components/houseList'
 import documents from '@/components/documents'
 import document from '@/components/document'
 import viewPDF from '@/components/viewPDF'
+import documentView from '@/components/documentView'
 
 Vue.component('app-header', header)
 Vue.component('app-sideBar', sideBar)
@@ -26,6 +27,7 @@ Vue.component('app-document', document)
 Vue.component('app-house', house)
 Vue.component('app-houseList', houseList)
 Vue.component('app-viewPDF', viewPDF)
+Vue.component('app-documentView', documentView)
 Vue.config.productionTip = false
 
 /* eslint-disable no-new */
