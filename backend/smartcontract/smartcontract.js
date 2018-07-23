@@ -317,7 +317,7 @@ async function getDocumentWithId(houseId, documentId, privateKey, res, success, 
     from: acc.address,
     gas: 5e6
   }).then(function(result) {
-    if (result[0] == '') {
+    if (result[0] === '') {
       error(res, "No item for this id");
     } else {
       success(res, parseResult(result, docFields));

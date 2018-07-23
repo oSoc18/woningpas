@@ -325,7 +325,7 @@ apiFunctions.getDocument = function(req, res, data) {
     let houseId= data.houseId;
     let documentId = data.documentId;
 
-    smartcontract.getDocumentWithId(documentId, houseId, get_ethereum_key(key), res, success, error);
+    smartcontract.getDocumentWithId(houseId, documentId, get_ethereum_key(key), res, success, error);
 
 }
 
