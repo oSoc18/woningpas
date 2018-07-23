@@ -20,7 +20,7 @@ let contractName = 'WoningPasV2';
 
 //const addressContract = '0x2765eabc3ca01361d38a53efabc38f9d100a4a01';
 //const addressContract = '0xb070cb107f3892c9d58750a961d28b2785e61a33';
-const addressContract = '0x20686bc3c9848455014c250827e10494a776e9c5';
+const addressContract = '0x19d4d068249bf6365ef6e0ca2b3a075f1fa46975';
 
 //needs to be changed
 var adresseFrom;
