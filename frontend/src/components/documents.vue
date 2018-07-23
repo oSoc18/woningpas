@@ -12,6 +12,7 @@
   		<div class="row">
         <div class="col-md-12">
           <app-document v-for="document in documents" v-bind:document="document" :key="document.fileId"></app-document>
+          <h1 v-if="documents.length == 0">No document</h1>
   				<!-- /col -->
         </div>
   		<!-- /row -->
