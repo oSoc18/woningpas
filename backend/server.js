@@ -177,6 +177,7 @@ apiFunctions.download = function(req, res, data) {
 }
 
 //Validate the file if the person trying to do so is an inspector.
+//Require the url of the file and the id of the house the file is associated to.
 apiFunctions.validate = function(req, res, data) {
 
     let key = data.key
@@ -190,8 +191,9 @@ apiFunctions.validate = function(req, res, data) {
     smartcontract.setVerification(url, houseId, get_ethereum_key(key), res, error, success);
 }
 
+//Check if the file is validated. Owner and inspector can check this.
+//Require the url of the file and the id of the house the file is associated to.
 apiFunctions.validated = function(req, res, data) {
-    console.log("validated")
 
     let key = data.key
     let url = data.url
@@ -202,31 +204,29 @@ apiFunctions.validated = function(req, res, data) {
         return error(res, "Only owner and inspector see validation status");
     }
 
-    console.log('called smartcontract');
-
     smartcontract.isVerified(url, houseId, get_ethereum_key(key), res, error, success);
 }
 
-
+//Get all the houses associated to an account.
 apiFunctions.getHouses = function(req, res, data) {
     let key = data.key;
     var houses = [];
 
+    //Call the smart contract to get the number of houses associated with the account.
     smartcontract.getNbHouses(res, error, get_ethereum_key(key), function(number) {
         let index = 0;
         let houseFields = ["street", "zipCode", "city", "country", "houseId"];
 
+        //Get each house one by one.
+        //As it is not possible to return arrays in solidity currently.
         for (var i = 1; i <= number; i++) {
             smartcontract.getHouse(i, get_ethereum_key(key), function(result) {
-                console.log(index);
+                //Prettify the result
                 prettyResult = {}
                 for (j in result) {
                     prettyResult[houseFields[j]] = result[j];
-
-
                 }
                 houses.push(prettyResult);
-                console.log(prettyResult);
                 index++;
 
                 if (index == number) {
@@ -234,13 +234,13 @@ apiFunctions.getHouses = function(req, res, data) {
                         "result": houses
                     });
                 }
-
             });
         }
     });
-
 }
 
+
+//Add a new house to the account.
 apiFunctions.addHouse = function(req, res, data) {
     let key = data.key;
     let street = data.street;
@@ -255,10 +255,9 @@ apiFunctions.addHouse = function(req, res, data) {
     }
 
     smartcontract.addHouse(street, zipCode, city, country, houseId, get_ethereum_key(key), res, error, success)
-
 }
 
-
+//Add a new document to the house.
 apiFunctions.addDocument = function(req, res, data) {
     let key = data.key;
     let houseId = data.houseId;
@@ -276,10 +275,6 @@ apiFunctions.addDocument = function(req, res, data) {
     fs.writeFileSync(UPLOAD_DIR + fileId, content, 'base64');
 
     smartcontract.addDocument(hash, get_ethereum_key(key), fileId, houseId, time, res, error, success)
-    success(res, {
-        "url": fileId
-    });
-
 }
 
 apiFunctions.getDocuments = function(req, res, data) {

@@ -103,9 +103,9 @@ async function setVerification(fileId, houseId, privateKey, res, error, success)
       web3.eth.sendSignedTransaction(signedTx.rawTransaction)
         .on('receipt', function(receipt) {
           console.log(receipt);
-          success(res, success(res, {
+          success(res, {
             "validated": true
-          }))
+          })
         });
     };
   })
@@ -160,9 +160,9 @@ async function addHouse(street, zipCode, city, country, houseId, privateKey, res
     } else {
       web3.eth.sendSignedTransaction(signedTx.rawTransaction)
         .on('receipt', function(receipt) {
-          success(res, success(res, {
+          success(res, {
             "message": "Success"
-          }))
+          })
         });
     };
   })
@@ -193,9 +193,9 @@ async function addDocument(hash, privateKey, fileId, houseId, time, res, error, 
     } else {
       web3.eth.sendSignedTransaction(signedTx.rawTransaction)
         .on('receipt', function(receipt) {
-          success(res, success(res, {
+          success(res, {
             "fileID": fileId
-          }))
+          })
         });
     };
   })
