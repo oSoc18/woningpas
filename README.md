@@ -19,6 +19,7 @@ Clone the github repositery first and open a terminal in the repositery.
 
 ``` bash
 # move into the backend folder
+cd backend
 
 # install dependencies
 npm install
@@ -34,6 +35,9 @@ More information about the API can be found [here](backend/API.md)
 ### Frontend
 
 ``` bash
+# move into the frontend folder
+cd frontend
+
 # install dependencies
 npm install
 
