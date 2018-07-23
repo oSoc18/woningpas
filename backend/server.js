@@ -121,7 +121,7 @@ app.use((req, res, next) => {
 let URIs = Object.keys(api);
 //Associate the various api function each with their own post request.
 URIs.forEach(function(uri) {
-    app.post('/api/' + uri, function(req, res) {
+    app.post('/' + uri, function(req, res) {
         console.log(uri);
         let params = api[uri];
         let err = false;
