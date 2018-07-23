@@ -292,7 +292,7 @@ async function getHouseWithId(houseId, privateKey, res, success, error) {
     gas: 5e6
   }).then(function(result) {
     success(res, {
-      "result": parseResult(result, houseFields);
+      "result": parseResult(result, houseFields)
     });
   }).catch(function(error) {
     console.log(error)
@@ -312,53 +312,53 @@ async function getDocumentWithId(houseId, documentId, privateKey, res, success, 
     from: acc.address,
     gas: 5e6
   }).then(function(result) {
-    success(res, {
-        "result": parseResult(result, docFields);
-    };
-  }).catch(function(error) {
-    console.log(error)
-    error(res, "Error with getDoc avec id")
-  })
+      success(res, {
+          "result": parseResult(result, docFields)
+        });
+      }).catch(function(error) {
+      console.log(error)
+      error(res, "Error with getDoc avec id")
+    })
 
-}
-
-function parseResult(data, fields) {
-  let index = 0;
-  var result = [];
-  let prettyResult = {};
-
-  for (var j in data) {
-    prettyResult[fields[j]] = data[j];
   }
 
-  console.log(prettyResult);
-  return prettyResult;
-}
+  function parseResult(data, fields) {
+    let index = 0;
+    var result = [];
+    let prettyResult = {};
+
+    for (var j in data) {
+      prettyResult[fields[j]] = data[j];
+    }
+
+    console.log(prettyResult);
+    return prettyResult;
+  }
 
 
-/*Pas complet*/
-function deployyy(hash, fileName) {
-  var ret = getContract();
+  /*Pas complet*/
+  function deployyy(hash, fileName) {
+    var ret = getContract();
 
-  ret = ret.deploy({
-    data: byteCodeContract,
-    arguments: ["hash", "fileName"]
-  });
+    ret = ret.deploy({
+      data: byteCodeContract,
+      arguments: ["hash", "fileName"]
+    });
 
-  console.log("Déploiment du contract sur le blockchain");
-  console.log(ret);
-}
+    console.log("Déploiment du contract sur le blockchain");
+    console.log(ret);
+  }
 
 
 
-module.exports.setVerification = setVerification;
-module.exports.isVerified = isVerified;
-module.exports.createAccount = createAccount;
-module.exports.addHouse = addHouse;
-module.exports.getHouse = getHouse;
-module.exports.getNbHouses = getNbHouses;
-module.exports.getDocument = getDocument;
-module.exports.getNbDoc = getNbDoc;
-module.exports.addDocument = addDocument;
-module.exports.getHouseWithId = getHouseWithId;
-module.exports.getDocumentWithId = getDocumentWithId;
+  module.exports.setVerification = setVerification;
+  module.exports.isVerified = isVerified;
+  module.exports.createAccount = createAccount;
+  module.exports.addHouse = addHouse;
+  module.exports.getHouse = getHouse;
+  module.exports.getNbHouses = getNbHouses;
+  module.exports.getDocument = getDocument;
+  module.exports.getNbDoc = getNbDoc;
+  module.exports.addDocument = addDocument;
+  module.exports.getHouseWithId = getHouseWithId;
+  module.exports.getDocumentWithId = getDocumentWithId;
