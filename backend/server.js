@@ -232,6 +232,9 @@ apiFunctions.getHouses = function(req, res, data) {
                 }
             });
         }
+        if (number == 0) {
+            success(res, "No house for this owner");
+        }
     });
 }
 
@@ -320,6 +323,15 @@ apiFunctions.getHouse = function(req, res, data) {
 
     smartcontract.getHouseWithId(houseId, get_ethereum_key(key), res, success, error);
 };
+
+apiFunctions.getDocument = function(req, res, data) {
+    let key = data.key;
+    let houseId= data.houseId;
+    let documentId = data.documentId;
+
+    smartcontract.getDocumentWithId(documentId, houseId, get_ethereum_key(key), res, success, error);
+
+}
 
 
 function generateDate() {

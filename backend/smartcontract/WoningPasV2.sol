@@ -7,7 +7,6 @@ contract WoningPasV2 {
 	struct Owner{
 		address addr;			
 		string[] keysOfHouses;
-		
 		//between id of the house and the house
 		mapping(string => House) houses; 
 	}
@@ -32,12 +31,6 @@ contract WoningPasV2 {
 	}
 
 
-	function addOwner() public{
-		owners[msg.sender] = Owner(msg.sender, new string[](0));
-		
-	}
-
-
 	function addHouse(string _streetName, uint _zipCode, string _city, string _country, string _idHouse) public{
 		House memory house = House(_idHouse, _streetName, _zipCode, _city, _country, new string[](0));
 		owners[msg.sender].houses[_idHouse] = house;
@@ -51,7 +44,7 @@ contract WoningPasV2 {
 		owners[msg.sender].houses[_idHouse].keysOfDocs.push(_fileId);
 	}
 
-	
+
 	function getFileHash(string _fileId, string _houseId) public view returns (string){
 		return owners[msg.sender].houses[_houseId].documents[_fileId].hash;
 	}
@@ -101,5 +94,12 @@ contract WoningPasV2 {
 		House storage house = owners[msg.sender].houses[_idHouse];
 		return (house.id, house.streetName, house.zipCode, house.city, house.country);
 	}
+	
+	function getDocumentWithId(string _idDocument, string _idHouse) view public returns(string, bool, string, string){
+		Document storage document = owners[msg.sender].houses[_idHouse].documents[_idDocument];
+		return (document.fileId, document.isVerified, document.hash, document.addedAt);
+	}
+	
+
 
 }
