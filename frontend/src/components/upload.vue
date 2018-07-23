@@ -40,7 +40,7 @@ export default {
         houseId: this.houseId
       }
       api.request('addDocument', data, function(data) {
-        alert('Document uploaded.\n' + document.location + '/document/' + data.url);
+        alert('Document uploaded.\n' + document.location + '/document/' + data.fileID);
         // TODO find better way to refresh page with getDocuments
         document.location.href = document.location.href;
       });
