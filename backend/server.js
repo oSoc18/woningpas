@@ -300,9 +300,7 @@ apiFunctions.getDocuments = function(req, res, data) {
             });
         }
         if (number == 0) {
-            error(res, {
-                "result": "No documents for this house"
-            });
+            error(res, "No documents for this house");
         }
 
     });

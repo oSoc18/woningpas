@@ -14,11 +14,8 @@ export default {
   name: 'House',
   data() {
     return {
-      id: ''
+      id: this.$route.params.id
     }
-  },
-  created() {
-      this.id = this.$route.params.id;
   }
 }
 </script>
