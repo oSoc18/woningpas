@@ -110,7 +110,7 @@ apiFunctions.login = function(req, res, data) {
  * Express routes
  */
 var app = express();
-app.use(bodyParser.json());
+app.use(bodyParser.json({limit: '50mb'}));
 app.use((req, res, next) => {
     res.append('Access-Control-Allow-Origin', ['*']);
     res.append('Access-Control-Allow-Methods', 'GET,POST');
