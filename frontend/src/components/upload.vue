@@ -39,7 +39,10 @@ export default {
         content: btoa(content),
         houseId: this.houseId
       }
-      api.request('addDocument', data);
+      api.request('addDocument', data, function(data) {
+        alert('Document uploaded.\n' + document.location + '/document/' + data.url);
+        document.location.href = document.location.href;
+      });
     }
   }
 }
