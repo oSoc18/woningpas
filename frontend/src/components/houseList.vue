@@ -53,7 +53,7 @@ export default {
   },
   created() {
     api.request('getHouses', {key: this.token}, (data) => {
-        this.houses = data.result
+        this.houses = data
     })
   },
   methods:{

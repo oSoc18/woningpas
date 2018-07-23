@@ -41,6 +41,7 @@ export default {
       }
       api.request('addDocument', data, function(data) {
         alert('Document uploaded.\n' + document.location + '/document/' + data.url);
+        // TODO find better way to refresh page with getDocuments
         document.location.href = document.location.href;
       });
     }

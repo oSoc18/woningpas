@@ -226,9 +226,7 @@ apiFunctions.getHouses = function(req, res, data) {
                 index++;
 
                 if (index == number) {
-                    success(res, {
-                        "result": houses
-                    });
+                    success(res, houses);
                 }
             });
         }
@@ -300,9 +298,7 @@ apiFunctions.getDocuments = function(req, res, data) {
                 index++;
 
                 if (index == number) {
-                    success(res, {
-                        "result": documents
-                    });
+                    success(res, documents);
 
                 }
 

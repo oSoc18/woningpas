@@ -46,7 +46,7 @@ export default {
             houseId: this.id
           }
           api.request('getDocuments', data, data => {
-            this.documents = data.result
+            this.documents = data
           })
         }
     }
