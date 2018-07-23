@@ -305,7 +305,7 @@ apiFunctions.getDocuments = function(req, res, data) {
             });
         }
         if (number == 0) {
-            success(res, "No documents for this house");
+            success(res, []);
         }
 
     });
