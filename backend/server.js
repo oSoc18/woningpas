@@ -160,10 +160,6 @@ apiFunctions.download = function(req, res, data) {
     var url = data.url
     var key = data.key
 
-    if (get_type(key) !== "inspector") {
-        return error(res, "Only inspector can download files");
-    }
-
     // TODO check error
     let content = fs.readFileSync(UPLOAD_DIR + url, 'base64');
     if (!content) {
@@ -264,7 +260,7 @@ apiFunctions.addDocument = function(req, res, data) {
     let content = data.content;
 
     if (get_type(key) !== "owner") {
-        return error(res, "Only owner can add houses");
+        return error(res, "Only owner can add documents");
     }
 
     let fileId = uuid();
