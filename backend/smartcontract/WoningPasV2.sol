@@ -97,4 +97,9 @@ contract WoningPasV2 {
 		return (doc.fileId, doc.isVerified, doc.hash, doc.addedAt);
 	}
 
+	function getHouseWithId(string _idHouse) view public returns(string, string, uint, string, string){
+		House storage house = owners[msg.sender].houses[_idHouse];
+		return (house.id, house.streetName, house.zipCode, house.city, house.country);
+	}
+
 }
