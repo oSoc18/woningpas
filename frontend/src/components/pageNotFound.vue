@@ -1,5 +1,5 @@
 <template>
-  <div id="notFound" class="u-bg-pattern u-bg-pattern--rectangles" data-styleguide="woningpas">
+  <div id="pageNotFound" class="u-bg-pattern u-bg-pattern--rectangles" data-styleguide="woningpas">
     <div class="site-container">
       <app-header></app-header>
       <main>
@@ -25,6 +25,6 @@
 
 <script>
   export default {
-    name: 'NotFound'
+    name: 'PageNotFound'
   }
 </script>

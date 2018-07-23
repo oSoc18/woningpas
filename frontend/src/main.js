@@ -9,21 +9,23 @@ import footer from '@/components/footer'
 import upload from '@/components/upload'
 import login from '@/components/login'
 import house from '@/components/house'
-import notFound from '@/components/notFound'
+import pageNotFound from '@/components/pageNotFound'
 import houseList from '@/components/houseList'
 import documents from '@/components/documents'
 import document from '@/components/document'
+import viewPDF from '@/components/viewPDF'
 
 Vue.component('app-header', header)
 Vue.component('app-sideBar', sideBar)
 Vue.component('app-footer', footer)
 Vue.component('app-upload', upload)
 Vue.component('app-login', login)
-Vue.component('app-notFound', notFound)
+Vue.component('app-pageNotFound', pageNotFound)
 Vue.component('app-documents', documents)
 Vue.component('app-document', document)
 Vue.component('app-house', house)
 Vue.component('app-houseList', houseList)
+Vue.component('app-viewPDF', viewPDF)
 Vue.config.productionTip = false
 
 /* eslint-disable no-new */

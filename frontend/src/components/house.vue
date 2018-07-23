@@ -14,8 +14,11 @@ export default {
   name: 'House',
   data() {
     return {
-      id: '9a083ac2-43e3-419d-944d-5cc45ccd6302'
+      id: ''
     }
+  },
+  created() {
+      this.id = this.$route.params.id;
   }
 }
 </script>
