@@ -11,6 +11,7 @@ let db = require("./database.js");
 
 generateDate();
 function hashh(base64content) {
+    //used to hash the content of the file, to be allowed to check its veracity.
     const hash = crypto.createHash('sha256');
     var content = Buffer.from(base64content, 'base64');
     hash.update(content);
@@ -34,6 +35,7 @@ console.log(keys);
 console.log("saving files in " + UPLOAD_DIR);
 
 function get_type(key) {
+    //Get the type of the identification token (owner, inspector or admin)
     for (let type of Object.keys(keys)) {
         if (keys[type][key]) {
             return type;
@@ -45,18 +47,18 @@ function get_type(key) {
 let mapping_key_ethereum = {}
 
 function get_ethereum_key(key) {
+    //get the web3 private key associated with the email account, using the identification token.
     return mapping_key_ethereum[key].privateKey
 }
 
 function create_key(account, callback) {
+    //initialise the mappings using the mongoDB database.
     let key = undefined
     key = uuid()
     db.getType(account, function(res) {
         if (res != null) {
-            console.log(res)
             keys[res][key] = true;
             db.getEth(account, function(eth) {
-                console.log(eth)
                 mapping_key_ethereum[key] = eth
                 callback(key)
             })
@@ -69,6 +71,7 @@ function create_key(account, callback) {
 
 
 function error(response, message) {
+    //Send to client an error message.
     response.status(400);
     let data = {
         "message": message
@@ -77,6 +80,7 @@ function error(response, message) {
 }
 
 function success(response, data) {
+    //
     response.status(200);
     response.json(data);
 }
