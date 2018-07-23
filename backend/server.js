@@ -277,25 +277,27 @@ apiFunctions.addDocument = function(req, res, data) {
     smartcontract.addDocument(hash, get_ethereum_key(key), fileId, houseId, time, res, error, success)
 }
 
+//Get all the documents associated with that house.
 apiFunctions.getDocuments = function(req, res, data) {
     let key = data.key;
     let houseId = data.houseId;
     var documents = [];
 
+    //Get each house one by one.
+    //As it is not possible to return arrays in solidity currently.
     smartcontract.getNbDoc(res, error, get_ethereum_key(key), houseId, function(number) {
-        console.log(number);
         let index = 0;
         let docFields = ["fileId", "isVerified", "hash", "addedAt"];
-
+        //Get each house one by one.
+        //As it is not possible to return arrays in solidity currently.
         for (var i = 1; i <= number; i++) {
             smartcontract.getDocument(i, get_ethereum_key(key), houseId, function(result) {
-                console.log(index);
+                //Prettify the result
                 let prettyResult = {};
                 for (j in result) {
                     prettyResult[docFields[j]] = result[j];
                 }
                 documents.push(prettyResult);
-                console.log(documents);
                 index++;
 
                 if (index == number) {
@@ -315,6 +317,7 @@ apiFunctions.getDocuments = function(req, res, data) {
 
 }
 
+//Get the house using the id of the house.
 apiFunctions.getHouse = function(req, res, data) {
     let key = data.key;
     let houseId = data.houseId;
