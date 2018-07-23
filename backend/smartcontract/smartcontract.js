@@ -14,13 +14,13 @@ const set = argv.set;
 const privateFor = argv.privateFor;
 const externallySign = argv.sign;
 
+var houseFields = ["houseId", "street", "zipCode", "city", "country"];
+var docFields = ["documentId", "isVerified", "hash", "addedAt"];
+
 var byteCodeContract;
 let contractName = 'WoningPasV2';
 
-
-//const addressContract = '0x2765eabc3ca01361d38a53efabc38f9d100a4a01';
-//const addressContract = '0xb070cb107f3892c9d58750a961d28b2785e61a33';
-const addressContract = '0x19d4d068249bf6365ef6e0ca2b3a075f1fa46975';
+const addressContract = '0x1b767a283c758dcad0d862b3069bd75434c53cb5';
 
 //needs to be changed
 var adresseFrom;
@@ -291,7 +291,9 @@ async function getHouseWithId(houseId, privateKey, res, success, error) {
     from: acc.address,
     gas: 5e6
   }).then(function(result) {
-    success(res, parseHouse(result));
+    success(res, {
+      "result": parseResult(result, houseFields)
+    });
   }).catch(function(error) {
     console.log(error)
     error(res, "Error with getHouse avec id")
@@ -299,22 +301,38 @@ async function getHouseWithId(houseId, privateKey, res, success, error) {
 
 }
 
-function parseHouse(data) {
 
+async function getDocumentWithId(houseId, documentId, privateKey, res, success, error) {
+  var ret = getContract();
+  console.log("getDoc avec ID");
+
+  let acc = web3.eth.accounts.privateKeyToAccount(privateKey);
+
+  ret.methods.getDocumentWithId(houseId, documentId).call({
+    from: acc.address,
+    gas: 5e6
+  }).then(function(result) {
+    success(res, {
+        "result": parseResult(result, docFields))
+    };
+  }).catch(function(error) {
+    console.log(error)
+    error(res, "Error with getDoc avec id")
+  })
+
+}
+
+function parseResult(data, fields) {
   let index = 0;
-  let houseFields = ["houseId", "street", "zipCode", "city", "country"];
-  var houses = [];
-
+  var result = [];
   let prettyResult = {};
 
   for (var j in data) {
-    prettyResult[houseFields[j]] = data[j];
+    prettyResult[fields[j]] = data[j];
   }
 
-  houses.push(prettyResult);
   console.log(prettyResult);
   return prettyResult;
-
 }
 
 
@@ -343,3 +361,4 @@ module.exports.getDocument = getDocument;
 module.exports.getNbDoc = getNbDoc;
 module.exports.addDocument = addDocument;
 module.exports.getHouseWithId = getHouseWithId;
+module.exports.getDocumentWithId = getDocumentWithId;
