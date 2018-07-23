@@ -35,6 +35,14 @@ Object.keys(authorized_types).forEach(function(type) {
 console.log(keys);
 console.log("saving files in " + UPLOAD_DIR);
 
+function exist_key(key) {
+    for (let type of Object.keys(keys)) {
+        if (keys[type][key]) {
+            return true;
+        }
+    }
+    return false; 
+}
 function get_type(key) {
     //Get the type of the identification token (owner, inspector or admin)
     for (let type of Object.keys(keys)) {
@@ -89,7 +97,7 @@ apiFunctions.login = function(req, res, data) {
     //and otherwise the key and type.
     create_key(data.account, function(key) {
         if (key === undefined) {
-            return error(res, "Account invalid")
+            return error(res, "No such account")
         }
         success(res, {
             "key": key,
@@ -124,6 +132,12 @@ URIs.forEach(function(uri) {
                 error(res, "Parameter " + param + " is mandatory");
             }
         })
+        if (uri!="login" && !err){
+            if (!exist_key(req.body["key"])){
+                err = true
+                error(res, "This account either doesn't exist or is not connected")
+            }
+        }
         if (!err) {
             apiFunctions[uri](req, res, req.body);
         }

@@ -12,8 +12,8 @@
   				</div>
   			</div>
   			<br>
-				<div class="row row--eq-height" v-for="house in houses">
-          <div class="col-md-4" v-on:click="selectHouse(house.houseId)">
+				<div class="row row--eq-height">
+          <div class="col-md-4" v-for="house in houses" v-on:click="selectHouse(house.houseId)">
             <div class="m_house">
               <div class="m_house__cover" style="background-image:url('http://woningpas.brandplatform.be/img/images/keuzescherm-home-01-x2.jpg')">
 						  </div>
@@ -30,6 +30,7 @@
   						</div>
 						</div>
           </div>
+
 
   			</div>
   		</div>
