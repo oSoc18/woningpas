@@ -2,7 +2,7 @@ import axios from 'axios'
 
 function request(path, data, success, error){
   axios({
-    url: 'http://localhost:8080/' + path,
+    url: 'http://localhost:8080/api/' + path,
     data: data,
     method: 'POST',
     responseType: 'json',
