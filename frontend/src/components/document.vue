@@ -100,7 +100,7 @@ export default {
       let self = this;
       api.request('validate', data, function() {
         self.validating = false;
-        self.$emit('validated');
+        self.document.isVerified = true;
       })
     },
     download(){

@@ -2,15 +2,17 @@
   <div id="documentView" class="site-container">
     <app-header></app-header>
     <main>
-      <app-sideBar v-if="role == 'owner'"></app-sideBar>
       <section class="content">
         <div class="container">
           <div class="row">
-            <div class="col-md-12" v-if="!error">
-              <app-document v-bind:document="document" :houseId="houseId" :owner="owner" @validated="updateDocument"></app-document>
+            <div v-if="loading" class="is-loading is-loading--big is-loading--before">
+              <p class="u-tac">Loading document ...</p>
+            </div>
+            <div v-else-if="error != ''">{{error}}</div>
+            <div v-else class="col-md-12">
+              <app-document v-bind:document="document" :houseId="houseId" :owner="owner"></app-document>
               <!-- /col -->
             </div>
-            <div v-else>Error, the house id or the document id is not correct.</div>
             <!-- /row -->
           </div>
           <!-- /container -->
@@ -31,7 +33,8 @@ export default {
   data() {
     return {
       role: auth.getRole(),
-      error: true,
+      loading: true,
+      error: '',
       document: {},
       houseId: this.$route.params.houseId,
       documentId: this.$route.params.documentId,
@@ -43,6 +46,8 @@ export default {
   },
   methods: {
     updateDocument(){
+      this.loading = true;
+      this.error = '';
       let data = {
         key: auth.getToken(),
         houseId: this.houseId,
@@ -50,10 +55,11 @@ export default {
         owner: this.owner
       }
       api.request('getDocument', data, data => {
-        this.document = data
-        this.error = false
-      }, callback => {
-
+        this.loading = false;
+        this.document = data;
+      }, err => {
+        this.loading = false;
+        this.error = err;
       })
     }
   }

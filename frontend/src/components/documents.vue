@@ -54,9 +54,19 @@ export default {
       }
       api.request('getDocuments', data, data => {
         console.log('updated');
+        data.sort(this.sortLastFirst);
         this.documents = data;
         this.loading = false;
       })
+    },
+    sortLastFirst(d1, d2) {
+      if (d1.addedAt > d2.addedAt) {
+        return -1;
+      } else if(d1.addedAt === d2.addedAt) {
+        return 0;
+      } else {
+        return 1;
+      }
     }
   }
 }
