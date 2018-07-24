@@ -183,13 +183,11 @@ apiFunctions.validate = function(req, res, data) {
     let houseId = data.houseId;
     let owner = data.owner;
 
-    verificationType(get_type(key), "inspector", res);
-
-    db.getEth(owner, function(result) {
-        smartcontract.setVerification(result.address, url, houseId, get_ethereum_key(key), res, error, success);
-    });
-
-
+    if(verificationType(get_type(key), "inspector", res)){
+        db.getEth(owner, function(result) {
+            smartcontract.setVerification(result.address, url, houseId, get_ethereum_key(key), res, error, success);
+        });
+    }
 }
 
 //Check if the file is validated. Owner and inspector can check this.
@@ -202,9 +200,9 @@ apiFunctions.validated = function(req, res, data) {
     let type = get_type(key)
     let owner = data.owner;
 
-    verificationType(type, "owner", res);
-    smartcontract.isVerified(url, houseId, get_ethereum_key(key), res, error, success);
-
+    if (verificationType(type, "owner", res)){
+        smartcontract.isVerified(url, houseId, get_ethereum_key(key), res, error, success);
+    }
 }
 
 //Get all the houses associated to an account.
@@ -245,10 +243,10 @@ apiFunctions.addHouse = function(req, res, data) {
     let country = data.country;
     let houseId = uuid();
 
-    verificationType(get_type(key), "owner", res);
+    if(verificationType(get_type(key), "owner", res)){
 
-    smartcontract.addHouse(street, zipCode, city, country, houseId, get_ethereum_key(key), res, error, success)
-
+        smartcontract.addHouse(street, zipCode, city, country, houseId, get_ethereum_key(key), res, error, success)
+    }
 }
 
 //Add a new document to the house.
@@ -257,16 +255,16 @@ apiFunctions.addDocument = function(req, res, data) {
     let houseId = data.houseId;
     let content = data.content;
 
-    verificationType(get_type(key), "owner", res);
-    let fileId = uuid();
-    let hash = hashh(content);
-    let time = generateDate();
+    if(verificationType(get_type(key), "owner", res)){
+        let fileId = uuid();
+        let hash = hashh(content);
+        let time = generateDate();
 
 
-    fs.writeFileSync(UPLOAD_DIR + fileId, content, 'base64');
+        fs.writeFileSync(UPLOAD_DIR + fileId, content, 'base64');
 
-    smartcontract.addDocument(hash, get_ethereum_key(key), fileId, houseId, time, res, error, success)
-
+        smartcontract.addDocument(hash, get_ethereum_key(key), fileId, houseId, time, res, error, success)
+    }
 }
 
 //Get all the documents associated with that house.
@@ -307,10 +305,10 @@ apiFunctions.getHouse = function(req, res, data) {
     let houseId = data.houseId;
     let owner = data.owner;
 
-    verificationType(get_type(key), "owner", res);
+    if(verificationType(get_type(key), "owner", res)){
 
-    smartcontract.getHouseWithId(houseId, get_ethereum_key(key), res, success, error);
-
+        smartcontract.getHouseWithId(houseId, get_ethereum_key(key), res, success, error);
+    }
 
 };
 
@@ -320,10 +318,11 @@ apiFunctions.getDocument = function(req, res, data) {
     let documentId = data.documentId;
     let owner = data.owner;
 
-    verificationType(get_type(key), "inspector", res);
-    db.getEth(owner, function(result) {
-        smartcontract.getDocumentWithId(result.address, houseId, documentId, get_ethereum_key(key), res, success, error);
-    });
+    if(verificationType(get_type(key), "inspector", res)){
+        db.getEth(owner, function(result) {
+            smartcontract.getDocumentWithId(result.address, houseId, documentId, get_ethereum_key(key), res, success, error);
+        });
+    }
 }
 
 apiFunctions.transfertOwnership = function(req, res, data) {
@@ -331,21 +330,23 @@ apiFunctions.transfertOwnership = function(req, res, data) {
     let mailFrom = data.from;
     let mailTo = data.to;
     let houseId = data.houseId;
-    verificationType(get_type(key), "admin", res);
-    db.getEth(mailFrom, function(result) {
-        let addressFrom = result.address;
-        db.getEth(mailTo, function(result) {
-            smartcontract.transfertOwnership(addressFrom, result.address, houseId, get_ethereum_key(key), res, success, error);
+    if(verificationType(get_type(key), "admin", res)){
+        db.getEth(mailFrom, function(result) {
+            let addressFrom = result.address;
+            db.getEth(mailTo, function(result) {
+                smartcontract.transfertOwnership(addressFrom, result.address, houseId, get_ethereum_key(key), res, success, error);
+            });
         });
-    });
+    }
 }
 
 function verificationType(keyType, type, res) {
-    if (keyType == type)
+    if (keyType == type){
         return true;
-    else
+    } else {
         error(res, "Only " + type + " can make this operation.");
-
+        return false;
+    }
 }
 
 

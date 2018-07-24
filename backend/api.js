@@ -8,6 +8,6 @@ module.exports.api = {
 	"getDocuments": ["key", "houseId"],
 	"addDocument": ["key", "houseId", "content"],
 	"getHouse" : ["key", "houseId"],
-	"getDocument" : ["key", "houseId","documentId"],
+	"getDocument" : ["key", "houseId","documentId", "owner"],
 	"transfertOwnership" : ["key", "from", "to"]
 }
