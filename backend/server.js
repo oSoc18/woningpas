@@ -163,15 +163,19 @@ apiFunctions.download = function(req, res, data) {
     var key = data.key
 
     // TODO check error
-    let content = fs.readFileSync(UPLOAD_DIR + url, 'base64');
-    if (!content) {
-        // already checked by smartcontract, should exists
-        return error(res, "No file with this name");
-    }
+    try{
+        let content = fs.readFileSync(UPLOAD_DIR + url, 'base64');
+        if (!content) {
+            // already checked by smartcontract, should exists
+            return error(res, "No file with this name");
+        }
 
-    success(res, {
-        "content": content
-    });
+        success(res, {
+            "content": content
+        });
+    } catch(err){
+        error(res, "No such file in the database")
+    }
 }
 
 //Validate the file if the person trying to do so is an inspector.
