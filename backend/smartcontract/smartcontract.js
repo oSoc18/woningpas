@@ -198,7 +198,7 @@ async function addDocument(hash, privateKey, fileId, houseId, time, res, error, 
       web3.eth.sendSignedTransaction(signedTx.rawTransaction)
         .on('receipt', function(receipt) {
           success(res, {
-            "fileID": fileId
+            "id": fileId
           })
         });
     };
