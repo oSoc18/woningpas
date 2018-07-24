@@ -26,11 +26,11 @@
               <p class="m-permit__details__subtitle"></p>
               <p></p>
               <div class="row">
-                <div class="col-md-2">
+                <div class="col-md-4">
                   <p class="m-permit__label">Added on</p>
                   <p class="m-permit__value">{{this.document.date}}</p>
                 </div>
-                <div class="col-md-4"></div>
+                <div class="col-md-2"></div>
                 <div class="col-md-2">
                   <a v-if="role == 'inspector'" class="a-button styleguide__button" @click="validate">Validate</a>
                 </div>
@@ -51,6 +51,7 @@
 <script>
 import auth from '@/js/auth.js'
 import api from '@/js/api.js'
+import file from '@/js/file.js'
 
 export default {
   props: ['document', 'houseId'],
@@ -73,23 +74,24 @@ export default {
   },
   created() {
     let doc = this.document
-    doc.year = doc.addedAt.substr(6, 4)
-    doc.date = doc.addedAt.substr(0, 10)
+    let date = new Date(doc.addedAt*1000)
+    doc.year = date.getFullYear()
+    doc.date = date.toLocaleString()
     doc.verified = doc.isVerified ? "Verified" : "Not verified"
   },
   methods: {
     validate(){
       let data = {
-        owner: 'owner1@woningpas.be',
+        owner: 'owner1@woningpas.be', // TODO get it from router
         houseId: this.houseId,
-        url: this.documentId,
+        url: this.document.id,
         key: auth.getToken()
       }
       api.request('validate', data)
     },
     download(){
       let data = {
-        url: this.documentId,
+        url: this.document.id,
         key: auth.getToken()
       }
       api.request('download', data, (data) => {

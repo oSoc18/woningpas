@@ -25,7 +25,6 @@
 <script>
 import auth from '@/js/auth.js'
 import api from '@/js/api.js'
-import file from '@/js/file.js'
 
 export default {
   name: 'DocumentView',
