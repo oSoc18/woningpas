@@ -15,7 +15,6 @@ const privateFor = argv.privateFor;
 const externallySign = argv.sign;
 
 var houseFields = ["houseId", "street", "zipCode", "city", "country"];
-var docFields = ["id", "isVerified", "hash", "addedAt"];
 
 var byteCodeContract;
 let contractName = 'WoningPasV2';
@@ -320,16 +319,16 @@ async function getDocumentWithId(houseId, documentId, privateKey, res, success, 
     if (result[0] === '') {
       error(res, "No item for this id");
     } else {
-      success(res, parseResult(result, docFields));
+      success(res, parseResult(result));
     }
   }).catch(function(error) {
     console.log(error)
     error(res, "Error with getDoc avec id")
   })
-
 }
 
-function parseResult(data, fields) {
+function parseResult(data) {
+  let fields = ["id", "isVerified", "hash", "addedAt"];
   let index = 0;
   var result = [];
   let prettyResult = {};
@@ -337,8 +336,6 @@ function parseResult(data, fields) {
   for (var j in data) {
     prettyResult[fields[j]] = data[j];
   }
-
-  console.log(prettyResult);
   return prettyResult;
 }
 
@@ -369,3 +366,4 @@ module.exports.getNbDoc = getNbDoc;
 module.exports.addDocument = addDocument;
 module.exports.getHouseWithId = getHouseWithId;
 module.exports.getDocumentWithId = getDocumentWithId;
+module.exports.parseResult = parseResult;

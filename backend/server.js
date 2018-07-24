@@ -290,11 +290,7 @@ apiFunctions.getDocuments = function(req, res, data) {
         for (var i = 1; i <= number; i++) {
             smartcontract.getDocument(i, get_ethereum_key(key), houseId, function(result) {
                 //Prettify the result
-                let prettyResult = {};
-                for (j in result) {
-                    prettyResult[docFields[j]] = result[j];
-                }
-                documents.push(prettyResult);
+                documents.push(smartcontract.parseResult(result));
                 index++;
 
                 if (index == number) {
@@ -324,9 +320,7 @@ apiFunctions.getDocument = function(req, res, data) {
     let key = data.key;
     let houseId= data.houseId;
     let documentId = data.documentId;
-
     smartcontract.getDocumentWithId(houseId, documentId, get_ethereum_key(key), res, success, error);
-
 }
 
 
