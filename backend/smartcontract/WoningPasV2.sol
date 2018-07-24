@@ -97,7 +97,7 @@ contract WoningPasV2 {
                owners[from].keysOfHouses[i] = owners[from].keysOfHouses[i+1];
             }
 
-            delete owners[from].keysOfHouses[i];
+            delete owners[from].keysOfHouses[owners[from].keysOfHouses.length-1];
             owners[from].keysOfHouses.length--;
             delete owners[from].houses[_idHouse];
             return;
