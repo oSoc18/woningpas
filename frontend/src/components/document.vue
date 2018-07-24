@@ -22,8 +22,10 @@
               <h4 class="m-permit__details__title">{{verified}}</h4>
               <p></p>
               <p v-if="role == 'owner' && !this.document.isVerified" class="m-permit__details__subtitle">
-                Link for the inspector:<br>{{inspectorLink}}
-              </p>
+                Link for the inspector:<br>
+                <input v-model="inspectorLink" id="inspectorLink">
+                <button @click="copyToClipboard" class="is-hyperlink" title="Copy to clipboard">Copy to clipboard</button>
+              </p><br>
               <p></p>
               <div class="row">
                 <div class="col-md-4">
@@ -109,7 +111,18 @@ export default {
       api.request('download', data, (data) => {
         file.download('file.pdf', atob(data.content))
       })
+    },
+    copyToClipboard() {
+      let copyText = $('#inspectorLink')
+      copyText.select()
+      document.execCommand("copy")
+      alert("Copied the text: " + copyText.val())
     }
   }
 }
 </script>
+<style scoped>
+input{
+  width: 100%;
+}
+</style>
