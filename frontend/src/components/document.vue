@@ -10,7 +10,7 @@
               <span class="icon icon-permit icon--primary icon--small"></span>
             </div>
             <div class="col-md-11">
-              <h4 class="m-permit__details__title">{{this.document.fileId}}</h4>
+              <h4 class="m-permit__details__title">{{this.document.id}}</h4>
             </div>
           </div>
           <div class="m-permit__section row">
