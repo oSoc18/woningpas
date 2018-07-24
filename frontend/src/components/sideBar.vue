@@ -60,7 +60,7 @@ export default {
     }
   },
   created() {
-    this.getHouse();
+    this.getHouse()
   },
   methods: {
       getHouse(){

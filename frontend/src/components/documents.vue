@@ -15,7 +15,8 @@
             <p class="u-tac">Loading documents ...</p>
           </div>
           <h1 v-else-if="documents.length == 0">No document</h1>
-          <app-document v-for="document in documents" v-bind:document="document" :key="document.id"></app-document>
+          <app-document v-for="document in documents" v-bind:document="document" :key="document.id" :houseId="id">
+          </app-document>
           <!-- /col -->
         </div>
         <!-- /row -->

@@ -10,7 +10,9 @@
               <span class="icon icon-permit icon--primary icon--small"></span>
             </div>
             <div class="col-md-11">
-              <h4 class="m-permit__details__title">{{this.document.id}}</h4>
+              <router-link :to="{ name: 'DocumentView', params: {houseId: this.houseId, documentId: this.document.id} }">
+                <h4 class="m-permit__details__title">{{this.document.id}}</h4>
+              </router-link>
             </div>
           </div>
           <div class="m-permit__section row">
@@ -27,6 +29,14 @@
                   <p class="m-permit__label">Added on</p>
                   <p class="m-permit__value">{{this.document.date}}</p>
                 </div>
+                <div class="col-md-4"></div>
+                <div class="col-md-2">
+                  <a v-if="role == 'inspector'" class="a-button styleguide__button" @click="validate">Validate</a>
+                </div>
+                <div class="col-md-1"></div>
+                <div class="col-md-2">
+                  <a class="a-button styleguide__button" @click="download">Download</a>
+                </div>
               </div>
             </div>
           </div>
@@ -42,14 +52,12 @@ import auth from '@/js/auth.js'
 import api from '@/js/api.js'
 
 export default {
-  props: ['document'],
+  props: ['document', 'houseId'],
   created: function() {
     let doc = this.document;
     doc.year = doc.addedAt.substr(6, 4);
     doc.date = doc.addedAt.substr(0, 10);
     doc.verified = doc.isVerified ? "Verified" : "Not verified";
-    console.log('document created');
-    console.log(JSON.stringify(doc));
   }
 }
 </script>
