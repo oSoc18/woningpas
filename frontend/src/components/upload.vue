@@ -1,7 +1,9 @@
 <template>
   <div>
-    <!--h2>Add a document</h2><br-->
-    <button class="a-button" :disabled="uploading" @click="addDocument">Add document</button>
+    <div v-if="uploading" class="is-loading is-loading--big is-loading--before">
+      <p class="u-tac">Uploading document ...</p>
+    </div>
+    <button v-else class="a-button" @click="addDocument">Add document</button>
     <input id="file" type="file" accept=".pdf" @change="fileChanged">
   </div>
 </template>
@@ -39,10 +41,12 @@ export default {
         content: btoa(content),
         houseId: this.houseId
       }
+
+      let self = this;
       api.request('addDocument', data, function(data) {
+        self.uploading = false;
+        self.$emit('uploaded');
         alert('Document uploaded.\n' + document.location + '/document/' + data.id);
-        // TODO find better way to refresh page with getDocuments
-        document.location.href = document.location.href;
       });
     }
   }
