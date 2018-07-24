@@ -284,7 +284,7 @@ apiFunctions.getDocuments = function(req, res, data) {
     //As it is not possible to return arrays in solidity currently.
     smartcontract.getNbDoc(res, error, get_ethereum_key(key), houseId, function(number) {
         let index = 0;
-        let docFields = ["fileId", "isVerified", "hash", "addedAt"];
+        let docFields = ["id", "isVerified", "hash", "addedAt"];
         //Get each house one by one.
         //As it is not possible to return arrays in solidity currently.
         for (var i = 1; i <= number; i++) {

@@ -15,7 +15,7 @@ const privateFor = argv.privateFor;
 const externallySign = argv.sign;
 
 var houseFields = ["houseId", "street", "zipCode", "city", "country"];
-var docFields = ["documentId", "isVerified", "hash", "addedAt"];
+var docFields = ["id", "isVerified", "hash", "addedAt"];
 
 var byteCodeContract;
 let contractName = 'WoningPasV2';
