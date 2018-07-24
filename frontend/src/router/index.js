@@ -54,9 +54,18 @@ export default new Router({
       }
     },
     {
-      path: '/house/:houseId/document/:documentId',
+      path: '/owner/:owner/house/:houseId/document/:documentId',
       name: 'DocumentView',
-      component: DocumentView
+      component: DocumentView,
+      beforeEnter: (to, from, next) => {
+        if (!auth.getRole()) {
+          next('/login')
+        }
+        else if (auth.getRole() == 'owner') {
+          next('/pageNotFound')
+        }
+        next()
+      }
     },
     {
       path: '/viewPDF',

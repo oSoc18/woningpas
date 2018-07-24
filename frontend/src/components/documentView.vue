@@ -35,7 +35,8 @@ export default {
       error: true,
       document: {},
       houseId: this.$route.params.houseId,
-      documentId: this.$route.params.documentId
+      documentId: this.$route.params.documentId,
+      owner: this.$route.params.owner,
     }
   },
   created() {
@@ -46,7 +47,8 @@ export default {
       let data = {
         key: auth.getToken(),
         houseId: this.houseId,
-        documentId: this.documentId
+        documentId: this.documentId,
+        owner: this.owner
       }
       api.request('getDocument', data, data => {
         this.document = data
