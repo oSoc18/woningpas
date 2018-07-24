@@ -334,6 +334,9 @@ function parseResult(data, fields) {
 
   for (var j in data) {
     prettyResult[fields[j]] = data[j];
+    if (fields[j]==="addedAt"){
+      prettyResult[fields[j]] = parseInt(data[j]);
+    }
   }
   return prettyResult;
 }
