@@ -15,7 +15,7 @@ const privateFor = argv.privateFor;
 const externallySign = argv.sign;
 
 var houseFields = ["houseId", "street", "zipCode", "city", "country"];
-var docFields = ["documentId", "isVerified", "hash", "addedAt"];
+var docFields = ["id", "isVerified", "hash", "addedAt"];
 
 var byteCodeContract;
 let contractName = 'WoningPasV2';
@@ -198,7 +198,7 @@ async function addDocument(hash, privateKey, fileId, houseId, time, res, error, 
       web3.eth.sendSignedTransaction(signedTx.rawTransaction)
         .on('receipt', function(receipt) {
           success(res, {
-            "fileID": fileId
+            "id": fileId
           })
         });
     };
