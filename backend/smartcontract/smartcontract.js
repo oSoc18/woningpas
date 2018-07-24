@@ -14,6 +14,7 @@ const set = argv.set;
 const privateFor = argv.privateFor;
 const externallySign = argv.sign;
 
+var fields = ["id", "isVerified", "hash", "addedAt"];
 var houseFields = ["houseId", "street", "zipCode", "city", "country"];
 
 var byteCodeContract;
@@ -319,7 +320,7 @@ async function getDocumentWithId(houseId, documentId, privateKey, res, success, 
     if (result[0] === '') {
       error(res, "No item for this id");
     } else {
-      success(res, parseResult(result));
+      success(res, parseResult(result, fields));
     }
   }).catch(function(error) {
     console.log(error)
@@ -327,8 +328,7 @@ async function getDocumentWithId(houseId, documentId, privateKey, res, success, 
   })
 }
 
-function parseResult(data) {
-  let fields = ["id", "isVerified", "hash", "addedAt"];
+function parseResult(data, fields) {
   let index = 0;
   var result = [];
   let prettyResult = {};

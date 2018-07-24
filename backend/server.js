@@ -217,12 +217,7 @@ apiFunctions.getHouses = function(req, res, data) {
         //As it is not possible to return arrays in solidity currently.
         for (var i = 1; i <= number; i++) {
             smartcontract.getHouse(i, get_ethereum_key(key), function(result) {
-                //Prettify the result
-                prettyResult = {}
-                for (j in result) {
-                    prettyResult[houseFields[j]] = result[j];
-                }
-                houses.push(prettyResult);
+                houses.push(smartcontract.parseResult(result, houseFields));
                 index++;
 
                 if (index == number) {
@@ -290,7 +285,7 @@ apiFunctions.getDocuments = function(req, res, data) {
         for (var i = 1; i <= number; i++) {
             smartcontract.getDocument(i, get_ethereum_key(key), houseId, function(result) {
                 //Prettify the result
-                documents.push(smartcontract.parseResult(result));
+                documents.push(smartcontract.parseResult(result, docFields));
                 index++;
 
                 if (index == number) {
