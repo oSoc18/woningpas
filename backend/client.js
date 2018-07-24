@@ -45,7 +45,7 @@ function request(cmd, data) {
   let options = {
     host: "localhost",
     port: 8080,
-    path: '/' + cmd,
+    path: '/api/' + cmd,
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'

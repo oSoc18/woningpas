@@ -14,8 +14,8 @@ const set = argv.set;
 const privateFor = argv.privateFor;
 const externallySign = argv.sign;
 
+var fields = ["id", "isVerified", "hash", "addedAt"];
 var houseFields = ["houseId", "street", "zipCode", "city", "country"];
-var docFields = ["documentId", "isVerified", "hash", "addedAt"];
 
 var byteCodeContract;
 let contractName = 'WoningPasV2';
@@ -198,7 +198,7 @@ async function addDocument(hash, privateKey, fileId, houseId, time, res, error, 
       web3.eth.sendSignedTransaction(signedTx.rawTransaction)
         .on('receipt', function(receipt) {
           success(res, {
-            "fileID": fileId
+            "id": fileId
           })
         });
     };
@@ -321,13 +321,12 @@ async function getDocumentWithId(houseId, documentId, privateKey, res, success, 
     if (result[0] === '') {
       error(res, "No item for this id");
     } else {
-      success(res, parseResult(result, docFields));
+      success(res, parseResult(result, fields));
     }
   }).catch(function(error) {
     console.log(error)
     error(res, "Error with getDoc avec id")
   })
-
 }
 
 function parseResult(data, fields) {
@@ -338,8 +337,6 @@ function parseResult(data, fields) {
   for (var j in data) {
     prettyResult[fields[j]] = data[j];
   }
-
-  console.log(prettyResult);
   return prettyResult;
 }
 
@@ -405,3 +402,4 @@ module.exports.addDocument = addDocument;
 module.exports.getHouseWithId = getHouseWithId;
 module.exports.getDocumentWithId = getDocumentWithId;
 module.exports.transfertOwnership = transfertOwnership;
+module.exports.parseResult = parseResult;
