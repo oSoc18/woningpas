@@ -181,11 +181,15 @@ apiFunctions.validate = function(req, res, data) {
     let key = data.key
     let url = data.url
     let houseId = data.houseId;
+    let owner = data.owner;
+
+    verificationType(get_type(key), "inspector", res);
+
+    db.getEth(owner, function(result) {
+        smartcontract.setVerification(result.address, url, houseId, get_ethereum_key(key), res, error, success);
+    });
 
 
-    if (verificationType(get_type(key), "inspector", res)) {
-        smartcontract.setVerification(url, houseId, get_ethereum_key(key), res, error, success);
-    }
 }
 
 //Check if the file is validated. Owner and inspector can check this.
@@ -196,11 +200,11 @@ apiFunctions.validated = function(req, res, data) {
     let url = data.url
     let houseId = data.houseId;
     let type = get_type(key)
+    let owner = data.owner;
 
+    verificationType(type, "owner", res);
+    smartcontract.isVerified(url, houseId, get_ethereum_key(key), res, error, success);
 
-    if (verificationType(get_type(key), "owner", res)) {
-        smartcontract.isVerified(url, houseId, get_ethereum_key(key), res, error, success);
-    }
 }
 
 //Get all the houses associated to an account.
@@ -241,11 +245,10 @@ apiFunctions.addHouse = function(req, res, data) {
     let country = data.country;
     let houseId = uuid();
 
+    verificationType(get_type(key), "owner", res);
 
-    if (verificationType(get_type(key), "owner", res)) {
+    smartcontract.addHouse(street, zipCode, city, country, houseId, get_ethereum_key(key), res, error, success)
 
-        smartcontract.addHouse(street, zipCode, city, country, houseId, get_ethereum_key(key), res, error, success)
-    }
 }
 
 //Add a new document to the house.
@@ -254,16 +257,16 @@ apiFunctions.addDocument = function(req, res, data) {
     let houseId = data.houseId;
     let content = data.content;
 
-    if (verificationType(get_type(key), "owner", res)) {
-        let fileId = uuid();
-        let hash = hashh(content);
-        let time = generateDate();
+    verificationType(get_type(key), "owner", res);
+    let fileId = uuid();
+    let hash = hashh(content);
+    let time = generateDate();
 
 
-        fs.writeFileSync(UPLOAD_DIR + fileId, content, 'base64');
+    fs.writeFileSync(UPLOAD_DIR + fileId, content, 'base64');
 
-        smartcontract.addDocument(hash, get_ethereum_key(key), fileId, houseId, time, res, error, success)
-    }
+    smartcontract.addDocument(hash, get_ethereum_key(key), fileId, houseId, time, res, error, success)
+
 }
 
 //Get all the documents associated with that house.
@@ -287,9 +290,7 @@ apiFunctions.getDocuments = function(req, res, data) {
 
                 if (index == number) {
                     success(res, documents);
-
                 }
-
             });
         }
         if (number == 0) {
@@ -304,8 +305,13 @@ apiFunctions.getDocuments = function(req, res, data) {
 apiFunctions.getHouse = function(req, res, data) {
     let key = data.key;
     let houseId = data.houseId;
-    if (verificationType(get_type(key), "owner", res))
-        smartcontract.getHouseWithId(houseId, get_ethereum_key(key), res, success, error);
+    let owner = data.owner;
+
+    verificationType(get_type(key), "owner", res);
+
+    smartcontract.getHouseWithId(houseId, get_ethereum_key(key), res, success, error);
+
+
 };
 
 apiFunctions.getDocument = function(req, res, data) {
@@ -313,9 +319,10 @@ apiFunctions.getDocument = function(req, res, data) {
     let houseId = data.houseId;
     let documentId = data.documentId;
 
-    if (verificationType(get_type(key), "owner", res))
-        smartcontract.getDocumentWithId(houseId, documentId, get_ethereum_key(key), res, success, error);
-
+    verificationType(get_type(key), "owner", res);
+    db.getEth(owner, function(result) {
+        smartcontract.getDocumentWithId(owner.address, houseId, documentId, get_ethereum_key(key), res, success, error);
+    });
 }
 
 apiFunctions.transfertOwnership = function(req, res, data) {
@@ -323,7 +330,7 @@ apiFunctions.transfertOwnership = function(req, res, data) {
     let mailFrom = data.from;
     let mailTo = data.to;
     let houseId = data.houseId;
-    if (verificationType(get_type(key), "admin", res)){
+    if (verificationType(get_type(key), "admin", res)) {
         db.getEth(mailFrom, function(result) {
             let addressFrom = result.address;
             db.getEth(mailTo, function(result) {

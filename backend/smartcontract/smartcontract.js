@@ -20,7 +20,7 @@ var houseFields = ["houseId", "street", "zipCode", "city", "country"];
 var byteCodeContract;
 let contractName = 'WoningPasV2';
 
-const addressContract = '0x421bb778167c6e07f4a952648b679add23519a07';
+const addressContract = '0xc3e389f9526bf0c5ae99eb10b72aa26f30618f36';
 
 //needs to be changed
 var adresseFrom;
@@ -82,14 +82,12 @@ function isVerified(fileId, houseId, privateKey, res, error, success) {
   })
 }
 
-async function setVerification(fileId, houseId, privateKey, res, error, success) {
+async function setVerification(owner, fileId, houseId, privateKey, res, error, success) {
   console.log("setVerification");
   var ret = getContract();
   let acc = web3.eth.accounts.privateKeyToAccount(privateKey);
 
-  let tx_builder = ret.methods.setVerification(fileId, houseId);
-
-
+  let tx_builder = ret.methods.setVerification(owner, fileId, houseId);
 
   let encoded_tx = tx_builder.encodeABI();
   let transactionObject = {
@@ -308,13 +306,13 @@ async function getHouseWithId(houseId, privateKey, res, success, error) {
 }
 
 
-async function getDocumentWithId(houseId, documentId, privateKey, res, success, error) {
+async function getDocumentWithId(owner, houseId, documentId, privateKey, res, success, error) {
   var ret = getContract();
   console.log("getDoc avec ID");
 
   let acc = web3.eth.accounts.privateKeyToAccount(privateKey);
 
-  ret.methods.getDocumentWithId(documentId, houseId).call({
+  ret.methods.getDocumentWithId(owner, documentId, houseId).call({
     from: acc.address,
     gas: 5e6
   }).then(function(result) {

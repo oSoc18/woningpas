@@ -43,8 +43,8 @@ contract WoningPasV2 {
 	}
 
 
-	 function setVerification(string _fileId, string _houseId) public {
-		owners[msg.sender].houses[_houseId].documents[_fileId].isVerified = true;
+	 function setVerification(address owner, string _fileId, string _houseId) public {
+		owners[owner].houses[_houseId].documents[_fileId].isVerified = true;
 	}
 
 
@@ -75,12 +75,12 @@ contract WoningPasV2 {
 		Document storage doc = owners[msg.sender].houses[_idHouse].documents[fileId];
 		return (doc.fileId, doc.isVerified, doc.hash, doc.addedAt);
 	}
-	function getHouseWithId(string _idHouse) view public returns(string, string, uint, string, string){
-		House storage house = owners[msg.sender].houses[_idHouse];
+	function getHouseWithId(address owner, string _idHouse) view public returns(string, string, uint, string, string){
+		House storage house = owners[owner].houses[_idHouse];
 		return (house.id, house.streetName, house.zipCode, house.city, house.country);
 	}
-	function getDocumentWithId(string _idDocument, string _idHouse) view public returns(string, bool, string, string){
-		Document storage document = owners[msg.sender].houses[_idHouse].documents[_idDocument];
+	function getDocumentWithId(address owner, string _idDocument, string _idHouse) view public returns(string, bool, string, string){
+		Document storage document = owners[owner].houses[_idHouse].documents[_idDocument];
 		return (document.fileId, document.isVerified, document.hash, document.addedAt);
 	}
 	function transfertOwnership(address from, address to, string _idHouse) public {
