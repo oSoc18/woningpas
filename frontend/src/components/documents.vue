@@ -7,7 +7,7 @@
         </div>
       </div>
       <hr>
-      <app-upload :houseId="id"></app-upload>
+      <app-upload :houseId="id" @uploaded="updateDocuments"></app-upload>
       <hr>
         <div class="row">
         <div class="col-md-12">
@@ -41,16 +41,19 @@ export default {
     }
   },
   created() {
-    this.getDocuments();
+    this.updateDocuments();
   },
   methods: {
-    getDocuments(){
-      console.log('houseId='+this.id);
+    updateDocuments(){
+      console.log('upadting documents')
+      this.documents = [];
+      this.loading = true;
       let data = {
         key: auth.getToken(),
         houseId: this.id
       }
       api.request('getDocuments', data, data => {
+        console.log('updated');
         this.documents = data;
         this.loading = false;
       })

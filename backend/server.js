@@ -349,29 +349,9 @@ function verificationType(keyType, type, res) {
 
 
 function generateDate() {
-    var today = new Date();
-    var dd = today.getDate();
-    var mm = today.getMonth() + 1; //January is 0!
-    var yyyy = today.getFullYear();
-    var minute = today.getMinutes();
-    var hour = today.getHours();
-    var minute = today.getMinutes();
-    var second = today.getSeconds();
-    var millisecond = today.getMilliseconds();
-
-
-    if (dd < 10) {
-        dd = '0' + dd
-    }
-
-    if (mm < 10) {
-        mm = '0' + mm
-    }
-
-    today = dd + '/' + mm + '/' + yyyy + " " + hour + ":" + minute + ":" + second + ":" + millisecond;
-
+    var today = Math.round((new Date()).getTime() / 1000);
     console.log(today);
-    return today;
+    return String(today);
 }
 
 
