@@ -14,9 +14,34 @@
         <div v-if="loading" class="is-loading is-loading--big is-loading--before text-center">
             <p class="u-tac">Loading houses ...</p>
         </div>
-        <h1 v-else-if="houses.length == 0" class="text-center">No house</h1>
-        <br>
-        <div class="row row--eq-height">
+
+        <section v-else-if="houses.length == 0" class="o-section u-mt-2 o-section--aqua">
+          <div class="row row--flex row--flexCenter">
+  					<div class="col-md-8">
+
+  						<h2 class="text-center">We do not find any Flemish properties that you own</h2>
+  						<br>
+  						<div>
+  								<p class="p--big">
+  									The ownership data comes from the Federal Public Service Finance, Patrimony Documentation.
+  		 							<ul class="ul--big">
+  										<li>
+  											Houses on Wallonia or Brussels territory do not have a home pass;
+  										</li>
+  										<li>
+  											When transferring ownership to a new owner, it can take a while (up to 3 months) before the change of ownership is correctly registered;
+  								 		</li>
+  										<li>
+  											For some information no link can be made between the owner and the correct address (house number, bus number), especially in case of apartments.
+  								 		</li>
+  									</ul>
+  								</p>
+  							</div>
+  						</div>
+  				</div>
+        </section>
+
+        <div v-else class="row row--eq-height">
           <div class="col-md-4" v-for="house in houses">
             <router-link :to="{ name: 'House', params: { houseId: house.houseId }}">
               <div class="m_house">

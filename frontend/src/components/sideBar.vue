@@ -19,11 +19,11 @@
                <li class="">
                  <a>Building, layout, location <span class="a-badge a-badge--red"></span></a>
                </li>
-               <li class=""><a>Energy <span class="a-badge a-badge--red"></span></a></li>
-               <li class=""><a>Insulation &amp; Glazing <span class="a-badge a-badge--red"></span></a></li>
-               <li class=""><a>Installations <span class="a-badge a-badge--red">2</span></a></li>
-               <li class=""><a>Ground <span class="a-badge a-badge--red"></span></a></li>
-               <li class=""><a>Permit <span class="a-badge a-badge--red"></span></a></li>
+               <li class=""><a>Energy </a></li>
+               <li class=""><a>Insulation &amp; Glazing </a></li>
+               <li class=""><a>Installations </a></li>
+               <li class=""><a>Ground </a></li>
+               <li class=""><a>Permit </a></li>
             </ul>
           </li>
           <li class="">
