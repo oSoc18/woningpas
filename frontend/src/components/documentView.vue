@@ -7,7 +7,7 @@
         <div class="container">
           <div class="row">
             <div class="col-md-12" v-if="!error">
-              <app-document v-bind:document="document" :houseId="houseId"></app-document>
+              <app-document v-bind:document="document" :houseId="houseId" :owner="owner" @validated="updateDocument"></app-document>
               <!-- /col -->
             </div>
             <div v-else>Error, the house id or the document id is not correct.</div>
@@ -39,10 +39,10 @@ export default {
     }
   },
   created() {
-    this.getDocument()
+    this.updateDocument()
   },
   methods: {
-    getDocument(){
+    updateDocument(){
       let data = {
         key: auth.getToken(),
         houseId: this.houseId,

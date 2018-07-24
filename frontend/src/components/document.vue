@@ -3,7 +3,7 @@
     <!-- page -->
     <div class="m-page__section">
       <div class="m-permit row">
-        <h3 class="col-md-1">{{this.document.year}}</h3>
+        <h3 class="col-md-1">{{year}}</h3>
         <div class="m-permit__details col-md-11">
           <div class="m-permit__section row">
             <div class="m-permit__icon col-md-1">
@@ -11,9 +11,6 @@
             </div>
             <div class="col-md-11">
               <h4 class="m-permit__details__title">{{this.document.id}}</h4>
-              <p v-if="role == 'owner'">
-                Link for the inspector:<br>{{inspectorLink}}
-              </p>
             </div>
           </div>
           <div class="m-permit__section row">
@@ -22,17 +19,20 @@
               <span v-else class="icon icon-cross icon--red icon--small"></span>
             </div>
             <div class="col-md-11">
-              <h4 class="m-permit__details__title">{{this.document.verified}}</h4>
-              <p class="m-permit__details__subtitle"></p>
+              <h4 class="m-permit__details__title">{{verified}}</h4>
+              <p></p>
+              <p v-if="role == 'owner' && !this.document.isVerified" class="m-permit__details__subtitle">
+                Link for the inspector:<br>{{inspectorLink}}
+              </p>
               <p></p>
               <div class="row">
                 <div class="col-md-4">
                   <p class="m-permit__label">Added on</p>
-                  <p class="m-permit__value">{{this.document.date}}</p>
+                  <p class="m-permit__value">{{localeDate}}</p>
                 </div>
                 <div class="col-md-2"></div>
                 <div class="col-md-2">
-                  <a v-if="role == 'inspector'" class="a-button styleguide__button" @click="validate">Validate</a>
+                  <a v-if="role == 'inspector' && !this.document.isVerified" class="a-button styleguide__button" @click="validate">Validate</a>
                 </div>
                 <div class="col-md-1"></div>
                 <div class="col-md-2">
@@ -54,7 +54,7 @@ import api from '@/js/api.js'
 import file from '@/js/file.js'
 
 export default {
-  props: ['document', 'houseId'],
+  props: ['document', 'houseId', 'owner'],
   data(){
     return {
       role: auth.getRole()
@@ -70,24 +70,32 @@ export default {
         + 'owner/' + auth.getToken()
         + '/house/' + this.houseId
         + '/document/' + this.document.id
+    },
+    date() {
+      return new Date(this.document.addedAt*1000)
+    },
+    year() {
+      return this.date.getFullYear()
+    },
+    localeDate() {
+      return this.date.toLocaleString()
+    },
+    verified() {
+      return this.document.isVerified ? "Verified" : "Not verified"
     }
-  },
-  created() {
-    let doc = this.document
-    let date = new Date(doc.addedAt*1000)
-    doc.year = date.getFullYear()
-    doc.date = date.toLocaleString()
-    doc.verified = doc.isVerified ? "Verified" : "Not verified"
   },
   methods: {
     validate(){
       let data = {
-        owner: 'owner1@woningpas.be', // TODO get it from router
+        owner: this.owner,
         houseId: this.houseId,
         url: this.document.id,
         key: auth.getToken()
       }
-      api.request('validate', data)
+      let self = this;
+      api.request('validate', data, function() {
+        self.$emit('validated');
+      })
     },
     download(){
       let data = {
