@@ -75,6 +75,7 @@ async function createAllAccounts(db, callback) {
     await createAccount(collection, "owner1@woningpas.be", "owner");
     await createAccount(collection, "owner2@woningpas.be", "owner");
     await createAccount(collection, "inspector1@woningpas.be", "inspector")
+    await createAccount(collection, "admin1@woningpas.be", "admin")
     callback()
 }
 function initDb(){
