@@ -322,7 +322,7 @@ apiFunctions.getDocument = function(req, res, data) {
 
     verificationType(get_type(key), "inspector", res);
     db.getEth(owner, function(result) {
-        smartcontract.getDocumentWithId(owner.address, houseId, documentId, get_ethereum_key(key), res, success, error);
+        smartcontract.getDocumentWithId(result.address, houseId, documentId, get_ethereum_key(key), res, success, error);
     });
 }
 
