@@ -318,6 +318,7 @@ apiFunctions.getDocument = function(req, res, data) {
     let key = data.key;
     let houseId = data.houseId;
     let documentId = data.documentId;
+    let owner = data.owner;
 
     verificationType(get_type(key), "inspector", res);
     db.getEth(owner, function(result) {
