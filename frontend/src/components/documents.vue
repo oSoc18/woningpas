@@ -9,17 +9,20 @@
       <hr>
       <app-upload :houseId="id"></app-upload>
       <hr>
-  		<div class="row">
+        <div class="row">
         <div class="col-md-12">
-          <app-document v-for="document in documents" v-bind:document="document" :key="document.fileId"></app-document>
-          <h1 v-if="documents.length == 0">No document</h1>
-  				<!-- /col -->
+          <div v-if="loading" class="is-loading is-loading--big is-loading--before">
+            <p class="u-tac">Loading documents ...</p>
+          </div>
+          <h1 v-else-if="documents.length == 0">No document</h1>
+          <app-document v-for="document in documents" v-bind:document="document" :key="document.id"></app-document>
+          <!-- /col -->
         </div>
-  		<!-- /row -->
+        <!-- /row -->
       </div>
-  		<!-- /container -->
+      <!-- /container -->
     </div>
-  	<!-- /content -->
+    <!-- /content -->
   </section>
 </template>
 
@@ -28,27 +31,29 @@ import auth from '@/js/auth.js'
 import api from '@/js/api.js'
 
 export default {
-    name: 'Upload',
-    props: ['id'],
-    data() {
-        return {
-            documents: []
-        }
-    },
-    created() {
-      this.getDocuments();
-    },
-    methods: {
-        getDocuments(){
-          console.log('houseId='+this.id);
-          let data = {
-            key: auth.getToken(),
-            houseId: this.id
-          }
-          api.request('getDocuments', data, data => {
-            this.documents = data
-          })
-        }
+  name: 'Upload',
+  props: ['id'],
+  data() {
+    return {
+      loading: true,
+      documents: []
     }
+  },
+  created() {
+    this.getDocuments();
+  },
+  methods: {
+    getDocuments(){
+      console.log('houseId='+this.id);
+      let data = {
+        key: auth.getToken(),
+        houseId: this.id
+      }
+      api.request('getDocuments', data, data => {
+        this.documents = data;
+        this.loading = false;
+      })
+    }
+  }
 }
 </script>
