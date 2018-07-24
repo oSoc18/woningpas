@@ -330,14 +330,13 @@ apiFunctions.transfertOwnership = function(req, res, data) {
     let mailFrom = data.from;
     let mailTo = data.to;
     let houseId = data.houseId;
-    if (verificationType(get_type(key), "admin", res)) {
-        db.getEth(mailFrom, function(result) {
-            let addressFrom = result.address;
-            db.getEth(mailTo, function(result) {
-                smartcontract.transfertOwnership(addressFrom, result.address, houseId, get_ethereum_key(key), res, success, error);
-            });
-        })
-    }
+    verificationType(get_type(key), "admin", res);
+    db.getEth(mailFrom, function(result) {
+        let addressFrom = result.address;
+        db.getEth(mailTo, function(result) {
+            smartcontract.transfertOwnership(addressFrom, result.address, houseId, get_ethereum_key(key), res, success, error);
+        });
+    });
 }
 
 function verificationType(keyType, type, res) {
