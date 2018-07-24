@@ -91,7 +91,7 @@ async function setVerification(owner, fileId, houseId, privateKey, res, error, s
 
   let encoded_tx = tx_builder.encodeABI();
   let transactionObject = {
-    gas: 50000,
+    gas: 500000,
     data: encoded_tx,
     from: acc.address,
     to: addressContract
