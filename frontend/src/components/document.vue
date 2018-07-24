@@ -53,11 +53,36 @@ import api from '@/js/api.js'
 
 export default {
   props: ['document', 'houseId'],
-  created: function() {
-    let doc = this.document;
-    doc.year = doc.addedAt.substr(6, 4);
-    doc.date = doc.addedAt.substr(0, 10);
-    doc.verified = doc.isVerified ? "Verified" : "Not verified";
+  data(){
+    return {
+      role: auth.getRole()
+    }
+  },
+  created() {
+    let doc = this.document
+    doc.year = doc.addedAt.substr(6, 4)
+    doc.date = doc.addedAt.substr(0, 10)
+    doc.verified = doc.isVerified ? "Verified" : "Not verified"
+  },
+  methods: {
+    validate(){
+      let data = {
+        owner: 'owner1@woningpas.be',
+        houseId: this.houseId,
+        url: this.documentId,
+        key: auth.getToken()
+      }
+      api.request('validate', data)
+    },
+    download(){
+      let data = {
+        url: this.documentId,
+        key: auth.getToken()
+      }
+      api.request('download', data, (data) => {
+        file.download('file.pdf', atob(data.content))
+      })
+    }
   }
 }
 </script>

@@ -38,7 +38,7 @@ export default {
       documentId: this.$route.params.documentId
     }
   },
-  mounted: function () {
+  created() {
     this.getDocument()
   },
   methods: {
@@ -53,24 +53,6 @@ export default {
         this.error = false
       }, callback => {
 
-      })
-    },
-    validate(){
-      let data = {
-        owner: 'owner1@woningpas.be',
-        houseId: this.houseId,
-        url: this.documentId,
-        key: auth.getToken()
-      }
-      api.request('validate', data);
-    },
-    download(){
-      let data = {
-        url: this.documentId,
-        key: auth.getToken()
-      }
-      api.request('download', data, (data) => {
-        file.download('file.pdf', atob(data.content));
       })
     }
   }
