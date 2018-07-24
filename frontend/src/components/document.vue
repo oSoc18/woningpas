@@ -10,9 +10,10 @@
               <span class="icon icon-permit icon--primary icon--small"></span>
             </div>
             <div class="col-md-11">
-              <router-link :to="{ name: 'DocumentView', params: {houseId: this.houseId, documentId: this.document.id} }">
-                <h4 class="m-permit__details__title">{{this.document.id}}</h4>
-              </router-link>
+              <h4 class="m-permit__details__title">{{this.document.id}}</h4>
+              <p v-if="role == 'owner'">
+                Link for the inspector:<br>{{inspectorLink}}
+              </p>
             </div>
           </div>
           <div class="m-permit__section row">
@@ -56,6 +57,18 @@ export default {
   data(){
     return {
       role: auth.getRole()
+    }
+  },
+  computed: {
+    inspectorLink() {
+      let page = document.location.href
+      let end = page.indexOf('house')
+      let host = page.substr(0, end)
+      console.log(host)
+      return host
+        + 'owner/' + auth.getToken()
+        + '/house/' + this.houseId
+        + '/document/' + this.document.id
     }
   },
   created() {
