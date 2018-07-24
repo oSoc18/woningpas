@@ -32,7 +32,8 @@
                 </div>
                 <div class="col-md-2"></div>
                 <div class="col-md-2">
-                  <a v-if="role == 'inspector' && !this.document.isVerified" class="a-button styleguide__button" @click="validate">Validate</a>
+                  <a v-if="validating" class="a-button styleguide__button" disabled>Validating...</a>
+                  <a v-else-if="role == 'inspector' && !this.document.isVerified" class="a-button styleguide__button" @click="validate">Validate</a>
                 </div>
                 <div class="col-md-1"></div>
                 <div class="col-md-2">
@@ -57,7 +58,8 @@ export default {
   props: ['document', 'houseId', 'owner'],
   data(){
     return {
-      role: auth.getRole()
+      role: auth.getRole(),
+      validating: false
     }
   },
   computed: {
@@ -86,6 +88,7 @@ export default {
   },
   methods: {
     validate(){
+      this.validating = true;
       let data = {
         owner: this.owner,
         houseId: this.houseId,
@@ -94,6 +97,7 @@ export default {
       }
       let self = this;
       api.request('validate', data, function() {
+        self.validating = false;
         self.$emit('validated');
       })
     },
