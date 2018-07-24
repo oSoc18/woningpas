@@ -46,7 +46,6 @@ export default {
       api.request('addDocument', data, function(data) {
         self.uploading = false;
         self.$emit('uploaded');
-        alert('Document uploaded.\n' + document.location + '/document/' + data.id);
       });
     }
   }
