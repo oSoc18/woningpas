@@ -20,7 +20,7 @@ var docFields = ["documentId", "isVerified", "hash", "addedAt"];
 var byteCodeContract;
 let contractName = 'WoningPasV2';
 
-const addressContract = '0xe8f16e6769705c93d265076682cfb59a8d3abce9';
+const addressContract = '0x421bb778167c6e07f4a952648b679add23519a07';
 
 //needs to be changed
 var adresseFrom;
@@ -243,7 +243,7 @@ async function getNbHouses(res, error, privateKey, callB) {
 }
 
 
-async function getNbDoc(res, error, privateKey, houseId, callB) {
+async function getNbDoc(res, error, privateKey, houseId, callback) {
 
   var ret = getContract();
   console.log("getNbDoc");
@@ -254,7 +254,8 @@ async function getNbDoc(res, error, privateKey, houseId, callB) {
     from: acc.address,
     gas: 5e6
   }).then(function(result) {
-    callB(result);
+    console.log(result);
+    callback(result);
 
   }).catch(function(error) {
     console.log(error)
@@ -342,6 +343,40 @@ function parseResult(data, fields) {
   return prettyResult;
 }
 
+async function transfertOwnership(from, to, houseId, privateKey, res, success, error) {
+  console.log("transfertOwnership");
+  var ret = getContract();
+  let acc = web3.eth.accounts.privateKeyToAccount(privateKey);
+
+  console.log("Addresse from to ");
+  console.log(from);
+  console.log(to);
+
+  let tx_builder = ret.methods.transfertOwnership(from, to, houseId);
+  let encoded_tx = tx_builder.encodeABI();
+
+  let transactionObject = {
+    gas: 5000000,
+    data: encoded_tx,
+    from: acc.address,
+    to: addressContract
+  };
+
+  web3.eth.accounts.signTransaction(transactionObject, acc.privateKey, function(err, signedTx) {
+    if (err) {
+      console.log(err);
+      error(res, "Error with transfertOwnership")
+    } else {
+      web3.eth.sendSignedTransaction(signedTx.rawTransaction)
+        .on('receipt', function(receipt) {
+          success(res, receipt);
+        });
+    };
+  })
+
+
+}
+
 
 /*Pas complet*/
 function deployyy(hash, fileName) {
@@ -369,3 +404,4 @@ module.exports.getNbDoc = getNbDoc;
 module.exports.addDocument = addDocument;
 module.exports.getHouseWithId = getHouseWithId;
 module.exports.getDocumentWithId = getDocumentWithId;
+module.exports.transfertOwnership = transfertOwnership;
