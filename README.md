@@ -2,7 +2,9 @@
 
 ## Introduction
 
-Explore blockchain to store house documents and check their authenticity.
+How could blockchain enable more efficient and secure storage of official documents about houses, such as sustainability documents or EPC certificates? Team woningpas was asked by the Flemish government to explore this question.
+
+Our answer: "it's complicated!" Thanks to building a working prototype we have discovered how a blockchain application could be architected for the woningpas and what challenges remain that need to be solved in the future.
 
 ## Installation
 
