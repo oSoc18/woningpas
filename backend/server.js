@@ -286,7 +286,7 @@ apiFunctions.getDocument = function(req, res, data) {
     })
 }
 
-apiFunctions.transfertOwnership = function(req, res, data) {
+apiFunctions.transferOwnership = function(req, res, data) {
     let key = data.key;
     let mailFrom = data.from;
     let mailTo = data.to;
