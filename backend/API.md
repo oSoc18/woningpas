@@ -52,21 +52,10 @@ with `Content-Type` set to `application/json`.
 - key: access key
 - url: file url
 - houseId : id of the house that the document is linked
+- owner: The nale of the person the file belong to.
 
 ### Response parameters
 None
-
-
-## /validated
-
-### Request parameters
-- key: access key
-- url: file url
-- houseId : id of the house that the document is linked
-
-### Response parameters
--validated: boolean wether or not this file has been validated
-
 
 ## /getHouses
 
@@ -76,6 +65,14 @@ None
 ### Response parameters
 -content : list of houses and for each house a list of files
 
+## /getHouses-
+
+### Request parameters
+- key: access key
+- houseId: id of the house that the document is linked
+
+### Response parameters
+None
 
 
 ## /addHouse
@@ -102,7 +99,19 @@ none
  
 
 ### Response parameters
-none
+None
+
+## /getDocuments
+
+### Request parameters
+- key: access key
+- houseId : id of the house
+- documentId: Id of the document
+- owner: the owner of the house
+ 
+
+### Response parameters
+None
 
 
 
