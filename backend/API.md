@@ -8,7 +8,6 @@ body. Server needs `Content-Type` set to `application/json`.
 Status code is:
 - `200` if success
 - `400` if client/parameter error
-- `500` if server error
 Error should return a `message` parameter to provide informations about the
 error.
 
@@ -19,10 +18,11 @@ with `Content-Type` set to `application/json`.
 ## /login
 
 ### Request parameters
-- type=owner/inspector/admin
+- account: the name of the account trying to login
 
 ### Response parameters
 - key: access key
+- type: The type of the user
 
 
 ## /addDocument
