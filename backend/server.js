@@ -16,64 +16,9 @@ function hashh(base64content) {
     return hash.digest('hex');
 }
 
-let authorized_types = {
-    "owner": true,
-    "inspector": true,
-    "admin": true
-}
 let MAX_FILE_SIZE = 1e6 // 1e6 === 1 * 1000000 ~~~ 1MB
 let UPLOAD_DIR = __dirname + "/uploads/"
-
-
-let keys = {}
-Object.keys(authorized_types).forEach(function(type) {
-    keys[type] = {}
-});
-console.log(keys);
 console.log("saving files in " + UPLOAD_DIR);
-
-//Verify if the key is connected.
-function exist_key(key) {
-    for (let type of Object.keys(keys)) {
-        if (keys[type][key]) {
-            return true;
-        }
-    }
-    return false;
-}
-
-//Get the type of the identification token (owner, inspector or admin)
-function get_type(key) {
-    for (let type of Object.keys(keys)) {
-        if (keys[type][key]) {
-            return type;
-        }
-    }
-    return null;
-}
-
-let mapping_key_ethereum = {}
-
-
-//get the web3 private key associated with the email account
-function get_ethereum_key(key) {
-    return mapping_key_ethereum[key].privateKey
-}
-
-//initialise the mappings using the mongoDB database.
-function create_key(account, callback) {
-    db.getType(account, function(res) {
-        if (res != null) {
-            keys[res][account] = true;
-            db.getEth(account, function(eth) {
-                mapping_key_ethereum[account] = eth
-                callback(account)
-            })
-        } else {
-            callback(undefined)
-        }
-    })
-}
 
 //Send to client an error message.
 function error(response, message) {
@@ -93,17 +38,32 @@ function success(response, data) {
 //handle the login. Return an error message to the client in case of failure,
 //and otherwise the key and type.
 apiFunctions.login = function(req, res, data) {
-    create_key(data.account, function(key) {
-        if (key === undefined) {
-            return error(res, "No such account")
-        }
-        success(res, {
-            "key": key,
-            "type": get_type(key)
-        });
-
-    })
+  console.log(data.account);
+  db.getAccount(data.account).then(acc => {
+    let data = {
+      "key": acc.email,
+      "type": acc.type
+    }
+    success(res, data)
+  }, err => {
+    error(res, "No such account"+err)
+  })
 }
+
+function check_type(res, key, type) {
+  return new Promise(function (resolve, reject) {
+    db.getAccount(key).then(acc => {
+      if(acc.type == type) {
+        resolve(acc)
+      } else {
+        error(res, "Only " + type + " can do this action")
+      }
+    }, err => {
+      error(res, "Invalid key")
+    })
+  })
+}
+
 /**
  * Express routes
  */
@@ -132,14 +92,17 @@ URIs.forEach(function(uri) {
                 error(res, "Parameter " + param + " is mandatory");
             }
         })
-        if (uri != "login" && !err) {
-            if (!exist_key(req.body["key"])) {
-                err = true
-                error(res, "This account either doesn't exist or is not connected")
-            }
-        }
         if (!err) {
+          if(req.body.key) {
+            db.getAccount(req.body.key).then(acc => {
+              req.body.acc = acc
+              apiFunctions[uri](req, res, req.body);
+            }, err => {
+              error(res, "This account either doesn't exist or is not connected"+err)
+            })
+          } else {
             apiFunctions[uri](req, res, req.body);
+          }
         }
     })
 });
@@ -160,6 +123,7 @@ apiFunctions.download = function(req, res, data) {
     var url = data.url
     var key = data.key
 
+    // TODO check key
     // TODO check error
     try{
         let content = fs.readFileSync(UPLOAD_DIR + url, 'base64');
@@ -185,11 +149,13 @@ apiFunctions.validate = function(req, res, data) {
     let houseId = data.houseId;
     let owner = data.owner;
 
-    if(verificationType(get_type(key), "inspector", res)){
-        db.getEth(owner, function(result) {
-            smartcontract.setVerification(result.address, url, houseId, get_ethereum_key(key), res, error, success);
-        });
-    }
+    check_type(res, key, "inspector").then(acc => {
+      db.getAccount(owner).then(o => {
+        smartcontract.setVerification(o.ethereum.address, url, houseId, acc.ethereum.privateKey, res, error, success);
+      }, err => {
+        error(res, "This owner does not exists")
+      })
+    })
 }
 
 //Get all the houses associated to an account.
@@ -197,27 +163,30 @@ apiFunctions.getHouses = function(req, res, data) {
     let key = data.key;
     var houses = [];
 
-    //Call the smart contract to get the number of houses associated with the account.
-    smartcontract.getNbHouses(res, error, get_ethereum_key(key), function(number) {
-        let index = 0;
-        let houseFields = ["street", "zipCode", "city", "country", "houseId"];
+    check_type(res, key, "owner").then(acc => {
+      let pk = acc.ethereum.privateKey
+      //Call the smart contract to get the number of houses associated with the account.
+      smartcontract.getNbHouses(res, error, pk, function(number) {
+          let index = 0;
+          let houseFields = ["street", "zipCode", "city", "country", "houseId"];
 
-        //Get each house one by one.
-        //As it is not possible to return arrays in solidity currently.
-        for (var i = 1; i <= number; i++) {
-            smartcontract.getHouse(i, get_ethereum_key(key), function(result) {
-                houses.push(smartcontract.parseResult(result, houseFields));
-                index++;
+          //Get each house one by one.
+          //As it is not possible to return arrays in solidity currently.
+          for (var i = 1; i <= number; i++) {
+              smartcontract.getHouse(i, pk, function(result) {
+                  houses.push(smartcontract.parseResult(result, houseFields));
+                  index++;
 
-                if (index == number) {
-                    success(res, houses);
-                }
-            });
-        }
-        if (number == 0) {
-            success(res, []);
-        }
-    });
+                  if (index == number) {
+                      success(res, houses);
+                  }
+              });
+          }
+          if (number == 0) {
+              success(res, []);
+          }
+      });
+    })
 }
 
 
@@ -230,10 +199,10 @@ apiFunctions.addHouse = function(req, res, data) {
     let country = data.country;
     let houseId = uuid();
 
-    if(verificationType(get_type(key), "owner", res)){
-
-        smartcontract.addHouse(street, zipCode, city, country, houseId, get_ethereum_key(key), res, error, success)
-    }
+    check_type(res, key, "owner").then(acc => {
+      let pk = acc.ethereum.privateKey
+      smartcontract.addHouse(street, zipCode, city, country, houseId, pk, res, error, success)
+    })
 }
 
 //Add a new document to the house.
@@ -242,16 +211,16 @@ apiFunctions.addDocument = function(req, res, data) {
     let houseId = data.houseId;
     let content = data.content;
 
-    if(verificationType(get_type(key), "owner", res)){
-        let fileId = uuid();
-        let hash = hashh(content);
-        let time = generateDate();
+    check_type(res, key, "owner").then(acc => {
+      let pk = acc.ethereum.privateKey
+      let fileId = uuid();
+      let hash = hashh(content);
+      let time = generateDate();
 
+      fs.writeFileSync(UPLOAD_DIR + fileId, content, 'base64');
 
-        fs.writeFileSync(UPLOAD_DIR + fileId, content, 'base64');
-
-        smartcontract.addDocument(hash, get_ethereum_key(key), fileId, houseId, time, res, error, success)
-    }
+      smartcontract.addDocument(hash, pk, fileId, houseId, time, res, error, success)
+    })
 }
 
 //Get all the documents associated with that house.
@@ -260,29 +229,32 @@ apiFunctions.getDocuments = function(req, res, data) {
     let houseId = data.houseId;
     var documents = [];
 
-    //Get each house one by one.
-    //As it is not possible to return arrays in solidity currently.
-    smartcontract.getNbDoc(res, error, get_ethereum_key(key), houseId, function(number) {
-        let index = 0;
-        let docFields = ["id", "isVerified", "hash", "addedAt"];
-        //Get each house one by one.
-        //As it is not possible to return arrays in solidity currently.
-        for (var i = 1; i <= number; i++) {
-            smartcontract.getDocument(i, get_ethereum_key(key), houseId, function(result) {
-                //Prettify the result
-                documents.push(smartcontract.parseResult(result, docFields));
-                index++;
+    check_type(res, key, "owner").then(acc => {
+      let pk = acc.ethereum.privateKey
+      //Get each house one by one.
+      //As it is not possible to return arrays in solidity currently.
+      smartcontract.getNbDoc(res, error, pk, houseId, function(number) {
+          let index = 0;
+          let docFields = ["id", "isVerified", "hash", "addedAt"];
+          //Get each house one by one.
+          //As it is not possible to return arrays in solidity currently.
+          for (var i = 1; i <= number; i++) {
+              smartcontract.getDocument(i, pk, houseId, function(result) {
+                  //Prettify the result
+                  documents.push(smartcontract.parseResult(result, docFields));
+                  index++;
 
-                if (index == number) {
-                    success(res, documents);
-                }
-            });
-        }
-        if (number == 0) {
-            success(res, []);
-        }
+                  if (index == number) {
+                      success(res, documents);
+                  }
+              });
+          }
+          if (number == 0) {
+              success(res, []);
+          }
 
-    });
+      });
+    })
 
 }
 
@@ -292,11 +264,10 @@ apiFunctions.getHouse = function(req, res, data) {
     let houseId = data.houseId;
     let owner = data.owner;
 
-    if(verificationType(get_type(key), "owner", res)){
-
-        smartcontract.getHouseWithId(houseId, get_ethereum_key(key), res, success, error);
-    }
-
+    check_type(res, key, "owner").then(acc => {
+      let pk = acc.ethereum.privateKey
+      smartcontract.getHouseWithId(houseId, pk, res, success, error)
+    })
 };
 
 apiFunctions.getDocument = function(req, res, data) {
@@ -305,37 +276,30 @@ apiFunctions.getDocument = function(req, res, data) {
     let documentId = data.documentId;
     let owner = data.owner;
 
-    if(verificationType(get_type(key), "inspector", res)){
-        db.getEth(owner, function(result) {
-            smartcontract.getDocumentWithId(result.address, houseId, documentId, get_ethereum_key(key), res, success, error);
-        });
-    }
+    check_type(res, key, "inspector").then(acc => {
+      db.getAccount(owner).then(owner_acc => {
+        let eth = owner_acc.ethereum
+        smartcontract.getDocumentWithId(eth.address, houseId, documentId, eth.privateKey, res, success, error);
+      }, err => {
+        error(res, "This owner does not exists")
+      })
+    })
 }
 
-apiFunctions.transfertOwnership = function(req, res, data) {
+apiFunctions.transferOwnership = function(req, res, data) {
     let key = data.key;
     let mailFrom = data.from;
     let mailTo = data.to;
     let houseId = data.houseId;
-    if(verificationType(get_type(key), "admin", res)){
-        db.getEth(mailFrom, function(result) {
-            let addressFrom = result.address;
-            db.getEth(mailTo, function(result) {
-                smartcontract.transfertOwnership(addressFrom, result.address, houseId, get_ethereum_key(key), res, success, error);
-            });
-        });
-    }
-}
 
-function verificationType(keyType, type, res) {
-    if (keyType == type){
-        return true;
-    } else {
-        error(res, "Only " + type + " can make this operation.");
-        return false;
-    }
+    check_type(res, key, "admin").then(acc => {
+      db.getAccount(mailFrom).then(from => {
+        db.getAccount(mailTo).then(to => {
+          smartcontract.transfertOwnership(from.ethereum.address, to.ethereum.address, houseId, acc.ethereum.privateKey, res, success, error);
+        })
+      })
+    })
 }
-
 
 function generateDate() {
     var today = Math.round((new Date()).getTime() / 1000);
