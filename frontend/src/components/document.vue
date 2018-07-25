@@ -67,7 +67,7 @@ export default {
   computed: {
     inspectorLink() {
       let port = location.port ? ':'+location.port: ''
-      let host = location.protocol+'//'+location.hostname+port
+      let host = location.protocol+'//'+location.hostname+port+'/'
       return host
         + 'owner/' + auth.getEmail()
         + '/house/' + this.houseId
