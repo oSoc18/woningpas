@@ -1,6 +1,5 @@
 var express = require('express');
 var fs = require("fs");
-var qs = require('querystring');
 var uuid = require("uuid/v4");
 var bodyParser = require('body-parser');
 var crypto = require('crypto');
@@ -9,7 +8,6 @@ var api = require('./api.js').api;
 var apiFunctions = {};
 let db = require("./database.js");
 
-generateDate();
 //used to hash the content of the file, to create a fingerprint
 function hashh(base64content) {
     const hash = crypto.createHash('sha256');
@@ -191,21 +189,6 @@ apiFunctions.validate = function(req, res, data) {
         db.getEth(owner, function(result) {
             smartcontract.setVerification(result.address, url, houseId, get_ethereum_key(key), res, error, success);
         });
-    }
-}
-
-//Check if the file is validated. Owner and inspector can check this.
-//Require the url of the file and the id of the house the file is associated to.
-apiFunctions.validated = function(req, res, data) {
-
-    let key = data.key
-    let url = data.url
-    let houseId = data.houseId;
-    let type = get_type(key)
-    let owner = data.owner;
-
-    if (verificationType(type, "owner", res)){
-        smartcontract.isVerified(url, houseId, get_ethereum_key(key), res, error, success);
     }
 }
 
