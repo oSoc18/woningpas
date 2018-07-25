@@ -12,7 +12,7 @@
                 </div>
                 <h1 class="text-center">This page was not found</h1>
                 <div class="row row--flex row--flexCenter row--margin">
-                  <a href="#" class="a-button">Go back to home page</a>
+                  <router-link :to="{ name: 'Home', params: {} }" class="a-button">Go back to home page</router-link>
                 </div>
               </div>
             </div>

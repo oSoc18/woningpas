@@ -88,17 +88,17 @@ export default {
   },
   methods: {
     validate(){
-      this.validating = true;
+      this.validating = true
       let data = {
         owner: this.owner,
         houseId: this.houseId,
         url: this.document.id,
         key: auth.getToken()
       }
-      let self = this;
+      let self = this
       api.request('validate', data, function() {
-        self.validating = false;
-        self.document.isVerified = true;
+        self.validating = false
+        self.document.isVerified = true
       })
     },
     download(){
@@ -113,7 +113,7 @@ export default {
     copyToClipboard(event) {
       $('#input' + this.document.id).select()
       document.execCommand("copy")
-      event.target.textContent = 'Copied'
+      event.target.textContent = 'Copied to clipboard'
     },
     selectAllText(event){
       event.target.setSelectionRange(0, event.target.value.length)
@@ -121,6 +121,7 @@ export default {
   }
 }
 </script>
+
 <style scoped>
 input{
   width: 100%;
