@@ -295,7 +295,7 @@ apiFunctions.transferOwnership = function(req, res, data) {
     check_type(res, key, "admin").then(acc => {
       db.getAccount(mailFrom).then(from => {
         db.getAccount(mailTo).then(to => {
-          smartcontract.transfertOwnership(from.address, to.address, houseId, acc.privateKey, res, success, error);
+          smartcontract.transfertOwnership(from.ethereum.address, to.ethereum.address, houseId, acc.ethereum.privateKey, res, success, error);
         })
       })
     })
