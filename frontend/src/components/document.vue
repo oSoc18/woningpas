@@ -23,7 +23,7 @@
               <p></p>
               <p v-if="role == 'owner' && !this.document.isVerified" class="m-permit__details__subtitle">
                 Link for the inspector:<br>
-                <input v-model="inspectorLink" id="inspectorLink">
+                <input :value="inspectorLink" @click="selectAllText" :id="'input'+this.document.id" readonly>
                 <button @click="copyToClipboard" class="is-hyperlink" title="Copy to clipboard">Copy to clipboard</button>
               </p><br>
               <p></p>
@@ -112,11 +112,13 @@ export default {
         file.download('file.pdf', atob(data.content))
       })
     },
-    copyToClipboard() {
-      let copyText = $('#inspectorLink')
-      copyText.select()
+    copyToClipboard(event) {
+      $('#input' + this.document.id).select()
       document.execCommand("copy")
-      alert("Copied the text: " + copyText.val())
+      event.target.textContent = 'Copied'
+    },
+    selectAllText(event){
+      event.target.setSelectionRange(0, event.target.value.length)
     }
   }
 }
