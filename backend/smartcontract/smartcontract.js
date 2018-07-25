@@ -20,7 +20,7 @@ var houseFields = ["houseId", "street", "zipCode", "city", "country"];
 var byteCodeContract;
 let contractName = 'WoningPasV2';
 
-const addressContract = '0x919c34a3aa49130584f14df8412ea7cfc6886552';
+const addressContract = '0x1fe093fa97a3e39d4eb122d6310974c97a24cbd7';
 
 //needs to be changed
 var adresseFrom;
