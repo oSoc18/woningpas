@@ -3,7 +3,7 @@
     <app-header></app-header>
     <section>
       <div class="m-img-overlay">
-        <h1>Know your home</h1>
+        <h1>Know your housing</h1>
         <p>Please choose between the followings</p>
         <button v-on:click="login" class="a-button" title="Log in" >owner1@woningpas.be</button>
         <button v-on:click="login" class="a-button" title="Log in">owner2@woningpas.be</button>
