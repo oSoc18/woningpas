@@ -52,7 +52,7 @@
                   </div>
                   <div class="m_house__information__text">
                     <p>
-                      {{house.street}} 543 <br>
+                      {{house.street}} <br>
                       <b>{{house.city}}</b>
                     </p>
                   </div>
