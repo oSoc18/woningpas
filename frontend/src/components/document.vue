@@ -66,12 +66,10 @@ export default {
   },
   computed: {
     inspectorLink() {
-      let page = document.location.href
-      let end = page.indexOf('house')
-      let host = page.substr(0, end)
-      console.log(host)
+      let port = location.port ? ':'+location.port: ''
+      let host = location.protocol+'//'+location.hostname+port
       return host
-        + 'owner/' + auth.getToken()
+        + 'owner/' + auth.getEmail()
         + '/house/' + this.houseId
         + '/document/' + this.document.id
     },
