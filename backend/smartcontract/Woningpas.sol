@@ -1,12 +1,12 @@
 pragma solidity ^0.4.23;
 
-contract WoningPasV2 {
+contract Woningpas {
 	mapping(address => Owner) owners;
 	struct Owner{
-		address addr;			
+		address addr;
 		string[] keysOfHouses;
 		//between id of the house and the house
-		mapping(string => House) houses; 
+		mapping(string => House) houses;
 	}
 	struct House{
 		string id;
@@ -53,7 +53,7 @@ contract WoningPasV2 {
 		for (uint i=0; i<_index; i++) {
  			houseId = owners[msg.sender].keysOfHouses[i];
 		}
-		
+
 		House storage house = owners[msg.sender].houses[houseId];
 		return (house.streetName, house.zipCode, house.city, house.country, house.id);
 	}
@@ -87,13 +87,13 @@ contract WoningPasV2 {
 		House storage house = owners[from].houses[_idHouse];
 		owners[to].houses[_idHouse] = house;
 		owners[to].keysOfHouses.push(_idHouse);
-		
-	
+
+
         for(uint i = 0 ; i < house.keysOfDocs.length; i++){
              Document storage doc = house.documents[house.keysOfDocs[i]];
              owners[to].houses[_idHouse].documents[house.keysOfDocs[i]] = doc;
         }
-        
+
 		string memory idH;
 		for(uint k = 0; k < owners[from].keysOfHouses.length; k++){
 			idH = owners[from].keysOfHouses[k];
@@ -108,6 +108,6 @@ contract WoningPasV2 {
 		        return;
 		    }
 		}
-		
+
 	}
 }

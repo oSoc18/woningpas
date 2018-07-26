@@ -9,16 +9,23 @@ const dir = __dirname;
 var fields = ["id", "isVerified", "hash", "addedAt"];
 var houseFields = ["houseId", "street", "zipCode", "city", "country"];
 
-let contractName = 'WoningPasV2';
-
-const addressContract = fs.readFileSync(__dirname + '/smartcontract.address').toString()
-console.log('Using contract at address "' + addressContract + '"')
-
+let contractName = 'Woningpas';
+let addressContract = null
+try {
+  addressContract = fs.readFileSync(`${dir}/${contractName}.address`).toString()
+  console.log('Using contract at address "' + addressContract + '"')
+} catch(e) {
+  console.log('No contract address yet')
+}
 
 //Address of the node
 var url = "https://e0vp6l0egw:lt32IHCYpL4rJuBlXHFD-oCTcxABbR96Bh0qaV2FLgE@e0qztrawvi-e0q2xif8zj-rpc.eu-central-1.kaleido.io";
 console.log(`1. Connecting to target node: ${url}`);
 let web3 = new Web3(new Web3.providers.HttpProvider(url));
+
+if(process.argv.length === 3 && process.argv[2] === 'deploy') {
+  deploy()
+}
 
 function getContract(deploy) {
   let tsSrc = fs.statSync(`${dir}/${contractName}.sol`);
@@ -71,7 +78,7 @@ function deploy() {
   getAccount().then((account) => {
     console.log(`\tFound account in the target node: ${account}`);
 
-    let theContract = getContract();
+    let theContract = getContract(true);
 
     let params = {
       from: account,
@@ -79,16 +86,8 @@ function deploy() {
       gas: 5e6
     };
 
-    if (privateFor) {
-      params.privateFor = JSON.parse(privateFor);
-    }
-
     console.log('2. Deploying smart contract');
     theContract.send(params)
-    .on('receipt', (receipt) => {
-      if (verbose)
-        console.log(receipt);
-    })
     .on('error', (err) => {
       console.error('Failed to deploy the smart contract. Error: ' + err);
       process.exit(1);
@@ -96,6 +95,7 @@ function deploy() {
     .then((newInstance) => {
       // smart contract deployed, ready to invoke it
       console.log(`\tSmart contract deployed, ready to take calls at "${newInstance._address}"`);
+      fs.writeFileSync(`${dir}/${contractName}.address`, newInstance._address);
     });
   });
 }
