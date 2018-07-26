@@ -15,7 +15,7 @@ Our answer: "it's complicated!" Thanks to building a working prototype we have d
 
 ### Before anything
 
-Clone the github repositery first and open a terminal in the repositery.
+Clone the github repository first and open a terminal in the repository.
 
 ### Backend
 
