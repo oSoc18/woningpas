@@ -94,6 +94,7 @@ function deploy() {
     })
     .then((newInstance) => {
       // smart contract deployed, ready to invoke it
+      addressContract = newInstance._address
       console.log(`\tSmart contract deployed, ready to take calls at "${newInstance._address}"`);
       fs.writeFileSync(`${dir}/${contractName}.address`, newInstance._address);
     });
