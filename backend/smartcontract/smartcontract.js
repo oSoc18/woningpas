@@ -20,7 +20,7 @@ var houseFields = ["houseId", "street", "zipCode", "city", "country"];
 var byteCodeContract;
 let contractName = 'WoningPasV2';
 
-const addressContract = fs.readFileSync(__dirname + '/smartcontract.address')
+const addressContract = '0xc8e4e6b479f0abb3e37df263e5ab71353fac5965';
 
 //needs to be changed
 var adresseFrom;
