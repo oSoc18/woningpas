@@ -83,7 +83,7 @@ contract WoningPasV2 {
 		Document storage document = owners[owner].houses[_idHouse].documents[_idDocument];
 		return (document.fileId, document.isVerified, document.hash, document.addedAt);
 	}
-	function transfertOwnership(address from, address to, string _idHouse) public {
+	function transferOwnership(address from, address to, string _idHouse) public {
 		House storage house = owners[from].houses[_idHouse];
 		owners[to].houses[_idHouse] = house;
 		owners[to].keysOfHouses.push(_idHouse);
