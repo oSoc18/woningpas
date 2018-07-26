@@ -1,5 +1,11 @@
 # woningpas
 
+## Usefull links
+
+* [The github page](https://osoc18.github.io/woningpas/)
+
+* [The website](http://34.248.155.242)
+
 ## Introduction
 
 How could blockchain enable more efficient and secure storage of official documents about houses, such as sustainability documents or EPC certificates? Team woningpas was asked by the Flemish government to explore this question.
