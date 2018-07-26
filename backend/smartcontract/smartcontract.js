@@ -1,18 +1,10 @@
 'use strict';
 
-const argv = require('yargs').argv;
 const Web3 = require('web3');
-const Tx = require('ethereumjs-tx');
 const solc = require('solc');
 const fs = require('fs');
 
 const dir = __dirname;
-const verbose = argv.verbose;
-const query = argv.query;
-const deploy = argv.deploy;
-const set = argv.set;
-const privateFor = argv.privateFor;
-const externallySign = argv.sign;
 
 var fields = ["id", "isVerified", "hash", "addedAt"];
 var houseFields = ["houseId", "street", "zipCode", "city", "country"];
@@ -21,18 +13,13 @@ var byteCodeContract;
 let contractName = 'WoningPasV2';
 
 const addressContract = fs.readFileSync(__dirname + '/smartcontract.address')
+console.log('Using contract at address ' + addressContract)
 
-//needs to be changed
-var adresseFrom;
 //Address of the node
 var url = "https://e0vp6l0egw:lt32IHCYpL4rJuBlXHFD-oCTcxABbR96Bh0qaV2FLgE@e0qztrawvi-e0q2xif8zj-rpc.eu-central-1.kaleido.io";
 console.log(`1. Connecting to target node: ${url}`);
-
 let web3 = new Web3(new Web3.providers.HttpProvider(url));
 
-var accountAddress;
-//setVerification('cf419cd4-cdb1-4dd6-8ee5-84ecf0218f62');
-//getAccount();
 function getContract() {
   let tsSrc = fs.statSync(`${dir}/${contractName}.sol`);
   let tsBin;
