@@ -46,12 +46,14 @@ function getContract() {
   let bytecode = '0x' + contract.bytecode;
   byteCodeContract = bytecode;
 
-  //adresse est optionnel dans Contract
+  //adresse is optional
   let ret = new web3.eth.Contract(abi, addressContract);
 
   return ret;
 }
 
+//Check if file is validated
+//By giving the id of the document and the house.
 function isVerified(fileId, houseId, privateKey, res, error, success) {
   var ret = getContract();
   console.log("isVerified");
@@ -70,6 +72,7 @@ function isVerified(fileId, houseId, privateKey, res, error, success) {
   })
 }
 
+//Validate a document
 async function setVerification(owner, fileId, houseId, privateKey, res, error, success) {
   console.log("setVerification");
   var ret = getContract();
@@ -101,22 +104,6 @@ async function setVerification(owner, fileId, houseId, privateKey, res, error, s
   })
 }
 
-
-
-function getUpload(fileId, houseId, callback) {
-  var ret = getContract();
-  console.log("getUpload");
-  ret.methods.getDocument(fileId, houseId).call({
-    from: addressContract
-  }).then(function(result) {
-    console.log(result);
-    if (callback) {
-      callback(result);
-    }
-  }).catch(function(error) {
-    console.log(error)
-  });
-}
 
 
 async function createAccount() {
@@ -209,7 +196,8 @@ async function getHouse(index, privateKey, callback) {
   })
 }
 
-async function getNbHouses(res, error, privateKey, callB) {
+//Get the nulber of house that a owner has
+async function getNbHouses(res, error, privateKey, callback) {
 
   var ret = getContract();
   console.log("getNbHouses");
@@ -220,7 +208,7 @@ async function getNbHouses(res, error, privateKey, callB) {
     from: acc.address,
     gas: 5e6
   }).then(function(result) {
-    callB(result);
+    callback(result);
 
   }).catch(function(error) {
     console.log(error)
@@ -228,7 +216,7 @@ async function getNbHouses(res, error, privateKey, callB) {
   })
 }
 
-
+//Get tge number of document that a owner has for a giving house.
 async function getNbDoc(res, error, privateKey, houseId, callback) {
 
   var ret = getContract();
@@ -249,7 +237,7 @@ async function getNbDoc(res, error, privateKey, houseId, callback) {
   })
 }
 
-
+//Get the document at a giving index
 async function getDocument(index, privateKey, houseId, callback) {
   var ret = getContract();
   console.log("getDocs");
@@ -267,6 +255,7 @@ async function getDocument(index, privateKey, houseId, callback) {
   })
 }
 
+//Get a house with his id
 async function getHouseWithId(houseId, privateKey, res, success, error) {
   var ret = getContract();
   console.log("getHouse avec ID");
@@ -293,7 +282,7 @@ async function getHouseWithId(houseId, privateKey, res, success, error) {
 
 }
 
-
+//Get a specific document with his id.
 async function getDocumentWithId(owner, houseId, documentId, privateKey, res, success, error) {
   var ret = getContract();
   console.log("getDoc avec ID");
@@ -329,7 +318,7 @@ function parseResult(data, fields) {
   return prettyResult;
 }
 
-async function transfertOwnership(from, to, houseId, privateKey, res, success, error) {
+async function transferOwnership(from, to, houseId, privateKey, res, success, error) {
   console.log("transfertOwnership");
   var ret = getContract();
   let acc = web3.eth.accounts.privateKeyToAccount(privateKey);
@@ -361,20 +350,6 @@ async function transfertOwnership(from, to, houseId, privateKey, res, success, e
   })
 
 
-}
-
-
-/*Pas complet*/
-function deployyy(hash, fileName) {
-  var ret = getContract();
-
-  ret = ret.deploy({
-    data: byteCodeContract,
-    arguments: ["hash", "fileName"]
-  });
-
-  console.log("Déploiment du contract sur le blockchain");
-  console.log(ret);
 }
 
 
