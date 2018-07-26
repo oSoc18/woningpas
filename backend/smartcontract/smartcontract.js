@@ -9,7 +9,6 @@ const dir = __dirname;
 var fields = ["id", "isVerified", "hash", "addedAt"];
 var houseFields = ["houseId", "street", "zipCode", "city", "country"];
 
-var byteCodeContract;
 let contractName = 'WoningPasV2';
 
 const addressContract = fs.readFileSync(__dirname + '/smartcontract.address').toString()
@@ -21,7 +20,7 @@ var url = "https://e0vp6l0egw:lt32IHCYpL4rJuBlXHFD-oCTcxABbR96Bh0qaV2FLgE@e0qztr
 console.log(`1. Connecting to target node: ${url}`);
 let web3 = new Web3(new Web3.providers.HttpProvider(url));
 
-function getContract() {
+function getContract(deploy) {
   let tsSrc = fs.statSync(`${dir}/${contractName}.sol`);
   let tsBin;
 
@@ -44,12 +43,61 @@ function getContract() {
   let contract = compiled.contracts[`:${contractName}`];
   let abi = JSON.parse(contract.interface);
   let bytecode = '0x' + contract.bytecode;
-  byteCodeContract = bytecode;
 
-  //adresse is optional
+  // address is optional
   let ret = new web3.eth.Contract(abi, addressContract);
+  if (deploy) {
+    // this is a new deployment, build the deploy object
+    ret = ret.deploy({
+      data: bytecode,
+      arguments: [10]
+    });
+  }
 
   return ret;
+}
+
+async function getAccount() {
+  let accounts = await web3.eth.personal.getAccounts();
+  if (!accounts || accounts.length === 0) {
+    console.error("Can't find accounts in the target node");
+    process.exit(1);
+  }
+
+  return accounts[0];
+}
+
+function deploy() {
+  getAccount().then((account) => {
+    console.log(`\tFound account in the target node: ${account}`);
+
+    let theContract = getContract();
+
+    let params = {
+      from: account,
+      gasPrice: 0,
+      gas: 5e6
+    };
+
+    if (privateFor) {
+      params.privateFor = JSON.parse(privateFor);
+    }
+
+    console.log('2. Deploying smart contract');
+    theContract.send(params)
+    .on('receipt', (receipt) => {
+      if (verbose)
+        console.log(receipt);
+    })
+    .on('error', (err) => {
+      console.error('Failed to deploy the smart contract. Error: ' + err);
+      process.exit(1);
+    })
+    .then((newInstance) => {
+      // smart contract deployed, ready to invoke it
+      console.log(`\tSmart contract deployed, ready to take calls at "${newInstance._address}"`);
+    });
+  });
 }
 
 //Check if file is validated
@@ -103,8 +151,6 @@ async function setVerification(owner, fileId, houseId, privateKey, res, error, s
     };
   })
 }
-
-
 
 async function createAccount() {
   let account = await web3.eth.accounts.create();
@@ -177,7 +223,6 @@ async function addDocument(hash, privateKey, fileId, houseId, time, res, error, 
     };
   })
 }
-
 
 async function getHouse(index, privateKey, callback) {
   var ret = getContract();
@@ -319,7 +364,7 @@ function parseResult(data, fields) {
 }
 
 async function transferOwnership(from, to, houseId, privateKey, res, success, error) {
-  console.log("transfertOwnership");
+  console.log("transferOwnership");
   var ret = getContract();
   let acc = web3.eth.accounts.privateKeyToAccount(privateKey);
 
