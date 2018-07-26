@@ -75,30 +75,33 @@ async function getAccount() {
 }
 
 function deploy() {
-  getAccount().then((account) => {
-    console.log(`\tFound account in the target node: ${account}`);
+  return new Promise(function(resolve, reject) {
+    getAccount().then((account) => {
+      console.log(`\tFound account in the target node: ${account}`);
 
-    let theContract = getContract(true);
+      let theContract = getContract(true);
 
-    let params = {
-      from: account,
-      gasPrice: 0,
-      gas: 5e6
-    };
+      let params = {
+        from: account,
+        gasPrice: 0,
+        gas: 5e6
+      };
 
-    console.log('2. Deploying smart contract');
-    theContract.send(params)
-    .on('error', (err) => {
-      console.error('Failed to deploy the smart contract. Error: ' + err);
-      process.exit(1);
-    })
-    .then((newInstance) => {
-      // smart contract deployed, ready to invoke it
-      addressContract = newInstance._address
-      console.log(`\tSmart contract deployed, ready to take calls at "${newInstance._address}"`);
-      fs.writeFileSync(`${dir}/${contractName}.address`, newInstance._address);
+      console.log('2. Deploying smart contract');
+      theContract.send(params)
+      .on('error', (err) => {
+        console.error('Failed to deploy the smart contract. Error: ' + err);
+        reject('Failed to deploy the smart contract. Error: ' + err)
+      })
+      .then((newInstance) => {
+        // smart contract deployed, ready to invoke it
+        addressContract = newInstance._address
+        console.log(`\tSmart contract deployed, ready to take calls at "${newInstance._address}"`);
+        fs.writeFileSync(`${dir}/${contractName}.address`, newInstance._address);
+        resolve(addressContract)
+      });
     });
-  });
+  })
 }
 
 //Check if file is validated
@@ -400,6 +403,7 @@ async function transferOwnership(from, to, houseId, privateKey, res, success, er
 
 
 
+module.exports.deploy = deploy;
 module.exports.setVerification = setVerification;
 module.exports.isVerified = isVerified;
 module.exports.createAccount = createAccount;

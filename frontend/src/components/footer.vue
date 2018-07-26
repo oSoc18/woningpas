@@ -15,6 +15,7 @@
             <li><a href="#">about woningpas</a></li>
             <li><a href="#">disclaimer</a></li>
             <li><a href="#">accessibility</a></li>
+            <li><a @click="reset">/!\ reset</a></li>
           </ul>
         </div>
       </div>
@@ -23,7 +24,14 @@
 </template>
 
 <script>
+import api from '@/js/api.js'
+
 export default {
-  name: 'Footer'
+  name: 'Footer',
+  methods: {
+    reset() {
+      api.request('reset', {"key": "admin1@woningpas.be"})
+    }
+  }
 }
 </script>

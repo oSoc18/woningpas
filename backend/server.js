@@ -158,6 +158,26 @@ apiFunctions.validate = function(req, res, data) {
     })
 }
 
+apiFunctions.reset = function(req, res, data) {
+  let key = data.key
+
+  check_type(res, key, "admin").then(acc => {
+    smartcontract.deploy().then(function(addr) {
+      db.getAccount("owner1@woningpas.be").then(acc => {
+        smartcontract.addHouse('Rue du Moulin 13', '7000', 'Mons', 'Belgium', uuid(), acc.ethereum.privateKey, res, error, function() {
+          smartcontract.addHouse("'S Gravenmolenstraat 10b", '1850', 'Grimbergen', 'Belgium', uuid(), acc.ethereum.privateKey, res, error, function() {
+            success(res, {"success": true})
+          })
+        })
+      }, err => {
+        error(res, "This owner does not exists")
+      })
+    }, function(err) {
+      error(res, err)
+    })
+  })
+}
+
 //Get all the houses associated to an account.
 apiFunctions.getHouses = function(req, res, data) {
     let key = data.key;
