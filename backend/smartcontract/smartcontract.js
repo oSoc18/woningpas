@@ -12,8 +12,9 @@ var houseFields = ["houseId", "street", "zipCode", "city", "country"];
 var byteCodeContract;
 let contractName = 'WoningPasV2';
 
-const addressContract = fs.readFileSync(__dirname + '/smartcontract.address')
-console.log('Using contract at address ' + addressContract)
+const addressContract = fs.readFileSync(__dirname + '/smartcontract.address').toString()
+console.log('Using contract at address "' + addressContract + '"')
+
 
 //Address of the node
 var url = "https://e0vp6l0egw:lt32IHCYpL4rJuBlXHFD-oCTcxABbR96Bh0qaV2FLgE@e0qztrawvi-e0q2xif8zj-rpc.eu-central-1.kaleido.io";

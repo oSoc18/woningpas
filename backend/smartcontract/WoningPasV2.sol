@@ -75,8 +75,8 @@ contract WoningPasV2 {
 		Document storage doc = owners[msg.sender].houses[_idHouse].documents[fileId];
 		return (doc.fileId, doc.isVerified, doc.hash, doc.addedAt);
 	}
-	function getHouseWithId(string _idHouse) view public returns(string, string, uint, string, string){
-		House storage house = owners[msg.sender].houses[_idHouse];
+	function getHouseWithId(address owner, string _idHouse) view public returns(string, string, uint, string, string){
+		House storage house = owners[owner].houses[_idHouse];
 		return (house.id, house.streetName, house.zipCode, house.city, house.country);
 	}
 	function getDocumentWithId(address owner, string _idDocument, string _idHouse) view public returns(string, bool, string, string){
@@ -87,12 +87,11 @@ contract WoningPasV2 {
 		House storage house = owners[from].houses[_idHouse];
 		owners[to].houses[_idHouse] = house;
 		owners[to].keysOfHouses.push(_idHouse);
+		
 	
         for(uint i = 0 ; i < house.keysOfDocs.length; i++){
-             Document storage doc = owners[from].houses[_idHouse].documents[house.keysOfDocs[i]];
+             Document storage doc = house.documents[house.keysOfDocs[i]];
              owners[to].houses[_idHouse].documents[house.keysOfDocs[i]] = doc;
-             owners[to].houses[_idHouse].keysOfDocs.push(doc.fileId);
-    
         }
         
 		string memory idH;
