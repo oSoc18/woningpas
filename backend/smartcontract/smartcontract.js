@@ -385,7 +385,7 @@ async function transferOwnership(from, to, houseId, privateKey, res, success, er
   web3.eth.accounts.signTransaction(transactionObject, acc.privateKey, function(err, signedTx) {
     if (err) {
       console.log(err);
-      error(res, "Error with transfertOwnership")
+      error(res, "Error with transferOwnership")
     } else {
       web3.eth.sendSignedTransaction(signedTx.rawTransaction)
         .on('receipt', function(receipt) {
@@ -410,5 +410,5 @@ module.exports.getNbDoc = getNbDoc;
 module.exports.addDocument = addDocument;
 module.exports.getHouseWithId = getHouseWithId;
 module.exports.getDocumentWithId = getDocumentWithId;
-module.exports.transfertOwnership = transfertOwnership;
+module.exports.transferOwnership = transferOwnership;
 module.exports.parseResult = parseResult;
