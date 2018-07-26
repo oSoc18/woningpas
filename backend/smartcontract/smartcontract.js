@@ -372,7 +372,7 @@ async function transferOwnership(from, to, houseId, privateKey, res, success, er
   console.log(from);
   console.log(to);
 
-  let tx_builder = ret.methods.transfertOwnership(from, to, houseId);
+  let tx_builder = ret.methods.transferOwnership(from, to, houseId);
   let encoded_tx = tx_builder.encodeABI();
 
   let transactionObject = {
