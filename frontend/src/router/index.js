@@ -4,10 +4,6 @@ import Home from '@/components/home'
 import Login from '@/components/login'
 import House from '@/components/house'
 import PageNotFound from '@/components/pageNotFound'
-import HouseList from '@/components/houseList'
-import Documents from '@/components/documents'
-import Document from '@/components/document'
-import ViewPDF from '@/components/viewPDF'
 import DocumentView from '@/components/documentView'
 import auth from '@/js/auth.js'
 
@@ -66,11 +62,6 @@ export default new Router({
         }
         next()
       }
-    },
-    {
-      path: '/viewPDF',
-      name: 'ViewPDF',
-      component: ViewPDF
     },
     {
       path: '*',
